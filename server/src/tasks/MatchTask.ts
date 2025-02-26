@@ -11,14 +11,27 @@ export class MatchTask {
 		this.riot_helper = new RiotHelper();
 	}
 
-	//TODO: implement method to fill db for a summoner
-
-	async updateMatchData(count = 69, offset = 0): Promise<void> {
-		const existingSummoners = await this.db_helper.genericGet<SummonerDb>(
-			{ offset: 0, limit: 100000, project: {}, filter: {} },
-			CollectionName.SUMMONER,
-			undefined,
-		);
+	async updateMatchData(count = 69, offset = 0, puuid = ""): Promise<void> {
+		const existingSummoners: SummonerDb[] = [];
+		if (puuid) {
+			const summoner = await this.db_helper.genericGet<SummonerDb>(
+				{ offset: 0, limit: 100000, project: {}, filter: { puuid } },
+				CollectionName.SUMMONER,
+				undefined,
+			);
+			if (summoner && summoner.length > 0) {
+				existingSummoners.push(summoner[0]);
+			}
+		} else {
+			const dbSummoners = await this.db_helper.genericGet<SummonerDb>(
+				{ offset: 0, limit: 100000, project: {}, filter: {} },
+				CollectionName.SUMMONER,
+				undefined,
+			);
+			if (dbSummoners && dbSummoners.length > 0) {
+				existingSummoners.push(...dbSummoners);
+			}
+		}
 
 		if (!existingSummoners || existingSummoners.length === 0) {
 			console.debug(
@@ -81,6 +94,12 @@ export class MatchTask {
 					undefined,
 				);
 			}
+		}
+	}
+
+	async fillMatchData(puuid: string) {
+		for (let i = 0; i < 2000; i += 69) {
+			await this.updateMatchData(69, i, puuid);
 		}
 	}
 }

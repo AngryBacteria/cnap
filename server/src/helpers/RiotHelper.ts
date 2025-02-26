@@ -45,8 +45,9 @@ export function mapAssetPath(
 }
 
 export class RiotHelper {
-	private riotApiKey: string;
-	private limiter: RateLimiter;
+	private readonly riotApiKey: string;
+	private limiter1: RateLimiter;
+	private limiter2: RateLimiter;
 
 	constructor() {
 		// Initialize Riot API Key
@@ -58,9 +59,14 @@ export class RiotHelper {
 		this.riotApiKey = riotKey;
 
 		// Initialize rate limiter (80 requests per 120 seconds)
-		this.limiter = new RateLimiter({
+		this.limiter1 = new RateLimiter({
 			tokensPerInterval: 80,
 			interval: 120 * 1000,
+		});
+		// Initialize rate limiter (10 requests per second)
+		this.limiter2 = new RateLimiter({
+			tokensPerInterval: 10,
+			interval: 1000,
 		});
 	}
 
@@ -77,7 +83,8 @@ export class RiotHelper {
 		useLimiter = true,
 	): Promise<T> {
 		if (useLimiter) {
-			await this.limiter.removeTokens(1);
+			await this.limiter1.removeTokens(1);
+			await this.limiter2.removeTokens(1);
 		}
 
 		const response = await fetch(url, {
