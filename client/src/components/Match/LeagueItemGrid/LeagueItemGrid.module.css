@@ -1,0 +1,17 @@
+.emptyItem {
+	width: 30px;
+	height: 30px;
+	background-color: var(--mantine-color-body);
+	border-radius: 5px;
+}
+
+.itemDescription {
+	white-space: pre-wrap;
+}
+
+.statsGrid {
+	display: grid;
+	grid-template-columns: 1fr 5fr;
+	gap: 1rem;
+	align-items: start;
+}

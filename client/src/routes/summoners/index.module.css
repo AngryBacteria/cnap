@@ -1,0 +1,12 @@
+.summoners {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+	gap: var(--mantine-spacing-md);
+	justify-items: center;
+}
+
+@media (max-width: 768px) {
+	.summoners {
+		grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+	}
+}
