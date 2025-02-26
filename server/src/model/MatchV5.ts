@@ -458,10 +458,10 @@ export const InfoSchema = z
 	.passthrough();
 export type Info = z.infer<typeof InfoSchema>;
 
-export const CnapMatchV5ElementSchema = z
+export const MatchV5Schema = z
 	.object({
 		metadata: MetadataSchema.optional(),
 		info: InfoSchema.optional(),
 	})
 	.passthrough();
-export type CnapMatchV5Element = z.infer<typeof CnapMatchV5ElementSchema>;
+export type MatchV5 = z.infer<typeof MatchV5Schema>;
