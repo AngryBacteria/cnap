@@ -1,4 +1,8 @@
-import { CollectionName, DBHelper } from "../helpers/DBHelper.js";
+import {
+	BasicFilterSchema,
+	CollectionName,
+	DBHelper,
+} from "../helpers/DBHelper.js";
 import { RiotHelper } from "../helpers/RiotHelper.js";
 import "dotenv/config";
 import { z } from "zod";
@@ -86,7 +90,7 @@ export class SummonerTask {
 	 */
 	async updateSummonerData(): Promise<void> {
 		const existingSummoners = await this.dbHelper.genericGet<SummonerDb>(
-			{ offset: 0, limit: 100000, project: {}, filter: {} },
+			BasicFilterSchema.parse({ limit: 100000 }),
 			CollectionName.SUMMONER,
 			SummonerDbSchema,
 		);

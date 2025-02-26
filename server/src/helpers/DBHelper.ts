@@ -7,39 +7,20 @@ import {
 } from "mongodb";
 import { z } from "zod";
 
-// CollectionName enum as a Zod schema
-export const CollectionNameSchema = z.enum([
-	"champion",
-	"game_mode",
-	"game_type",
-	"item",
-	"map",
-	"match_v5",
-	"queue",
-	"summoner",
-	"summoner_icon",
-	"summoner_spell",
-	"timeline_v5",
-]);
+export enum CollectionName {
+	CHAMPION = "champion",
+	GAME_MODE = "game_mode",
+	GAME_TYPE = "game_type",
+	ITEM = "item",
+	MAP = "map",
+	MATCH = "match_v5",
+	QUEUE = "queue",
+	SUMMONER = "summoner",
+	SUMMONER_ICON = "summoner_icon",
+	SUMMONER_SPELL = "summoner_spell",
+	TIMELINE = "timeline_v5",
+}
 
-// Type derived from the schema
-export type CollectionName = z.infer<typeof CollectionNameSchema>;
-
-export const CollectionName = {
-	CHAMPION: "champion" as CollectionName,
-	GAME_MODE: "game_mode" as CollectionName,
-	GAME_TYPE: "game_type" as CollectionName,
-	ITEM: "item" as CollectionName,
-	MAP: "map" as CollectionName,
-	MATCH: "match_v5" as CollectionName,
-	QUEUE: "queue" as CollectionName,
-	SUMMONER: "summoner" as CollectionName,
-	SUMMONER_ICON: "summoner_icon" as CollectionName,
-	SUMMONER_SPELL: "summoner_spell" as CollectionName,
-	TIMELINE: "timeline_v5" as CollectionName,
-} as const;
-
-// BasicFilter schema
 export const BasicFilterSchema = z.object({
 	offset: z
 		.number()
@@ -59,8 +40,6 @@ export const BasicFilterSchema = z.object({
 		.describe("Fields to return"),
 	filter: z.record(z.string(), z.any()).default({}).describe("Filter to apply"),
 });
-
-// Type derived from the schema
 export type BasicFilter = z.infer<typeof BasicFilterSchema>;
 
 export class DBHelper {
@@ -87,15 +66,15 @@ export class DBHelper {
 		console.debug("Disconnected from MongoDB");
 	}
 
+	/**
+	 * Test MongoDB connection by attempting to execute a simple command.
+	 * Returns true if connection is successful, false otherwise.
+	 */
 	async testConnection(): Promise<boolean> {
-		/**
-		 * Test MongoDB connection by attempting to execute a simple command.
-		 * Returns true if connection is successful, false otherwise.
-		 */
 		try {
 			// Ping the database
 			await this.database.command({ ping: 1 });
-			console.info("Successfully connected to MongoDB");
+			console.debug("Successfully connected to MongoDB");
 			return true;
 		} catch (error) {
 			console.error(
@@ -184,12 +163,10 @@ export class DBHelper {
 					idField,
 					{ [idField]: { $in: Array.from(idsSet) } },
 				);
-			} else if (entityName === "TimelineV5") {
+			} else {
 				existingIds = await this.getCollection(
 					CollectionName.TIMELINE,
 				).distinct(idField, { [idField]: { $in: Array.from(idsSet) } });
-			} else {
-				throw new Error(`Invalid entity name: ${entityName}`);
 			}
 
 			const nonExistingIds = Array.from(idsSet).filter(

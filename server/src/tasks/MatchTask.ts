@@ -1,4 +1,8 @@
-import { CollectionName, DBHelper } from "../helpers/DBHelper.js";
+import {
+	BasicFilterSchema,
+	CollectionName,
+	DBHelper,
+} from "../helpers/DBHelper.js";
 import { RiotHelper } from "../helpers/RiotHelper.js";
 import type { SummonerDb } from "../model/SummonerDb.js";
 
@@ -15,7 +19,7 @@ export class MatchTask {
 		const existingSummoners: SummonerDb[] = [];
 		if (puuid) {
 			const summoner = await this.db_helper.genericGet<SummonerDb>(
-				{ offset: 0, limit: 100000, project: {}, filter: { puuid } },
+				BasicFilterSchema.parse({ limit: 100000, filter: { puuid } }),
 				CollectionName.SUMMONER,
 				undefined,
 			);
@@ -24,7 +28,7 @@ export class MatchTask {
 			}
 		} else {
 			const dbSummoners = await this.db_helper.genericGet<SummonerDb>(
-				{ offset: 0, limit: 100000, project: {}, filter: {} },
+				BasicFilterSchema.parse({ limit: 100000 }),
 				CollectionName.SUMMONER,
 				undefined,
 			);
