@@ -38,7 +38,7 @@ export class MatchTask {
 		}
 
 		if (!existingSummoners || existingSummoners.length === 0) {
-			console.debug(
+			console.log(
 				"No Summoner data available to update match history. Stopping the loop",
 			);
 			return;

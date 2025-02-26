@@ -1,6 +1,10 @@
 import fs from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+// TRPC server
+import { initTRPC } from "@trpc/server";
+import * as trpcExpress from "@trpc/server/adapters/express";
+import express from "express";
 import { loggedProcedure } from "./middlewares/executionTime.js";
 
 // Static file paths
@@ -11,10 +15,6 @@ if (!fs.existsSync(staticFilesPath)) {
 	throw new Error(`The folder at ${staticFilesPath} does not exist.`);
 }
 
-// TRPC server
-import { initTRPC } from "@trpc/server";
-import * as trpcExpress from "@trpc/server/adapters/express";
-import express from "express";
 const t = initTRPC.create();
 const appRouter = t.router({
 	userList: loggedProcedure.query(() => {

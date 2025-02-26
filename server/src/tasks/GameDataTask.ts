@@ -22,7 +22,7 @@ export class GameDataTask {
 				"champion",
 				undefined,
 			);
-			console.debug("Champions updated");
+			console.log("Champions updated");
 		}
 	}
 
@@ -38,7 +38,7 @@ export class GameDataTask {
 				"game mode",
 				undefined,
 			);
-			console.debug("Game modes updated");
+			console.log("Game modes updated");
 		}
 	}
 
@@ -54,7 +54,7 @@ export class GameDataTask {
 				"game type",
 				undefined,
 			);
-			console.debug("Game types updated");
+			console.log("Game types updated");
 		}
 	}
 
@@ -70,7 +70,7 @@ export class GameDataTask {
 				"Item",
 				undefined,
 			);
-			console.debug("Items updated");
+			console.log("Items updated");
 		}
 	}
 
@@ -86,7 +86,7 @@ export class GameDataTask {
 				"map",
 				undefined,
 			);
-			console.debug("Maps updated");
+			console.log("Maps updated");
 		}
 	}
 
@@ -102,7 +102,7 @@ export class GameDataTask {
 				"queue",
 				undefined,
 			);
-			console.debug("Queues updated");
+			console.log("Queues updated");
 		}
 	}
 
@@ -118,7 +118,7 @@ export class GameDataTask {
 				"summoner_icon",
 				undefined,
 			);
-			console.debug("Summoner icons updated");
+			console.log("Summoner icons updated");
 		}
 	}
 
@@ -134,7 +134,7 @@ export class GameDataTask {
 				"summoner_spell",
 				undefined,
 			);
-			console.debug("Summoner spells updated");
+			console.log("Summoner spells updated");
 		}
 	}
 
@@ -148,6 +148,6 @@ export class GameDataTask {
 		await this.updateSummonerIcons();
 		await this.updateSummonerSpells();
 
-		console.debug("All game data updated");
+		console.log("All game data updated");
 	}
 }

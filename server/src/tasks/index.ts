@@ -16,6 +16,8 @@ async function intervalUpdate(
 	intervalTime: number,
 ): Promise<void> {
 	let iteration = initialIteration;
+
+	console.log(`Starting interval update iteration: ${iteration}`);
 	if (iteration % 25 === 0) {
 		await summonerTask.updateSummonerData();
 		await gameDataTask.updateEverything();

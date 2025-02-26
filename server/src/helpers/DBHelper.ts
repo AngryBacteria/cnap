@@ -63,7 +63,7 @@ export class DBHelper {
 
 	async disconnect(): Promise<void> {
 		await this.mongoClient.close();
-		console.debug("Disconnected from MongoDB");
+		console.log("Disconnected from MongoDB");
 	}
 
 	/**
@@ -74,7 +74,7 @@ export class DBHelper {
 		try {
 			// Ping the database
 			await this.database.command({ ping: 1 });
-			console.debug("Successfully connected to MongoDB");
+			console.log("Successfully connected to MongoDB");
 			return true;
 		} catch (error) {
 			console.error(
@@ -89,7 +89,7 @@ export class DBHelper {
 			await this.getCollection(CollectionName.SUMMONER).createIndex("puuid", {
 				unique: true,
 			});
-			console.debug("Created summoner indexes");
+			console.log("Created summoner indexes");
 
 			await this.getCollection(CollectionName.MATCH).createIndex(
 				"metadata.matchId",
@@ -103,7 +103,7 @@ export class DBHelper {
 				"info.participants.championId",
 				{ unique: false },
 			);
-			console.debug("Created match indexes");
+			console.log("Created match indexes");
 
 			await this.getCollection(CollectionName.TIMELINE).createIndex(
 				"metadata.matchId",
@@ -113,7 +113,7 @@ export class DBHelper {
 				"metadata.participants",
 				{ unique: false },
 			);
-			console.debug("Created timeline indexes");
+			console.log("Created timeline indexes");
 
 			await this.getCollection(CollectionName.CHAMPION).createIndex("id", {
 				unique: true,
@@ -135,9 +135,9 @@ export class DBHelper {
 			await this.getCollection(CollectionName.QUEUE).createIndex("queueId", {
 				unique: true,
 			});
-			console.debug("Created static data indexes");
+			console.log("Created static data indexes");
 
-			console.debug("All indexes created successfully");
+			console.log("All indexes created successfully");
 			return true;
 		} catch (error) {
 			console.error(`Error creating indexes: ${error}`);
@@ -148,10 +148,13 @@ export class DBHelper {
 	async getNonExistingMatchIds(
 		ids: string[],
 		entityName: "MatchV5" | "TimelineV5",
-		idField = "metadata.matchId",
+		idField: string,
 	): Promise<string[]> {
 		try {
 			if (!ids.length) {
+				console.warn(
+					"No ids provided, aborting operation and returning empty array",
+				);
 				return [];
 			}
 
@@ -172,7 +175,7 @@ export class DBHelper {
 			const nonExistingIds = Array.from(idsSet).filter(
 				(id) => !existingIds.includes(id),
 			);
-			console.debug(
+			console.log(
 				`${existingIds.length} of ${idsSet.size} ${entityName} were already present in the database`,
 			);
 			return nonExistingIds;
@@ -199,11 +202,11 @@ export class DBHelper {
 				.limit(baseFilter.limit);
 
 			const dataRaw = await cursor.toArray();
-			console.debug(`Got ${dataRaw.length} ${collectionName} objects from DB`);
+			console.log(`Got ${dataRaw.length} ${collectionName} objects from DB`);
 
 			if (validator) {
 				// Use validator to parse and convert the data to type T
-				return dataRaw.map((data) => validator.parse(data));
+				return validator.array().parse(dataRaw);
 			}
 			return dataRaw as unknown as T[];
 		} catch (error) {
@@ -224,7 +227,7 @@ export class DBHelper {
 	): Promise<boolean> {
 		try {
 			if (data.length === 0) {
-				console.debug(`No ${dataName} data to upsert`);
+				console.warn(`No ${dataName} data to upsert, aborted operation`);
 				return false;
 			}
 
@@ -246,7 +249,7 @@ export class DBHelper {
 			const result =
 				await this.getCollection(collectionName).bulkWrite(bulkOps);
 
-			console.debug(
+			console.log(
 				`Upserted ${result.upsertedCount} | Modified ${result.modifiedCount} | Matched ${result.matchedCount} --> ${dataName}`,
 			);
 			return true;

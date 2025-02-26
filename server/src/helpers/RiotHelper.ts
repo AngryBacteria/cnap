@@ -40,10 +40,7 @@ export function mapAssetPath(
 	}
 
 	const assetPath = inputPath.substring(prefix.length);
-	const mappedPath =
-		`https://raw.communitydragon.org/latest/plugins/${plugin}/global/default/${assetPath}`.toLowerCase();
-
-	return mappedPath;
+	return `https://raw.communitydragon.org/latest/plugins/${plugin}/global/default/${assetPath}`.toLowerCase();
 }
 
 export class RiotHelper {
@@ -96,7 +93,9 @@ export class RiotHelper {
 		});
 
 		if (!response.ok) {
-			throw new Error(`HTTP error! Status: ${response.status}`);
+			throw new Error(
+				`HTTP Status ${response.status} error: ${response.statusText}`,
+			);
 		}
 
 		const jsonData = await response.json();
@@ -124,7 +123,7 @@ export class RiotHelper {
 			console.log("Successfully tested Riot-API connection");
 			return true;
 		} catch (e) {
-			console.log(
+			console.error(
 				`Error while testing Riot-API connection. Check your API-Key: ${e}`,
 			);
 			return false;
