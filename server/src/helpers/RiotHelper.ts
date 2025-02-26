@@ -2,9 +2,7 @@ import { RateLimiter } from "limiter";
 import "dotenv/config";
 import { type Account, AccountSchema } from "src/model/Account.js";
 import { type Champion, ChampionSchema } from "src/model/Champion.js";
-import {
-	ChampionSummarySchema,
-} from "src/model/ChampionSummary.js";
+import { ChampionSummarySchema } from "src/model/ChampionSummary.js";
 import { type GameMode, GameModeSchema } from "src/model/GameMode.js";
 import { type GameType, GameTypeSchema } from "src/model/GameType.js";
 import { type Item, ItemSchema } from "src/model/Item.js";
