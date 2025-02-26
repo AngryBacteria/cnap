@@ -247,7 +247,7 @@ export class RiotHelper {
 			console.log(`Fetched Summoner [${puuid}] by puuid with Riot-API`);
 
 			// check if account provided
-			let properAccount: Account | null = null;
+			let properAccount: Account | null | undefined = account;
 			if (!account) {
 				properAccount = await this.getRiotAccountByPuuid(summonerRiot.puuid);
 			}

@@ -1,6 +1,6 @@
 import { createHTTPServer } from "@trpc/server/adapters/standalone";
+import { loggedProcedure } from "./middlewares/executionTime.js";
 import { publicProcedure, router } from "./trcp.js";
-import {loggedProcedure} from "./middlewares/executionTime.js";
 
 const appRouter = router({
 	userList: loggedProcedure.query(() => {

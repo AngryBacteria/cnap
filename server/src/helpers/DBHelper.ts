@@ -1,4 +1,4 @@
-import { config } from "dotenv";
+import "dotenv/config";
 import {
 	type AnyBulkWriteOperation,
 	type Collection,
@@ -42,7 +42,6 @@ export const CollectionName = {
 // BasicFilter schema
 export const BasicFilterSchema = z.object({
 	offset: z
-
 		.number()
 		.int()
 		.nonnegative()
@@ -69,8 +68,6 @@ export class DBHelper {
 	private database: Db;
 
 	constructor() {
-		config();
-
 		// Initialize MongoDB Connection
 		const mongodbConnectionString = process.env.MONGODB_CONNECTION_STRING;
 		if (!mongodbConnectionString) {
@@ -78,7 +75,7 @@ export class DBHelper {
 		}
 
 		this.mongoClient = new MongoClient(mongodbConnectionString);
-		this.database = this.mongoClient.db("cnap");
+		this.database = this.mongoClient.db("cnap_test");
 	}
 
 	getCollection(name: CollectionName): Collection {
@@ -241,10 +238,9 @@ export class DBHelper {
 	/**
 	 * Generic upsert method that handles both raw data and zod validated data
 	 */
-	async genericUpsert<T extends Document>(
+	async genericUpsert<T extends object>(
 		data: T[],
-		keyField: string,
-		keyValue: string,
+		keyField: keyof T,
 		collectionName: CollectionName,
 		dataName = "Generic Data",
 		validator?: z.ZodType<T>,
@@ -261,11 +257,10 @@ export class DBHelper {
 					validator.parse(item);
 				}
 			}
-
 			// Create bulk operations using the correct MongoDB interface
-			const bulkOps: AnyBulkWriteOperation[] = data.map((item) => ({
+			const bulkOps = data.map((item) => ({
 				updateOne: {
-					filter: { [keyField]: keyValue },
+					filter: { [keyField]: item[keyField] },
 					update: { $set: item },
 					upsert: true,
 				},
