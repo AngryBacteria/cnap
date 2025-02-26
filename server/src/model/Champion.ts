@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+//
+// Full Champion from Riot CDN
+//
 export const PassiveSchema = z
 	.object({
 		name: z.string(),
@@ -260,3 +263,32 @@ export const ChampionSchema = z
 	})
 	.passthrough();
 export type Champion = z.infer<typeof ChampionSchema>;
+
+//
+// ChampionSummary from Riot CDN
+//
+export const ChampionSummarySchema = z
+	.object({
+		id: z.number(),
+		name: z.string(),
+		alias: z.string(),
+		squarePortraitPath: z.string(),
+		roles: z.array(z.string()),
+	})
+	.passthrough();
+export type ChampionSummary = z.infer<typeof ChampionSummarySchema>;
+
+//
+// Reduced Champion from DB (after project)
+//
+export const ChampionReducedSchema = z
+	.object({
+		id: z.number(),
+		name: z.string(),
+		alias: z.string(),
+		title: z.string(),
+		shortBio: z.string(),
+		uncenteredSplashPath: z.string(),
+	})
+	.passthrough();
+export type ChampionReduced = z.infer<typeof ChampionReducedSchema>;

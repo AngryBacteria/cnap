@@ -1,13 +1,9 @@
-import {
-	BasicFilterSchema,
-	CollectionName,
-} from "../helpers/DBHelper.js";
-import rh from "../helpers/RiotHelper.js";
+import { BasicFilterSchema, CollectionName } from "../helpers/DBHelper.js";
 import dbh from "../helpers/DBHelper.js";
+import rh from "../helpers/RiotHelper.js";
 import type { SummonerDb } from "../model/SummonerDb.js";
 
 export class MatchTask {
-
 	async updateMatchData(count = 69, offset = 0, puuid = ""): Promise<void> {
 		const existingSummoners: SummonerDb[] = [];
 		if (puuid) {
@@ -38,11 +34,7 @@ export class MatchTask {
 		}
 
 		for (const summoner of existingSummoners) {
-			const riotMatchIds = await rh.getMatchList(
-				summoner.puuid,
-				count,
-				offset,
-			);
+			const riotMatchIds = await rh.getMatchList(summoner.puuid, count, offset);
 
 			const filteredMatchIds = await dbh.getNonExistingMatchIds(
 				riotMatchIds,

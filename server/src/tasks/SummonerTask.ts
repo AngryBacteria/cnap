@@ -1,12 +1,9 @@
-import {
-	BasicFilterSchema,
-	CollectionName,
-} from "../helpers/DBHelper.js";
+import { BasicFilterSchema, CollectionName } from "../helpers/DBHelper.js";
 import "dotenv/config";
 import { z } from "zod";
-import { type SummonerDb, SummonerDbSchema } from "../model/SummonerDb.js";
 import dbh from "../helpers/DBHelper.js";
 import rh from "../helpers/RiotHelper.js";
+import { type SummonerDb, SummonerDbSchema } from "../model/SummonerDb.js";
 
 export class SummonerTask {
 	private accountsString: string;
@@ -34,10 +31,7 @@ export class SummonerTask {
 				const name = parts[0];
 				const tag = parts[1];
 
-				const summonerData = await rh.getSummonerByAccountTag(
-					name,
-					tag,
-				);
+				const summonerData = await rh.getSummonerByAccountTag(name, tag);
 
 				if (summonerData !== null) {
 					summonerObjects.push(summonerData);
@@ -95,9 +89,7 @@ export class SummonerTask {
 			const newSummoners: SummonerDb[] = [];
 
 			for (const summoner of existingSummoners) {
-				const summonerRiot = await rh.getSummonerByPuuidRiot(
-					summoner.puuid,
-				);
+				const summonerRiot = await rh.getSummonerByPuuidRiot(summoner.puuid);
 
 				if (summonerRiot) {
 					newSummoners.push(summonerRiot);

@@ -1,10 +1,5 @@
 import "dotenv/config";
-import {
-	type AnyBulkWriteOperation,
-	type Collection,
-	type Db,
-	MongoClient,
-} from "mongodb";
+import { type Collection, type Db, MongoClient } from "mongodb";
 import { z } from "zod";
 
 export enum CollectionName {

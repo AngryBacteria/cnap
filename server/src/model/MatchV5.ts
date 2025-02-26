@@ -465,3 +465,17 @@ export const MatchV5Schema = z
 	})
 	.passthrough();
 export type MatchV5 = z.infer<typeof MatchV5Schema>;
+//TODO: proper types
+
+export const InfoSingleSchema = InfoSchema.omit({ participants: true }).extend({
+	participants: ParticipantSchema.optional(),
+});
+export type InfoSingle = z.infer<typeof InfoSingleSchema>;
+
+export const MatchV5SingleSchema = z
+	.object({
+		metadata: MetadataSchema.optional(),
+		info: InfoSingleSchema.optional(),
+	})
+	.passthrough();
+export type MatchV5Single = z.infer<typeof MatchV5SingleSchema>;
