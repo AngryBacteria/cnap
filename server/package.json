@@ -1,0 +1,31 @@
+{
+  "name": "typescript-node-project",
+  "version": "1.0.0",
+  "description": "A modern Node.js TypeScript project with ES modules",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "node --experimental-specifier-resolution=node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "type-check": "tsc --noEmit",
+    "build": "tsc",
+    "format": "biome format --write ./src/",
+    "lint": "biome lint --write ./src/",
+    "check": "biome check --write ./src/"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@types/node": "22.13.5",
+    "nodemon": "3.1.9",
+    "tsx": "^4.19.3",
+    "typescript": "5.7.3"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "limiter": "^3.0.0",
+    "mongodb": "^6.13.1",
+    "zod": "3.24.2"
+  }
+}
