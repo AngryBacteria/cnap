@@ -259,3 +259,5 @@ export class DBHelper {
 		}
 	}
 }
+
+export default new DBHelper();

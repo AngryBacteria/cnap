@@ -520,6 +520,4 @@ export class RiotHelper {
 	}
 }
 
-const helper = new RiotHelper();
-const match = helper.getMatch("EUW1_7091391432");
-const timeline = helper.getTimeline("EUW1_7091391432");
+export default new RiotHelper();

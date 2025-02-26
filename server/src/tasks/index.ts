@@ -1,10 +1,6 @@
-import { GameDataTask } from "./GameDataTask.js";
-import { MatchTask } from "./MatchTask.js";
-import { SummonerTask } from "./SummonerTask.js";
-
-const matchTask = new MatchTask();
-const summonerTask = new SummonerTask();
-const gameDataTask = new GameDataTask();
+import  gameDataTask  from "./GameDataTask.js";
+import  matchTask  from "./MatchTask.js";
+import  summonerTask  from "./SummonerTask.js";
 
 /**
  * Runs recurring updates at specified intervals

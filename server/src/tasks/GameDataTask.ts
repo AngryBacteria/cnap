@@ -1,21 +1,15 @@
-import { CollectionName, DBHelper } from "../helpers/DBHelper.js";
-import { RiotHelper } from "../helpers/RiotHelper.js";
+import { CollectionName } from "../helpers/DBHelper.js";
+import rh  from "../helpers/RiotHelper.js";
+import dbh from "../helpers/DBHelper.js";
+
 
 export class GameDataTask {
-	private dbHelper: DBHelper;
-	private riotHelper: RiotHelper;
-
-	constructor() {
-		this.dbHelper = new DBHelper();
-		this.riotHelper = new RiotHelper();
-	}
-
 	async updateChampions(): Promise<void> {
-		const champions = await this.riotHelper.getChampions();
+		const champions = await rh.getChampions();
 		if (champions.length <= 0) {
 			console.error("No champions found in CDN response");
 		} else {
-			await this.dbHelper.genericUpsert(
+			await dbh.genericUpsert(
 				champions,
 				"id",
 				CollectionName.CHAMPION,
@@ -27,11 +21,11 @@ export class GameDataTask {
 	}
 
 	async updateGameModes(): Promise<void> {
-		const gameModes = await this.riotHelper.getGameModes();
+		const gameModes = await rh.getGameModes();
 		if (gameModes.length <= 0) {
 			console.error("No game modes found in CDN response");
 		} else {
-			await this.dbHelper.genericUpsert(
+			await dbh.genericUpsert(
 				gameModes,
 				"gameMode",
 				CollectionName.GAME_MODE,
@@ -43,11 +37,11 @@ export class GameDataTask {
 	}
 
 	async updateGameTypes(): Promise<void> {
-		const gameTypes = await this.riotHelper.getGameTypes();
+		const gameTypes = await rh.getGameTypes();
 		if (gameTypes.length <= 0) {
 			console.error("No game types found in CDN response");
 		} else {
-			await this.dbHelper.genericUpsert(
+			await dbh.genericUpsert(
 				gameTypes,
 				"gametype",
 				CollectionName.GAME_TYPE,
@@ -59,11 +53,11 @@ export class GameDataTask {
 	}
 
 	async updateItems(): Promise<void> {
-		const items = await this.riotHelper.getItems();
+		const items = await rh.getItems();
 		if (items.length <= 0) {
 			console.error("No items found in CDN response");
 		} else {
-			await this.dbHelper.genericUpsert(
+			await dbh.genericUpsert(
 				items,
 				"id",
 				CollectionName.ITEM,
@@ -75,11 +69,11 @@ export class GameDataTask {
 	}
 
 	async updateMaps(): Promise<void> {
-		const maps = await this.riotHelper.getMaps();
+		const maps = await rh.getMaps();
 		if (maps.length <= 0) {
 			console.error("No maps found in CDN response");
 		} else {
-			await this.dbHelper.genericUpsert(
+			await dbh.genericUpsert(
 				maps,
 				"mapId",
 				CollectionName.MAP,
@@ -91,11 +85,11 @@ export class GameDataTask {
 	}
 
 	async updateQueues(): Promise<void> {
-		const queues = await this.riotHelper.getQueues();
+		const queues = await rh.getQueues();
 		if (queues.length <= 0) {
 			console.error("No queues found in CDN response");
 		} else {
-			await this.dbHelper.genericUpsert(
+			await dbh.genericUpsert(
 				queues,
 				"queueId",
 				CollectionName.QUEUE,
@@ -107,11 +101,11 @@ export class GameDataTask {
 	}
 
 	async updateSummonerIcons(): Promise<void> {
-		const summonerIcons = await this.riotHelper.getSummonerIcons();
+		const summonerIcons = await rh.getSummonerIcons();
 		if (summonerIcons.length <= 0) {
 			console.error("No summoner icons found in CDN response");
 		} else {
-			await this.dbHelper.genericUpsert(
+			await dbh.genericUpsert(
 				summonerIcons,
 				"id",
 				CollectionName.SUMMONER_ICON,
@@ -123,11 +117,11 @@ export class GameDataTask {
 	}
 
 	async updateSummonerSpells(): Promise<void> {
-		const summonerSpells = await this.riotHelper.getSummonerSpells();
+		const summonerSpells = await rh.getSummonerSpells();
 		if (summonerSpells.length <= 0) {
 			console.error("No summoner spells found in CDN response");
 		} else {
-			await this.dbHelper.genericUpsert(
+			await dbh.genericUpsert(
 				summonerSpells,
 				"id",
 				CollectionName.SUMMONER_SPELL,
@@ -151,3 +145,5 @@ export class GameDataTask {
 		console.log("All game data updated");
 	}
 }
+
+export default new GameDataTask();

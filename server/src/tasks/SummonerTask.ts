@@ -1,21 +1,17 @@
 import {
 	BasicFilterSchema,
 	CollectionName,
-	DBHelper,
 } from "../helpers/DBHelper.js";
-import { RiotHelper } from "../helpers/RiotHelper.js";
 import "dotenv/config";
 import { z } from "zod";
 import { type SummonerDb, SummonerDbSchema } from "../model/SummonerDb.js";
+import dbh from "../helpers/DBHelper.js";
+import rh from "../helpers/RiotHelper.js";
 
 export class SummonerTask {
-	private dbHelper: DBHelper;
-	private riotHelper: RiotHelper;
 	private accountsString: string;
 
 	constructor() {
-		this.dbHelper = new DBHelper();
-		this.riotHelper = new RiotHelper();
 		this.accountsString =
 			"AngryBacteria_cnap,BriBri_0699,VerniHD_EUW,Baywack_CnAP,3 6 6 1_#EUW,SignisAura_CnAP,Alraune22_CnAP,Aw3s0m3mag1c_EUW,Gnerfedurf_BCH,Gnoblin_BCH,VredVampire_2503,D3M0NK1LL3RG0D_EUW,GLOMVE_EUW,hide on büschli_EUW,IBlueSnow_EUW,Nayan Stocker_EUW,Norina Michel_EUW,pentaskill_CnAP,Pollux_2910,Polylinux_EUW,Prequ_EUW,Sausage Revolver_EUW,swiss egirI_EUW,TCT Tawan_EUW,The 26th Bam_EUW,Theera3rd_EUW,Zinsstro_EUW,WhatThePlay_CnAP,pentaskill_CnAP,Árexo_CNAP,Naaji_EUW,6c51o_6C51";
 
@@ -38,7 +34,7 @@ export class SummonerTask {
 				const name = parts[0];
 				const tag = parts[1];
 
-				const summonerData = await this.riotHelper.getSummonerByAccountTag(
+				const summonerData = await rh.getSummonerByAccountTag(
 					name,
 					tag,
 				);
@@ -51,7 +47,7 @@ export class SummonerTask {
 			}
 		}
 
-		await this.dbHelper.genericUpsert(
+		await dbh.genericUpsert(
 			summonerObjects,
 			"puuid",
 			CollectionName.SUMMONER,
@@ -67,13 +63,13 @@ export class SummonerTask {
 		let summonerData: SummonerDb | null = null;
 
 		if (puuid) {
-			summonerData = await this.riotHelper.getSummonerByPuuidRiot(puuid);
+			summonerData = await rh.getSummonerByPuuidRiot(puuid);
 		} else {
-			summonerData = await this.riotHelper.getSummonerByAccountTag(name, tag);
+			summonerData = await rh.getSummonerByAccountTag(name, tag);
 		}
 
 		if (summonerData !== null) {
-			await this.dbHelper.genericUpsert(
+			await dbh.genericUpsert(
 				[summonerData],
 				"puuid",
 				CollectionName.SUMMONER,
@@ -89,7 +85,7 @@ export class SummonerTask {
 	 * Update the summoner data of all summoners in the summoners collection
 	 */
 	async updateSummonerData(): Promise<void> {
-		const existingSummoners = await this.dbHelper.genericGet<SummonerDb>(
+		const existingSummoners = await dbh.genericGet<SummonerDb>(
 			BasicFilterSchema.parse({ limit: 100000 }),
 			CollectionName.SUMMONER,
 			SummonerDbSchema,
@@ -99,7 +95,7 @@ export class SummonerTask {
 			const newSummoners: SummonerDb[] = [];
 
 			for (const summoner of existingSummoners) {
-				const summonerRiot = await this.riotHelper.getSummonerByPuuidRiot(
+				const summonerRiot = await rh.getSummonerByPuuidRiot(
 					summoner.puuid,
 				);
 
@@ -108,7 +104,7 @@ export class SummonerTask {
 				}
 			}
 
-			await this.dbHelper.genericUpsert(
+			await dbh.genericUpsert(
 				newSummoners,
 				"puuid",
 				CollectionName.SUMMONER,
@@ -118,3 +114,5 @@ export class SummonerTask {
 		}
 	}
 }
+
+export default new SummonerTask();

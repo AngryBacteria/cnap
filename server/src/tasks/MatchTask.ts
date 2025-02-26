@@ -1,24 +1,17 @@
 import {
 	BasicFilterSchema,
 	CollectionName,
-	DBHelper,
 } from "../helpers/DBHelper.js";
-import { RiotHelper } from "../helpers/RiotHelper.js";
+import rh from "../helpers/RiotHelper.js";
+import dbh from "../helpers/DBHelper.js";
 import type { SummonerDb } from "../model/SummonerDb.js";
 
 export class MatchTask {
-	private db_helper: DBHelper;
-	private riot_helper: RiotHelper;
-
-	constructor() {
-		this.db_helper = new DBHelper();
-		this.riot_helper = new RiotHelper();
-	}
 
 	async updateMatchData(count = 69, offset = 0, puuid = ""): Promise<void> {
 		const existingSummoners: SummonerDb[] = [];
 		if (puuid) {
-			const summoner = await this.db_helper.genericGet<SummonerDb>(
+			const summoner = await dbh.genericGet<SummonerDb>(
 				BasicFilterSchema.parse({ limit: 100000, filter: { puuid } }),
 				CollectionName.SUMMONER,
 				undefined,
@@ -27,7 +20,7 @@ export class MatchTask {
 				existingSummoners.push(summoner[0]);
 			}
 		} else {
-			const dbSummoners = await this.db_helper.genericGet<SummonerDb>(
+			const dbSummoners = await dbh.genericGet<SummonerDb>(
 				BasicFilterSchema.parse({ limit: 100000 }),
 				CollectionName.SUMMONER,
 				undefined,
@@ -45,19 +38,19 @@ export class MatchTask {
 		}
 
 		for (const summoner of existingSummoners) {
-			const riotMatchIds = await this.riot_helper.getMatchList(
+			const riotMatchIds = await rh.getMatchList(
 				summoner.puuid,
 				count,
 				offset,
 			);
 
-			const filteredMatchIds = await this.db_helper.getNonExistingMatchIds(
+			const filteredMatchIds = await dbh.getNonExistingMatchIds(
 				riotMatchIds,
 				"MatchV5",
 				"metadata.matchId",
 			);
 
-			const filteredTimelineIds = await this.db_helper.getNonExistingMatchIds(
+			const filteredTimelineIds = await dbh.getNonExistingMatchIds(
 				riotMatchIds,
 				"TimelineV5",
 				"metadata.matchId",
@@ -65,14 +58,14 @@ export class MatchTask {
 
 			const matchData = [];
 			for (const matchId of filteredMatchIds) {
-				const match = await this.riot_helper.getMatch(matchId);
+				const match = await rh.getMatch(matchId);
 				if (match) {
 					matchData.push(match);
 				}
 			}
 
 			if (matchData && matchData.length > 0) {
-				await this.db_helper.genericUpsert(
+				await dbh.genericUpsert(
 					matchData,
 					"metadata.matchId",
 					CollectionName.MATCH,
@@ -83,14 +76,14 @@ export class MatchTask {
 
 			const timelineData = [];
 			for (const timelineId of filteredTimelineIds) {
-				const timeline = await this.riot_helper.getTimeline(timelineId);
+				const timeline = await rh.getTimeline(timelineId);
 				if (timeline) {
 					timelineData.push(timeline);
 				}
 			}
 
 			if (timelineData && timelineData.length > 0) {
-				await this.db_helper.genericUpsert(
+				await dbh.genericUpsert(
 					timelineData,
 					"metadata.matchId",
 					CollectionName.TIMELINE,
@@ -107,3 +100,5 @@ export class MatchTask {
 		}
 	}
 }
+
+export default new MatchTask();
