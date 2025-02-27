@@ -31,7 +31,7 @@ const appRouter = t.router({
 		];
 	}),
 	championsReduced: loggedProcedure.query(async () => {
-		return dbh.genericGet(
+		return await dbh.genericGet(
 			CollectionName.CHAMPION,
 			{
 				limit: 1000,
@@ -174,20 +174,20 @@ const appRouter = t.router({
 			};
 		}),
 	queues: loggedProcedure.query(async () => {
-		return dbh.genericGet(CollectionName.QUEUE, { limit: 1000 }, QueueSchema);
+		return await dbh.genericGet(CollectionName.QUEUE, { limit: 1000 }, QueueSchema);
 	}),
 	items: loggedProcedure.query(async () => {
-		return dbh.genericGet(CollectionName.ITEM, { limit: 1000 }, ItemSchema);
+		return await dbh.genericGet(CollectionName.ITEM, { limit: 1000 }, ItemSchema);
 	}),
 	summonerSpells: loggedProcedure.query(async () => {
-		return dbh.genericGet(
+		return await dbh.genericGet(
 			CollectionName.SUMMONER_SPELL,
 			{ limit: 1000 },
 			SummonerSpellSchema,
 		);
 	}),
 	summoners: loggedProcedure.query(async () => {
-		return dbh.genericGet(
+		return await dbh.genericGet(
 			CollectionName.SUMMONER,
 			{ limit: 1000 },
 			SummonerDbSchema,
