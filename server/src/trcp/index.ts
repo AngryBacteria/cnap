@@ -7,7 +7,7 @@ import * as trpcExpress from "@trpc/server/adapters/express";
 import express from "express";
 import { z } from "zod";
 import dbh, { BasicFilterSchema, CollectionName } from "../helpers/DBHelper.js";
-import { ChampionReducedSchema } from "../model/Champion.js";
+import { ChampionReducedSchema, ChampionSchema } from "../model/Champion.js";
 import { ItemSchema } from "../model/Item.js";
 import { MatchV5SingleSchema } from "../model/MatchV5.js";
 import { QueueSchema } from "../model/Queue.js";
@@ -33,10 +33,9 @@ const appRouter = t.router({
 	}),
 	championsReduced: loggedProcedure.query(async () => {
 		return dbh.genericGet(
+			CollectionName.CHAMPION,
 			{
-				offset: 0,
 				limit: 1000,
-				filter: {},
 				project: {
 					_id: 0,
 					id: 1,
@@ -47,19 +46,16 @@ const appRouter = t.router({
 					uncenteredSplashPath: 1,
 				},
 			},
-			CollectionName.CHAMPION,
 			ChampionReducedSchema,
 		);
 	}),
 	championByAlias: loggedProcedure.input(z.string()).query(async (opts) => {
 		return dbh.genericGet(
-			{
-				offset: 0,
-				limit: 1,
-				filter: { alias: { $regex: `^${opts.input}$`, $options: "i" } },
-				project: {},
-			},
 			CollectionName.CHAMPION,
+			{
+				filter: { alias: { $regex: `^${opts.input}$`, $options: "i" } },
+			},
+			ChampionSchema,
 		);
 	}),
 	matchesByChampion: loggedProcedure
@@ -88,11 +84,11 @@ const appRouter = t.router({
 			// Optionally Filter by summoner puuids
 			if (onlySummonersInDb) {
 				const existingSummonerPuuids = await dbh.genericGet(
-					BasicFilterSchema.parse({
+					CollectionName.SUMMONER,
+					{
 						limit: 100000,
 						project: { puuid: 1 },
-					}),
-					CollectionName.SUMMONER,
+					},
 					z.object({ puuid: z.string() }),
 				);
 
@@ -125,11 +121,11 @@ const appRouter = t.router({
 			if (onlySummonersInDb) {
 				if (summonerPuuids.length === 0) {
 					const existingSummonerPuuids = await dbh.genericGet(
-						BasicFilterSchema.parse({
+						CollectionName.SUMMONER,
+						{
 							limit: 100000,
 							project: { puuid: 1 },
-						}),
-						CollectionName.SUMMONER,
+						},
 						z.object({ puuid: z.string() }),
 					);
 
@@ -181,30 +177,22 @@ const appRouter = t.router({
 			};
 		}),
 	queues: loggedProcedure.query(async () => {
-		return dbh.genericGet(
-			BasicFilterSchema.parse({ limit: 1000 }),
-			CollectionName.QUEUE,
-			QueueSchema,
-		);
+		return dbh.genericGet(CollectionName.QUEUE, { limit: 1000 }, QueueSchema);
 	}),
 	items: loggedProcedure.query(async () => {
-		return dbh.genericGet(
-			BasicFilterSchema.parse({ limit: 1000 }),
-			CollectionName.ITEM,
-			ItemSchema,
-		);
+		return dbh.genericGet(CollectionName.ITEM, { limit: 1000 }, ItemSchema);
 	}),
 	summonerSpells: loggedProcedure.query(async () => {
 		return dbh.genericGet(
-			BasicFilterSchema.parse({ limit: 1000 }),
 			CollectionName.SUMMONER_SPELL,
+			{ limit: 1000 },
 			SummonerSpellSchema,
 		);
 	}),
 	summoners: loggedProcedure.query(async () => {
 		return dbh.genericGet(
-			BasicFilterSchema.parse({ limit: 1000 }),
 			CollectionName.SUMMONER,
+			{ limit: 1000 },
 			SummonerDbSchema,
 		);
 	}),

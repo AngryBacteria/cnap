@@ -8,8 +8,8 @@ export class MatchTask {
 		const existingSummoners: SummonerDb[] = [];
 		if (puuid) {
 			const summoner = await dbh.genericGet<SummonerDb>(
-				BasicFilterSchema.parse({ limit: 100000, filter: { puuid } }),
 				CollectionName.SUMMONER,
+				{ limit: 100000, filter: { puuid } },
 				undefined,
 			);
 			if (summoner && summoner.length > 0) {
@@ -17,8 +17,8 @@ export class MatchTask {
 			}
 		} else {
 			const dbSummoners = await dbh.genericGet<SummonerDb>(
-				BasicFilterSchema.parse({ limit: 100000 }),
 				CollectionName.SUMMONER,
+				{ limit: 100000 },
 				undefined,
 			);
 			if (dbSummoners && dbSummoners.length > 0) {

@@ -37,6 +37,9 @@ export const BasicFilterSchema = z.object({
 });
 export type BasicFilter = z.infer<typeof BasicFilterSchema>;
 
+export const PartialBasicFilter = BasicFilterSchema.partial();
+export type PartialBasicFilter = z.infer<typeof PartialBasicFilter>;
+
 export class DBHelper {
 	private mongoClient: MongoClient;
 	private database: Db;
@@ -186,11 +189,12 @@ export class DBHelper {
 	 * Generic get method that can return raw data or validated data
 	 */
 	async genericGet<T>(
-		baseFilter: BasicFilter,
 		collectionName: CollectionName,
+		partialFilter: PartialBasicFilter = {},
 		validator?: z.ZodType<T>,
 	): Promise<T[]> {
 		try {
+			const baseFilter = BasicFilterSchema.parse(partialFilter);
 			const cursor = this.getCollection(collectionName)
 				.find(baseFilter.filter, { projection: baseFilter.project })
 				.skip(baseFilter.offset)

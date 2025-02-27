@@ -80,8 +80,8 @@ export class SummonerTask {
 	 */
 	async updateSummonerData(): Promise<void> {
 		const existingSummoners = await dbh.genericGet<SummonerDb>(
-			BasicFilterSchema.parse({ limit: 100000 }),
 			CollectionName.SUMMONER,
+			{ limit: 100000 },
 			SummonerDbSchema,
 		);
 
