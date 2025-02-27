@@ -1,8 +1,8 @@
 import { Flex, Text } from "@mantine/core";
-import type { LolV1ChampionSpell } from "../../../model/Api";
+import type { Outputs } from "../../../utils/trcp.ts";
 
 interface Props {
-	championAbility: LolV1ChampionSpell;
+	championAbility: Outputs["championByAlias"]["spells"][number];
 }
 
 export function ChampionAbilityStats({ championAbility }: Props) {

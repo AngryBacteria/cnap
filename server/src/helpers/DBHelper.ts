@@ -247,6 +247,18 @@ export class DBHelper {
 	}
 
 	/**
+	 * Gets a nested value from an object using a dot-separated path.
+	 */
+	getNestedValue(obj: unknown, path: string): unknown {
+		return (
+			path
+				.split(".")
+				// @ts-ignore
+				.reduce((acc, key) => (acc ? acc[key] : undefined), obj)
+		);
+	}
+
+	/**
 	 * Generic upsert method for inserting or updating documents.
 	 * Validates the data if a validator is supplied and uses a bulk operation to upsert the data.
 	 * Upserting means that if a document with the same keyField exists, it will be updated/replaced.
@@ -259,7 +271,7 @@ export class DBHelper {
 	 */
 	async genericUpsert<T extends object>(
 		data: T[],
-		keyField: keyof T,
+		keyField: string,
 		collectionName: CollectionName,
 		validator?: z.ZodType<T>,
 	): Promise<boolean> {
@@ -278,7 +290,7 @@ export class DBHelper {
 			// Create bulk operations using the correct MongoDB interface
 			const bulkOps = data.map((item) => ({
 				updateOne: {
-					filter: { [keyField]: item[keyField] },
+					filter: { [keyField]: this.getNestedValue(item, keyField) },
 					update: { $set: item },
 					upsert: true,
 				},

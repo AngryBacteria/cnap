@@ -4,18 +4,18 @@ import styles from "./ChampionSkins.module.css";
 
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
-import type { ChampionDTO, LolV1ChampionSkin } from "../../../model/Api";
+import type { Outputs } from "../../../utils/trcp.ts";
 
 interface Props {
-	champion: ChampionDTO;
+	champion: Outputs["championByAlias"];
 }
 export function ChampionSkins({ champion }: Props) {
 	const [opened, { open, close }] = useDisclosure(false);
 	const [focusedSkin, setFocusedSkin] = useState<
-		undefined | LolV1ChampionSkin
+		undefined | Outputs["championByAlias"]["skins"][number]
 	>();
 
-	function openSkinModal(skin: LolV1ChampionSkin) {
+	function openSkinModal(skin: Outputs["championByAlias"]["skins"][number]) {
 		setFocusedSkin(skin);
 		open();
 	}

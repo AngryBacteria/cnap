@@ -1,11 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { MatchV5SingleDTO } from "../../model/Api";
-
-export interface ChampionMatchesAPIResponse {
-	page: number;
-	maxPage: number;
-	data: MatchV5SingleDTO[];
-}
+import { trpc } from "../../utils/trcp.ts";
 
 export const useChampionMatches = (
 	championId: number,
@@ -13,33 +7,12 @@ export const useChampionMatches = (
 	queue_id?: string | null,
 	only_summoners_in_db = true,
 ) => {
-	const championMatchesQuery = useQuery({
-		queryKey: [
-			"matchesChampion",
+	return useQuery(
+		trpc.matchesByChampion.queryOptions({
 			championId,
+			queueId: queue_id ? Number.parseInt(queue_id) : undefined,
+			onlySummonersInDb: only_summoners_in_db,
 			page,
-			queue_id,
-			only_summoners_in_db,
-		],
-		queryFn: async () => {
-			const params = new URLSearchParams({
-				only_summoners_in_db: only_summoners_in_db.toString(),
-				page: page.toString(),
-			});
-			if (queue_id) {
-				params.append("queue_id", queue_id);
-			}
-
-			const response = await fetch(
-				`http://localhost:8000/matches/champion/${championId}?${params.toString()}`,
-			);
-			if (!response.ok) {
-				throw new Error("Failed to load champion matches data");
-			}
-
-			return (await response.json()) as ChampionMatchesAPIResponse;
-		},
-	});
-
-	return championMatchesQuery;
+		}),
+	);
 };

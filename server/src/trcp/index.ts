@@ -1,15 +1,14 @@
 import fs from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-// TRPC server
 import { initTRPC } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
+import cors from "cors";
 import express from "express";
-import { z } from "zod";
-import dbh, { BasicFilterSchema, CollectionName } from "../helpers/DBHelper.js";
+import { unknown, z } from "zod";
+import dbh, { CollectionName } from "../helpers/DBHelper.js";
 import { ChampionReducedSchema, ChampionSchema } from "../model/Champion.js";
 import { ItemSchema } from "../model/Item.js";
-import { MatchV5SingleSchema } from "../model/MatchV5.js";
 import { QueueSchema } from "../model/Queue.js";
 import { SummonerDbSchema } from "../model/SummonerDb.js";
 import { SummonerSpellSchema } from "../model/SummonerSpell.js";
@@ -50,13 +49,17 @@ const appRouter = t.router({
 		);
 	}),
 	championByAlias: loggedProcedure.input(z.string()).query(async (opts) => {
-		return dbh.genericGet(
+		const dbResult = await dbh.genericGet(
 			CollectionName.CHAMPION,
 			{
 				filter: { alias: { $regex: `^${opts.input}$`, $options: "i" } },
 			},
 			ChampionSchema,
 		);
+		if (!dbResult[0]) {
+			throw new Error("Champion not found");
+		}
+		return dbResult[0];
 	}),
 	matchesByChampion: loggedProcedure
 		.input(
@@ -156,13 +159,7 @@ const appRouter = t.router({
 			const collection = dbh.getCollection(CollectionName.MATCH);
 			const cursor = collection.aggregate(pipeline);
 
-			const result = z
-				.object({
-					metadata: z.array(z.object({ total: z.number() })),
-					data: MatchV5SingleSchema.array(),
-				})
-				.array()
-				.parse(await cursor.toArray());
+			const result = await cursor.toArray();
 
 			const metadata = result[0]?.metadata || [];
 			const total = metadata[0]?.total || 0;
@@ -199,6 +196,7 @@ const appRouter = t.router({
 });
 
 const app = express();
+app.use(cors());
 app.use("/static", express.static(staticFilesPath));
 app.use(
 	"/trpc",

@@ -1,14 +1,14 @@
 import { Card, Image, Text, Title } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
-import type { ChampionReducedDTO } from "../../model/Api.ts";
 import {
 	capitalizeFirstLetter,
 	truncateText,
 } from "../../utils/GeneralUtil.ts";
+import type { Outputs } from "../../utils/trcp.ts";
 import styles from "./ChampionReducedCard.module.css";
 
 interface ChampionCardProps {
-	champion: ChampionReducedDTO;
+	champion: Outputs["championsReduced"][number];
 }
 
 export function ChampionReducedCard({ champion }: ChampionCardProps) {

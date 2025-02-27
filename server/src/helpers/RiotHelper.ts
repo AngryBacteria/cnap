@@ -22,8 +22,6 @@ import {
 	SummonerSpellSchema,
 } from "src/model/SummonerSpell.js";
 import { z } from "zod";
-import { type MatchV5, MatchV5Schema } from "../model/MatchV5.js";
-import { type TimelineV5, TimelineV5Schema } from "../model/TimelineV5.js";
 
 /**
  * Maps an asset path to the correct URL for the Community Dragon CDN.
@@ -138,10 +136,10 @@ export class RiotHelper {
 	 * @param matchId The match id of the match to fetch
 	 * @returns Dict representation of the match
 	 */
-	async getMatch(matchId: string): Promise<MatchV5 | null> {
+	async getMatch(matchId: string): Promise<unknown | null> {
 		try {
 			const url = `https://europe.api.riotgames.com/lol/match/v5/matches/${matchId}`;
-			const match = await this.makeRequest(url, MatchV5Schema);
+			const match = await this.makeRequest(url);
 			console.log(`Match [${matchId}] fetched with Riot-API`);
 			return match;
 		} catch (e) {
@@ -157,10 +155,10 @@ export class RiotHelper {
 	 * @param timelineId The id of the timeline to fetch
 	 * @returns Dict representation of the timeline
 	 */
-	async getTimeline(timelineId: string): Promise<TimelineV5 | null> {
+	async getTimeline(timelineId: string): Promise<unknown | null> {
 		try {
 			const url = `https://europe.api.riotgames.com/lol/match/v5/matches/${timelineId}/timeline`;
-			const timeline = await this.makeRequest(url, TimelineV5Schema);
+			const timeline = await this.makeRequest(url);
 			console.log(`Timeline [${timelineId}] fetched with Riot-API`);
 			return timeline;
 		} catch (e) {

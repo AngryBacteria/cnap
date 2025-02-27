@@ -1,9 +1,8 @@
 import { QueryClient } from "@tanstack/react-query";
 import { createTRPCClient, httpBatchLink } from "@trpc/client";
+import type { inferRouterOutputs } from "@trpc/server";
 import { createTRPCOptionsProxy } from "@trpc/tanstack-react-query";
 import type { AppRouter } from "../../../server/src/trcp";
-
-//TODO: replace old query with this
 
 export const queryClient = new QueryClient({
 	defaultOptions: {
@@ -15,10 +14,11 @@ export const queryClient = new QueryClient({
 });
 
 const trpcClient = createTRPCClient<AppRouter>({
-	links: [httpBatchLink({ url: "http://localhost:3000" })],
+	links: [httpBatchLink({ url: "http://localhost:3000/trpc" })],
 });
 
 export const trpc = createTRPCOptionsProxy<AppRouter>({
 	client: trpcClient,
 	queryClient,
 });
+export type Outputs = inferRouterOutputs<AppRouter>;

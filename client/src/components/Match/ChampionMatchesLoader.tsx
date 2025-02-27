@@ -5,6 +5,7 @@ import { useChampionMatches } from "../../hooks/api/useChampionMatches";
 import { useItems } from "../../hooks/api/useItems";
 import { useQueues } from "../../hooks/api/useQueues";
 import { useSummonerSpells } from "../../hooks/api/useSummonerSpells";
+import type { MatchV5Single } from "../../modelOverrides/MatchV5.ts";
 import { MatchBannerSummary } from "./MatchBannerSummary/MatchBannerSummary";
 
 export interface Props {
@@ -70,6 +71,9 @@ export function ChampionMatchesLoader({ championId }: Props) {
 		return <Alert title={"Error loading champion matches"} variant={"light"} />;
 	}
 
+	const championMatchesQueryData = championMatchesQuery.data
+		.data as MatchV5Single[];
+
 	return (
 		<>
 			<Title order={2}>Matches from CnAP Players on this champion</Title>
@@ -84,7 +88,7 @@ export function ChampionMatchesLoader({ championId }: Props) {
 				label="Select a Queue (nothing means return all queues)"
 			/>
 
-			{championMatchesQuery.data.data.map((match) => (
+			{championMatchesQueryData.map((match) => (
 				<MatchBannerSummary
 					key={`${match.info.gameId} - ${match.info.participants.puuid}`}
 					match={match}

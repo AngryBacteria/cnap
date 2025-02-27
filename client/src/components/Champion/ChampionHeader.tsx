@@ -1,9 +1,9 @@
 import { Badge, Card, Flex, Grid, Image, Text, Title } from "@mantine/core";
-import type { ChampionDTO } from "../../model/Api";
+import type { Outputs } from "../../utils/trcp.ts";
 import { ChampionAttributeRadar } from "./ChampionAttributeRadar.tsx";
 
 interface Props {
-	champion: ChampionDTO;
+	champion: Outputs["championByAlias"];
 }
 
 export function ChampionHeader({ champion }: Props) {
