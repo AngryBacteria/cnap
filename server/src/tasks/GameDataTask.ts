@@ -12,7 +12,6 @@ export class GameDataTask {
 				champions,
 				"id",
 				CollectionName.CHAMPION,
-				"champion",
 				undefined,
 			);
 			console.log("Champions updated");
@@ -28,7 +27,6 @@ export class GameDataTask {
 				gameModes,
 				"gameMode",
 				CollectionName.GAME_MODE,
-				"game mode",
 				undefined,
 			);
 			console.log("Game modes updated");
@@ -44,7 +42,6 @@ export class GameDataTask {
 				gameTypes,
 				"gametype",
 				CollectionName.GAME_TYPE,
-				"game type",
 				undefined,
 			);
 			console.log("Game types updated");
@@ -56,13 +53,7 @@ export class GameDataTask {
 		if (items.length <= 0) {
 			console.error("No items found in CDN response");
 		} else {
-			await dbh.genericUpsert(
-				items,
-				"id",
-				CollectionName.ITEM,
-				"Item",
-				undefined,
-			);
+			await dbh.genericUpsert(items, "id", CollectionName.ITEM, undefined);
 			console.log("Items updated");
 		}
 	}
@@ -72,13 +63,7 @@ export class GameDataTask {
 		if (maps.length <= 0) {
 			console.error("No maps found in CDN response");
 		} else {
-			await dbh.genericUpsert(
-				maps,
-				"mapId",
-				CollectionName.MAP,
-				"map",
-				undefined,
-			);
+			await dbh.genericUpsert(maps, "mapId", CollectionName.MAP, undefined);
 			console.log("Maps updated");
 		}
 	}
@@ -92,7 +77,6 @@ export class GameDataTask {
 				queues,
 				"queueId",
 				CollectionName.QUEUE,
-				"queue",
 				undefined,
 			);
 			console.log("Queues updated");
@@ -108,7 +92,6 @@ export class GameDataTask {
 				summonerIcons,
 				"id",
 				CollectionName.SUMMONER_ICON,
-				"summoner_icon",
 				undefined,
 			);
 			console.log("Summoner icons updated");
@@ -124,7 +107,6 @@ export class GameDataTask {
 				summonerSpells,
 				"id",
 				CollectionName.SUMMONER_SPELL,
-				"summoner_spell",
 				undefined,
 			);
 			console.log("Summoner spells updated");

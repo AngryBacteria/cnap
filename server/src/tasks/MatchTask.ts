@@ -1,5 +1,4 @@
-import { BasicFilterSchema, CollectionName } from "../helpers/DBHelper.js";
-import dbh from "../helpers/DBHelper.js";
+import dbh, { CollectionName } from "../helpers/DBHelper.js";
 import rh from "../helpers/RiotHelper.js";
 import type { SummonerDb } from "../model/SummonerDb.js";
 
@@ -36,15 +35,15 @@ export class MatchTask {
 		for (const summoner of existingSummoners) {
 			const riotMatchIds = await rh.getMatchList(summoner.puuid, count, offset);
 
-			const filteredMatchIds = await dbh.getNonExistingMatchIds(
+			const filteredMatchIds = await dbh.getNonExistingIds(
 				riotMatchIds,
-				"MatchV5",
+				CollectionName.MATCH,
 				"metadata.matchId",
 			);
 
-			const filteredTimelineIds = await dbh.getNonExistingMatchIds(
+			const filteredTimelineIds = await dbh.getNonExistingIds(
 				riotMatchIds,
-				"TimelineV5",
+				CollectionName.TIMELINE,
 				"metadata.matchId",
 			);
 
@@ -61,7 +60,6 @@ export class MatchTask {
 					matchData,
 					"metadata.matchId",
 					CollectionName.MATCH,
-					"Match",
 					undefined,
 				);
 			}
@@ -79,7 +77,6 @@ export class MatchTask {
 					timelineData,
 					"metadata.matchId",
 					CollectionName.TIMELINE,
-					"Timeline",
 					undefined,
 				);
 			}

@@ -45,7 +45,6 @@ export class SummonerTask {
 			summonerObjects,
 			"puuid",
 			CollectionName.SUMMONER,
-			"summoner",
 			undefined,
 		);
 	}
@@ -67,7 +66,6 @@ export class SummonerTask {
 				[summonerData],
 				"puuid",
 				CollectionName.SUMMONER,
-				"summoner",
 				undefined,
 			);
 		} else {
@@ -100,7 +98,6 @@ export class SummonerTask {
 				newSummoners,
 				"puuid",
 				CollectionName.SUMMONER,
-				"summoner",
 				undefined,
 			);
 		}
