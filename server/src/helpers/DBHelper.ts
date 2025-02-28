@@ -68,7 +68,7 @@ export class DBHelper {
 		}
 
 		this.mongoClient = new MongoClient(mongodbConnectionString);
-		this.database = this.mongoClient.db("cnap_test");
+		this.database = this.mongoClient.db("cnap");
 	}
 
 	/**
