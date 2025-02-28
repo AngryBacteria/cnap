@@ -1,15 +1,14 @@
 import { Card, Flex, Image, Text, Tooltip } from "@mantine/core";
 import { useMemo } from "react";
-import type { MatchV5Single } from "../../../modelOverrides/MatchV5.ts";
 import type { Outputs } from "../../../utils/trcp.ts";
 import { LeagueItemGrid } from "../LeagueItemGrid/LeagueItemGrid";
 import styles from "./MatchBannerSummary.module.css";
 
 interface Props {
-	match: MatchV5Single;
-	queues: Outputs["queues"];
-	summonerSpells: Outputs["summonerSpells"];
-	items: Outputs["items"];
+	match: Outputs["getMatchesParticipant"]["data"][number];
+	queues: Outputs["getQueues"];
+	summonerSpells: Outputs["getSummonerSpells"];
+	items: Outputs["getItems"];
 }
 
 export function MatchBannerSummary({

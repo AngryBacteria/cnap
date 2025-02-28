@@ -2,7 +2,7 @@ import { Flex, Text } from "@mantine/core";
 import type { Outputs } from "../../../utils/trcp.ts";
 
 interface Props {
-	championAbility: Outputs["championByAlias"]["spells"][number];
+	championAbility: Outputs["getChampionByAlias"]["spells"][number];
 }
 
 export function ChampionAbilityStats({ championAbility }: Props) {

@@ -3,7 +3,7 @@ import type { Outputs } from "../../utils/trcp.ts";
 import styles from "./SummonerCard.module.css";
 
 interface Props {
-	summoner: Outputs["summoners"][number];
+	summoner: Outputs["getSummoners"][number];
 }
 
 export function SummonerCard({ summoner }: Props) {

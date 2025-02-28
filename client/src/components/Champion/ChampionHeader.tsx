@@ -3,7 +3,7 @@ import type { Outputs } from "../../utils/trcp.ts";
 import { ChampionAttributeRadar } from "./ChampionAttributeRadar.tsx";
 
 interface Props {
-	champion: Outputs["championByAlias"];
+	champion: Outputs["getChampionByAlias"];
 }
 
 export function ChampionHeader({ champion }: Props) {

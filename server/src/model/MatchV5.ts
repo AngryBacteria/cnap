@@ -1,11 +1,11 @@
 //TODO: find better solution for this mess. This is now only weak typing in app
 
-export interface MatchV5Single {
+export interface MatchV5Participant {
 	metadata: Metadata;
-	info: InfoSingle;
+	info: InfoParticipant;
 }
 
-export interface InfoSingle {
+export interface InfoParticipant {
 	gameCreation: number;
 	gameDuration: number;
 	gameEndTimestamp: number;

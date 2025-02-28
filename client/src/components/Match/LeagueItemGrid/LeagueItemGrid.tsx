@@ -1,12 +1,11 @@
 import { Flex, HoverCard, Image, Space, Text, Title } from "@mantine/core";
 import { useMemo } from "react";
-import type { Participant } from "../../../modelOverrides/MatchV5.ts";
 import type { Outputs } from "../../../utils/trcp.ts";
 import styles from "./LeagueItemGrid.module.css";
 
 interface Props {
-	participant: Participant;
-	items: Outputs["items"];
+	participant: Outputs["getMatchesParticipant"]["data"][number]["info"]["participants"];
+	items: Outputs["getItems"];
 }
 
 interface PreparedItem {

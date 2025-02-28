@@ -5,10 +5,11 @@ import { initTRPC } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import cors from "cors";
 import express from "express";
-import { unknown, z } from "zod";
+import { z } from "zod";
 import dbh, { CollectionName } from "../helpers/DBHelper.js";
 import { ChampionReducedSchema, ChampionSchema } from "../model/Champion.js";
 import { ItemSchema } from "../model/Item.js";
+import type { MatchV5Participant } from "../model/MatchV5.js";
 import { QueueSchema } from "../model/Queue.js";
 import { SummonerDbSchema } from "../model/SummonerDb.js";
 import { SummonerSpellSchema } from "../model/SummonerSpell.js";
@@ -30,7 +31,7 @@ const appRouter = t.router({
 			{ id: 2, name: "Jane Doe" },
 		];
 	}),
-	championsReduced: loggedProcedure.query(async () => {
+	getChampionsReduced: loggedProcedure.query(async () => {
 		return await dbh.genericGet(
 			CollectionName.CHAMPION,
 			{
@@ -48,7 +49,7 @@ const appRouter = t.router({
 			ChampionReducedSchema,
 		);
 	}),
-	championByAlias: loggedProcedure.input(z.string()).query(async (opts) => {
+	getChampionByAlias: loggedProcedure.input(z.string()).query(async (opts) => {
 		const dbResult = await dbh.genericGet(
 			CollectionName.CHAMPION,
 			{
@@ -61,10 +62,10 @@ const appRouter = t.router({
 		}
 		return dbResult[0];
 	}),
-	matchesByChampion: loggedProcedure
+	getMatchesParticipant: loggedProcedure
 		.input(
 			z.object({
-				championId: z.number(),
+				championId: z.number().optional(),
 				queueId: z.number().optional(),
 				onlySummonersInDb: z.boolean().default(true),
 				page: z.number().default(1),
@@ -80,11 +81,15 @@ const appRouter = t.router({
 			// Init the pipeline
 			const pipeline: Record<string, unknown>[] = [];
 
-			// Filter by champion id
-			pipeline.push({ $match: { "info.participants.championId": championId } });
+			// Optionally filter by champion id
+			if (championId) {
+				pipeline.push({
+					$match: { "info.participants.championId": championId },
+				});
+			}
 
-			let summonerPuuids: string[] = [];
 			// Optionally Filter by summoner puuids
+			let summonerPuuids: string[] = [];
 			if (onlySummonersInDb) {
 				const existingSummonerPuuids = await dbh.genericGet(
 					CollectionName.SUMMONER,
@@ -105,7 +110,7 @@ const appRouter = t.router({
 			}
 
 			// Filter by queue id
-			if (queueId !== undefined) {
+			if (queueId) {
 				pipeline.push({ $match: { "info.queueId": queueId } });
 			}
 
@@ -117,8 +122,12 @@ const appRouter = t.router({
 				},
 			});
 
-			// Filter unwinded documents again by champion_id
-			pipeline.push({ $match: { "info.participants.championId": championId } });
+			// Optionally filter unwinder document again by champion id
+			if (championId) {
+				pipeline.push({
+					$match: { "info.participants.championId": championId },
+				});
+			}
 
 			// Optionally filter unwinded documents again by summoner puuids
 			if (onlySummonersInDb) {
@@ -165,7 +174,7 @@ const appRouter = t.router({
 			const total = metadata[0]?.total || 0;
 
 			const maxPage = Math.ceil(total / pageSize);
-			const data = result[0]?.data || [];
+			const data = (result[0]?.data || []) as MatchV5Participant[];
 
 			return {
 				page,
@@ -173,20 +182,28 @@ const appRouter = t.router({
 				data,
 			};
 		}),
-	queues: loggedProcedure.query(async () => {
-		return await dbh.genericGet(CollectionName.QUEUE, { limit: 1000 }, QueueSchema);
+	getQueues: loggedProcedure.query(async () => {
+		return await dbh.genericGet(
+			CollectionName.QUEUE,
+			{ limit: 1000 },
+			QueueSchema,
+		);
 	}),
-	items: loggedProcedure.query(async () => {
-		return await dbh.genericGet(CollectionName.ITEM, { limit: 1000 }, ItemSchema);
+	getItems: loggedProcedure.query(async () => {
+		return await dbh.genericGet(
+			CollectionName.ITEM,
+			{ limit: 1000 },
+			ItemSchema,
+		);
 	}),
-	summonerSpells: loggedProcedure.query(async () => {
+	getSummonerSpells: loggedProcedure.query(async () => {
 		return await dbh.genericGet(
 			CollectionName.SUMMONER_SPELL,
 			{ limit: 1000 },
 			SummonerSpellSchema,
 		);
 	}),
-	summoners: loggedProcedure.query(async () => {
+	getSummoners: loggedProcedure.query(async () => {
 		return await dbh.genericGet(
 			CollectionName.SUMMONER,
 			{ limit: 1000 },

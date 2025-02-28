@@ -1,11 +1,10 @@
 import { Alert, Loader, Pagination, Select, Title } from "@mantine/core";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useChampionMatches } from "../../hooks/api/useChampionMatches";
 import { useItems } from "../../hooks/api/useItems";
+import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts";
 import { useQueues } from "../../hooks/api/useQueues";
 import { useSummonerSpells } from "../../hooks/api/useSummonerSpells";
-import type { MatchV5Single } from "../../modelOverrides/MatchV5.ts";
 import { MatchBannerSummary } from "./MatchBannerSummary/MatchBannerSummary";
 
 export interface Props {
@@ -24,11 +23,11 @@ export function ChampionMatchesLoader({ championId }: Props) {
 		});
 	};
 
-	const championMatchesQuery = useChampionMatches(
-		championId,
+	const matchesParticipantQuery = useMatchesParticipant(
 		page,
+		championId,
 		selectedQueue,
-		true,
+		false,
 	);
 	const itemQuery = useItems();
 	const queuesQuery = useQueues();
@@ -54,7 +53,7 @@ export function ChampionMatchesLoader({ championId }: Props) {
 	}, [queuesQuery.data]);
 
 	if (
-		championMatchesQuery.status === "pending" ||
+		matchesParticipantQuery.status === "pending" ||
 		itemQuery.status === "pending" ||
 		queuesQuery.status === "pending" ||
 		summonerSpellsQuery.status === "pending"
@@ -63,16 +62,13 @@ export function ChampionMatchesLoader({ championId }: Props) {
 	}
 
 	if (
-		championMatchesQuery.status === "error" ||
+		matchesParticipantQuery.status === "error" ||
 		itemQuery.status === "error" ||
 		queuesQuery.status === "error" ||
 		summonerSpellsQuery.status === "error"
 	) {
 		return <Alert title={"Error loading champion matches"} variant={"light"} />;
 	}
-
-	const championMatchesQueryData = championMatchesQuery.data
-		.data as MatchV5Single[];
 
 	return (
 		<>
@@ -88,7 +84,7 @@ export function ChampionMatchesLoader({ championId }: Props) {
 				label="Select a Queue (nothing means return all queues)"
 			/>
 
-			{championMatchesQueryData.map((match) => (
+			{matchesParticipantQuery.data.data.map((match) => (
 				<MatchBannerSummary
 					key={`${match.info.gameId} - ${match.info.participants.puuid}`}
 					match={match}
@@ -98,7 +94,7 @@ export function ChampionMatchesLoader({ championId }: Props) {
 				/>
 			))}
 			<Pagination
-				total={championMatchesQuery.data.maxPage}
+				total={matchesParticipantQuery.data.maxPage}
 				value={page}
 				onChange={handlePageChange}
 			/>

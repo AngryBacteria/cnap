@@ -2,5 +2,5 @@ import { useQuery } from "@tanstack/react-query";
 import { trpc } from "../../utils/trcp.ts";
 
 export const useChampions = () => {
-	return useQuery(trpc.championsReduced.queryOptions());
+	return useQuery(trpc.getChampionsReduced.queryOptions());
 };

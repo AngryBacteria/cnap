@@ -9,7 +9,7 @@
     "build": "tsc",
     "format": "biome format --write ./src/",
     "lint": "biome lint --write ./src/",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc -b",
     "biome": "biome check --write ./src/",
     "start": "node dist/trcp/index.js",
     "start-tasks": "node dist/tasks/index.js"
