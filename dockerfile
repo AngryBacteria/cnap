@@ -4,15 +4,13 @@ WORKDIR /app
 # Copy all files
 COPY . .
 
-# Install dependencies for backend and frontend if they have separate package\.json files
+# Install dependencies for backend
 WORKDIR /app/server
-RUN npm install
-RUN npm run build
+RUN npm install && npm run build
 
+# Install dependencies for frontend
 WORKDIR /app/client
-RUN npm install
-RUN  npm run build
-RUN npm install -g serve
+RUN npm install && npm run build && npm install -g serve && npm cache clean --force
 
 # Go back to the project root to copy the start script
 WORKDIR /app
@@ -22,4 +20,4 @@ RUN chmod +x start.sh
 EXPOSE 3000
 EXPOSE 4173
 
-CMD ["./start.sh"]
+CMD ["/bin/bash", "./start.sh"]

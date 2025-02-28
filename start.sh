@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # Start backend in the background
 cd server && npm run start &
 
