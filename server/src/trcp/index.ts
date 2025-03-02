@@ -7,6 +7,7 @@ import cors from "cors";
 import express from "express";
 import { z } from "zod";
 import dbh, { CollectionName } from "../helpers/DBHelper.js";
+import simpleCache from "../helpers/SimpleCache.js";
 import { ChampionReducedSchema, ChampionSchema } from "../model/Champion.js";
 import { ItemSchema } from "../model/Item.js";
 import type { MatchV5Participant } from "../model/MatchV5.js";
@@ -32,7 +33,14 @@ const appRouter = t.router({
 		];
 	}),
 	getChampionsReduced: loggedProcedure.query(async () => {
-		return await dbh.genericGet(
+		const cachedResult = ChampionReducedSchema.array().safeParse(
+			simpleCache.get("championReduced"),
+		);
+		if (cachedResult.success) {
+			return cachedResult;
+		}
+
+		const result = await dbh.genericGet(
 			CollectionName.CHAMPION,
 			{
 				limit: 1000,
@@ -48,6 +56,8 @@ const appRouter = t.router({
 			},
 			ChampionReducedSchema,
 		);
+		simpleCache.set("championReduced", result);
+		return result;
 	}),
 	getChampionByAlias: loggedProcedure.input(z.string()).query(async (opts) => {
 		const dbResult = await dbh.genericGet(
@@ -183,32 +193,68 @@ const appRouter = t.router({
 			};
 		}),
 	getQueues: loggedProcedure.query(async () => {
-		return await dbh.genericGet(
+		const cachedResult = QueueSchema.array().safeParse(
+			simpleCache.get("getQueues"),
+		);
+		if (cachedResult.success) {
+			return cachedResult;
+		}
+
+		const result = await dbh.genericGet(
 			CollectionName.QUEUE,
 			{ limit: 1000 },
 			QueueSchema,
 		);
+		simpleCache.set("getQueues", result);
+		return result;
 	}),
 	getItems: loggedProcedure.query(async () => {
-		return await dbh.genericGet(
+		const cachedResult = ItemSchema.array().safeParse(
+			simpleCache.get("getItems"),
+		);
+		if (cachedResult.success) {
+			return cachedResult;
+		}
+
+		const results = await dbh.genericGet(
 			CollectionName.ITEM,
 			{ limit: 1000 },
 			ItemSchema,
 		);
+		simpleCache.set("getItems", results);
+		return results;
 	}),
 	getSummonerSpells: loggedProcedure.query(async () => {
-		return await dbh.genericGet(
+		const cachedResult = SummonerSpellSchema.array().safeParse(
+			simpleCache.get("getSummonerSpells"),
+		);
+		if (cachedResult.success) {
+			return cachedResult;
+		}
+
+		const result = await dbh.genericGet(
 			CollectionName.SUMMONER_SPELL,
 			{ limit: 1000 },
 			SummonerSpellSchema,
 		);
+		simpleCache.set("getSummonerSpells", result);
+		return result;
 	}),
 	getSummoners: loggedProcedure.query(async () => {
-		return await dbh.genericGet(
+		const cachedResult = QueueSchema.array().safeParse(
+			simpleCache.get("getSummoners"),
+		);
+		if (cachedResult.success) {
+			return cachedResult;
+		}
+
+		const result = await dbh.genericGet(
 			CollectionName.SUMMONER,
 			{ limit: 1000 },
 			SummonerDbSchema,
 		);
+		simpleCache.set("getSummoners", result);
+		return result;
 	}),
 });
 
