@@ -14,7 +14,10 @@ async function intervalUpdate(
 ): Promise<void> {
 	let iteration = initialIteration;
 
-	logger.info(`Starting interval update iteration: ${iteration}`);
+	logger.debug(
+		{ iteration, initialIteration, intervalTime },
+		"Task:intervalUpdate - Starting interval update ",
+	);
 	if (iteration % 25 === 0) {
 		await summonerTask.updateSummonerData();
 		await gameDataTask.updateEverything();

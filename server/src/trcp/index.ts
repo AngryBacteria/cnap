@@ -38,7 +38,7 @@ const appRouter = t.router({
 			simpleCache.get("championReduced"),
 		);
 		if (cachedResult.success) {
-			logger.debug("API:getChampionsReduced - Cache hit");
+			logger.debug({ cached: true }, "API:getChampionsReduced - Cache hit");
 			return cachedResult.data;
 		}
 
@@ -60,6 +60,7 @@ const appRouter = t.router({
 		);
 		simpleCache.set("championReduced", result);
 		logger.debug(
+			{ cached: false },
 			"API:getChampionsReduced - Returning DB result and updating cache",
 		);
 		return result;
@@ -74,11 +75,15 @@ const appRouter = t.router({
 		);
 		if (!dbResult[0]) {
 			logger.error(
-				`API:getChampionByAlias - Champion not found: ${opts.input}`,
+				{ operationInputs: opts.input, cached: false },
+				"API:getChampionByAlias - Champion not found",
 			);
 			throw new Error(`Champion not found: ${opts.input}`);
 		}
-		logger.debug(`API:getChampionByAlias - Returning DB result: ${opts.input}`);
+		logger.debug(
+			{ operationInputs: opts.input, cached: false },
+			"API:getChampionByAlias - Returning DB result",
+		);
 		return dbResult[0];
 	}),
 	getMatchesParticipant: loggedProcedure
@@ -182,7 +187,8 @@ const appRouter = t.router({
 			const data = (result[0]?.data || []) as MatchV5Participant[];
 
 			logger.debug(
-				`API:getMatchesParticipant - Returning DB result: ${opts.input}`,
+				{ operationInputs: opts.input, cached: false },
+				"API:getMatchesParticipant - Returning DB result",
 			);
 			return {
 				page,
@@ -195,7 +201,7 @@ const appRouter = t.router({
 			simpleCache.get("getQueues"),
 		);
 		if (cachedResult.success) {
-			logger.debug("API:getQueues - Cache hit");
+			logger.debug({ cached: true }, "API:getQueues - Cache hit");
 			return cachedResult.data;
 		}
 
@@ -205,7 +211,10 @@ const appRouter = t.router({
 			QueueSchema,
 		);
 		simpleCache.set("getQueues", result);
-		logger.debug("API:getQueues - Returning DB result and updating cache");
+		logger.debug(
+			{ cached: false },
+			"API:getQueues - Returning DB result and updating cache",
+		);
 		return result;
 	}),
 	getItems: loggedProcedure.query(async () => {
@@ -213,7 +222,7 @@ const appRouter = t.router({
 			simpleCache.get("getItems"),
 		);
 		if (cachedResult.success) {
-			logger.debug("API:getItems - Cache hit");
+			logger.debug({ cached: true }, "API:getItems - Cache hit");
 			return cachedResult.data;
 		}
 
@@ -223,7 +232,10 @@ const appRouter = t.router({
 			ItemSchema,
 		);
 		simpleCache.set("getItems", results);
-		logger.debug("API:getItems - Returning DB result and updating cache");
+		logger.debug(
+			{ cached: false },
+			"API:getItems - Returning DB result and updating cache",
+		);
 		return results;
 	}),
 	getSummonerSpells: loggedProcedure.query(async () => {
@@ -231,7 +243,7 @@ const appRouter = t.router({
 			simpleCache.get("getSummonerSpells"),
 		);
 		if (cachedResult.success) {
-			logger.debug("API:getSummonerSpells - Cache hit");
+			logger.debug({ cached: true }, "API:getSummonerSpells - Cache hit");
 			return cachedResult.data;
 		}
 
@@ -242,6 +254,7 @@ const appRouter = t.router({
 		);
 		simpleCache.set("getSummonerSpells", result);
 		logger.debug(
+			{ cached: false },
 			"API:getSummonerSpells - Returning DB result and updating cache",
 		);
 		return result;
@@ -251,7 +264,7 @@ const appRouter = t.router({
 			simpleCache.get("getSummoners"),
 		);
 		if (cachedResult.success) {
-			logger.debug("API:getSummoners - Cache hit");
+			logger.debug({ cached: true }, "API:getSummoners - Cache hit");
 			return cachedResult.data;
 		}
 
@@ -261,7 +274,10 @@ const appRouter = t.router({
 			SummonerDbSchema,
 		);
 		simpleCache.set("getSummoners", result);
-		logger.debug("API:getSummoners - Returning DB result and updating cache");
+		logger.debug(
+			{ cached: false },
+			"API:getSummoners - Returning DB result and updating cache",
+		);
 		return result;
 	}),
 });
@@ -276,9 +292,13 @@ app.use(
 	}),
 );
 app.listen(3000);
-logger.info(
-	{url: "http://localhost:3000/trpc"},
-	"API:Startup - tRPC Server is running on http://localhost:3000/trpc",
+logger.debug(
+	{
+		port: 3000,
+		baseUrl: "http://localhost",
+		url: "http://localhost:3000/trpc",
+	},
+	"API:Startup - tRPC Server is running",
 );
 
 export type AppRouter = typeof appRouter;

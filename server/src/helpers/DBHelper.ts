@@ -98,9 +98,10 @@ export class DBHelper {
 				"DBHelper:testConnection - Successfully connected to MongoDB",
 			);
 			return true;
-		} catch (error) {
+		} catch (e) {
 			logger.error(
-				`DBHelper:testConnection - MongoDB connection test failed. Review your connection string and internet connection: ${error}`,
+				{ error: e },
+				"DBHelper:testConnection - MongoDB connection test failed. Review your connection string and internet connection",
 			);
 			return false;
 		}
@@ -167,7 +168,7 @@ export class DBHelper {
 			logger.debug("DBHelper:initIndexes - All indexes created successfully");
 			return true;
 		} catch (error) {
-			logger.error(`DBHelper:initIndexes - Error creating indexes: ${error}`);
+			logger.error({ error }, "DBHelper:initIndexes - Error creating indexes");
 			return false;
 		}
 	}
@@ -204,12 +205,18 @@ export class DBHelper {
 				(id) => !existingIds.includes(id),
 			);
 			logger.debug(
-				`DBHelper:getNonExistingIds - ${existingIds.length} of ${idsSet.size} ${collectionName} were already present in the database`,
+				{
+					existing: existingIds.length,
+					total: idsSet.size,
+					collectionName,
+				},
+				"DBHelper:getNonExistingIds -  Some ids were already present in the database",
 			);
 			return nonExistingIds;
 		} catch (error) {
 			logger.error(
-				`DBHelper:getNonExistingIds - Error while checking for existing ${collectionName.toLowerCase()} ids: ${error}`,
+				{ error, collectionName },
+				"DBHelper:getNonExistingIds - Error while checking for existing ids",
 			);
 			return [];
 		}
@@ -237,7 +244,8 @@ export class DBHelper {
 
 			const dataRaw = await cursor.toArray();
 			logger.debug(
-				`DBHelper:genericGet - Got ${dataRaw.length} ${collectionName} objects from DB`,
+				{ length: dataRaw.length, collectionName },
+				`DBHelper:genericGet - Got ${collectionName} objects from DB`,
 			);
 
 			if (validator) {
@@ -247,7 +255,8 @@ export class DBHelper {
 			return dataRaw as unknown as T[];
 		} catch (error) {
 			logger.error(
-				`DBHelper:genericGet - Error getting data with MongoDB: ${error}`,
+				{ error, collectionName },
+				"DBHelper:genericGet - Error getting data with MongoDB",
 			);
 			return [];
 		}
@@ -285,7 +294,8 @@ export class DBHelper {
 		try {
 			if (data.length === 0) {
 				logger.warn(
-					`DBHelper:genericUpsert - No ${collectionName} data to upsert, aborted operation`,
+					{ collectionName },
+					"DBHelper:genericUpsert - No data to upsert, aborted operation",
 				);
 				return false;
 			}
@@ -309,12 +319,19 @@ export class DBHelper {
 				await this.getCollection(collectionName).bulkWrite(bulkOps);
 
 			logger.debug(
-				`DBHelper:genericUpsert - Upserted ${result.upsertedCount} | Modified ${result.modifiedCount} | Matched ${result.matchedCount}: ${collectionName}`,
+				{
+					upserted: result.upsertedCount,
+					modified: result.modifiedCount,
+					matched: result.matchedCount,
+					collectionName,
+				},
+				"DBHelper:genericUpsert - Upserted data to MongoDB",
 			);
 			return true;
 		} catch (error) {
 			logger.error(
-				`DBHelper:genericUpsert - Error uploading ${collectionName} to MongoDB: ${error}`,
+				{ error, collectionName },
+				"DBHelper:genericUpsert - Error upserting to MongoDB",
 			);
 			return false;
 		}

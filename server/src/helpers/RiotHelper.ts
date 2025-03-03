@@ -126,7 +126,8 @@ export class RiotHelper {
 			return true;
 		} catch (e) {
 			logger.error(
-				`RiotHelper:testConnection - Error while testing Riot-API connection, check your API-Key: ${e}`,
+				{ error: e },
+				"RiotHelper:testConnection - Error while testing Riot-API connection, check your API-Key",
 			);
 			return false;
 		}
@@ -142,12 +143,14 @@ export class RiotHelper {
 			const url = `https://europe.api.riotgames.com/lol/match/v5/matches/${matchId}`;
 			const match = await this.makeRequest(url);
 			logger.debug(
-				`RiotHelper:getMatch - Match fetched by MatchId from Riot-API: ${matchId}`,
+				{ matchId },
+				"RiotHelper:getMatch - Match fetched by MatchId from Riot-API",
 			);
 			return match;
 		} catch (e) {
 			logger.error(
-				`RiotHelper:getMatch - Error while fetching Match by MatchId from Riot-API: ${matchId} ${e}`,
+				{ matchId, error: e },
+				"RiotHelper:getMatch - Error while fetching Match by MatchId from Riot-API",
 			);
 			return null;
 		}
@@ -163,12 +166,14 @@ export class RiotHelper {
 			const url = `https://europe.api.riotgames.com/lol/match/v5/matches/${timelineId}/timeline`;
 			const timeline = await this.makeRequest(url);
 			logger.debug(
-				`RiotHelper:getTimeline - Timeline fetched by TimelineId from Riot-API: ${timelineId}`,
+				{ timelineId },
+				"RiotHelper:getTimeline - Timeline fetched by TimelineId from Riot-API",
 			);
 			return timeline;
 		} catch (e) {
 			logger.error(
-				`RiotHelper:getTimeline - Error while fetching Timeline by TimelineId from Riot-API: ${timelineId} ${e}`,
+				{ timelineId, error: e },
+				"RiotHelper:getTimeline - Error while fetching Timeline by TimelineId from Riot-API",
 			);
 			return null;
 		}
@@ -186,12 +191,14 @@ export class RiotHelper {
 			const url = `https://europe.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${offset}&count=${count}`;
 			const matchList = await this.makeRequest(url, z.array(z.string()));
 			logger.debug(
-				`RiotHelper:getMatchList - Fetched Matchlist by puuid from Riot-API: ${puuid}`,
+				{ puuid },
+				"RiotHelper:getMatchList - Fetched Matchlist by puuid from Riot-API",
 			);
 			return matchList;
 		} catch (e) {
 			logger.error(
-				`RiotHelper:getMatchList - Error while fetching Matchlist by puuid from Riot-API: ${puuid} ${e}`,
+				{ puuid, error: e },
+				"RiotHelper:getMatchList - Error while fetching Matchlist by puuid from Riot-API",
 			);
 			return [];
 		}
@@ -212,12 +219,14 @@ export class RiotHelper {
 			const url = `https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${name}/${properTag}`;
 			const account = await this.makeRequest(url, AccountSchema);
 			logger.debug(
-				`RiotHelper:getRiotAccountByTag - Fetched Account with name-tag from Riot-API: ${name}-${tag}`,
+				{ name, tag },
+				"RiotHelper:getRiotAccountByTag - Fetched Account with name-tag from Riot-API",
 			);
 			return account;
 		} catch (e) {
 			logger.error(
-				`RiotHelper:getRiotAccountByTag - Error while fetching Account by name-tag from Riot-API: ${name}-${tag} ${e}`,
+				{ name, tag, error: e },
+				"RiotHelper:getRiotAccountByTag - Error while fetching Account by name-tag from Riot-API",
 			);
 			return null;
 		}
@@ -233,12 +242,14 @@ export class RiotHelper {
 			const url = `https://europe.api.riotgames.com/riot/account/v1/accounts/by-puuid/${puuid}`;
 			const account = await this.makeRequest(url, AccountSchema);
 			logger.debug(
-				`RiotHelper:getRiotAccountByPuuid - Fetched Account by puuid from Riot-API: ${puuid}`,
+				{ puuid },
+				"RiotHelper:getRiotAccountByPuuid - Fetched Account by puuid from Riot-API",
 			);
 			return account;
 		} catch (e) {
 			logger.error(
-				`RiotHelper:getRiotAccountByPuuid - Error while fetching Account by puuid from Riot-API: ${puuid} ${e}`,
+				{ puuid, error: e },
+				"RiotHelper:getRiotAccountByPuuid - Error while fetching Account by puuid from Riot-API",
 			);
 			return null;
 		}
@@ -259,7 +270,8 @@ export class RiotHelper {
 			const url = `https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`;
 			const summonerRiot = await this.makeRequest(url, SummonerSchema);
 			logger.debug(
-				`RiotHelper:getSummonerByPuuidRiot - Fetched Summoner by puuid from Riot-API: ${puuid}`,
+				{ puuid },
+				"RiotHelper:getSummonerByPuuidRiot - Fetched Summoner by puuid from Riot-API",
 			);
 
 			// check if account provided
@@ -274,12 +286,14 @@ export class RiotHelper {
 				return SummonerDbSchema.parse(mergedData);
 			}
 			logger.error(
-				`RiotHelper:getSummonerByPuuidRiot - Account not found by puuid from Riot-API: ${puuid}`,
+				{ puuid },
+				"RiotHelper:getSummonerByPuuidRiot - Account not found by puuid from Riot-API",
 			);
 			return null;
 		} catch (e) {
 			logger.error(
-				`RiotHelper:getSummonerByPuuidRiot - Error while fetching Summoner by puuid from Riot-API: ${puuid} ${e}`,
+				{ puuid, error: e },
+				"RiotHelper:getSummonerByPuuidRiot - Error while fetching Summoner by puuid from Riot-API",
 			);
 			return null;
 		}
@@ -302,12 +316,14 @@ export class RiotHelper {
 				return this.getSummonerByPuuidRiot(account.puuid, account);
 			}
 			logger.error(
-				`RiotHelper:getSummonerByAccountTag - Summoner not found by name-tag from Riot-API: ${name}-${tag}`,
+				{ name, tag },
+				"RiotHelper:getSummonerByAccountTag - Summoner not found by name-tag from Riot-API",
 			);
 			return null;
 		} catch (e) {
 			logger.error(
-				`RiotHelper:getSummonerByAccountTag - Error while fetching Summoner by name-tag with Riot-API: ${name}-${tag} ${e}`,
+				{ name, tag, error: e },
+				"RiotHelper:getSummonerByAccountTag - Error while fetching Summoner by name-tag with Riot-API",
 			);
 			return null;
 		}
@@ -329,12 +345,14 @@ export class RiotHelper {
 			}
 
 			logger.debug(
-				`RiotHelper:getItems - Fetched ${output.length} Items from Riot-CDN`,
+				{ amount: output.length },
+				"RiotHelper:getItems - Fetched Items from Riot-CDN",
 			);
 			return output;
 		} catch (e) {
 			logger.error(
-				`RiotHelper:getItems - Error while fetching Items from Riot-CDN: ${e}`,
+				{ error: e },
+				"RiotHelper:getItems - Error while fetching Items from Riot-CDN",
 			);
 			return [];
 		}
@@ -404,12 +422,14 @@ export class RiotHelper {
 			}
 
 			logger.debug(
-				`RiotHelper:getChampions - Fetched ${outputData.length} Champions from Riot-CDN`,
+				{ amount: outputData.length },
+				"RiotHelper:getChampions - Fetched Champions from Riot-CDN",
 			);
 			return outputData;
 		} catch (e) {
 			logger.error(
-				`RiotHelper:getChampions - Error while fetching Champions from Riot-CDN: ${e}`,
+				{ error: e },
+				"RiotHelper:getChampions - Error while fetching Champions from Riot-CDN",
 			);
 			return [];
 		}
@@ -427,12 +447,14 @@ export class RiotHelper {
 			);
 
 			logger.debug(
-				`RiotHelper:getGameModes - Fetched ${gameModes.length} Game Modes from Riot-CDN`,
+				{ amount: gameModes.length },
+				"RiotHelper:getGameModes - Fetched Game Modes from Riot-CDN",
 			);
 			return gameModes;
 		} catch (e) {
 			logger.error(
-				`RiotHelper:getGameModes - Error while fetching Game Modes from Riot-CDN: ${e}`,
+				{ error: e },
+				"RiotHelper:getGameModes - Error while fetching Game Modes from Riot-CDN",
 			);
 			return [];
 		}
@@ -450,12 +472,14 @@ export class RiotHelper {
 			);
 
 			logger.debug(
-				`RiotHelper:getGameTypes - Fetched ${gameTypes.length} Game Types from Riot-CDN`,
+				{ amount: gameTypes.length },
+				"RiotHelper:getGameTypes - Fetched Game Types from Riot-CDN",
 			);
 			return gameTypes;
 		} catch (e) {
 			logger.error(
-				`RiotHelper:getGameTypes - Error while fetching Game Types from Riot-CDN: ${e}`,
+				{ error: e },
+				"RiotHelper:getGameTypes - Error while fetching Game Types from Riot-CDN",
 			);
 			return [];
 		}
@@ -473,12 +497,14 @@ export class RiotHelper {
 			);
 
 			logger.debug(
-				`RiotHelper:getMaps - Fetched ${maps.length} Maps from Riot-CDN`,
+				{ amount: maps.length },
+				"RiotHelper:getMaps - Fetched Maps from Riot-CDN",
 			);
 			return maps;
 		} catch (e) {
 			logger.error(
-				`RiotHelper:getMaps - Error while fetching Maps from Riot-CDN: ${e}`,
+				{ error: e },
+				"RiotHelper:getMaps - Error while fetching Maps from Riot-CDN",
 			);
 			return [];
 		}
@@ -496,12 +522,14 @@ export class RiotHelper {
 			);
 
 			logger.debug(
-				`RiotHelper:getQueues - Fetched ${queues.length} Queues from Riot-CDN`,
+				{ amount: queues.length },
+				"RiotHelper:getQueues - Fetched Queues from Riot-CDN",
 			);
 			return queues;
 		} catch (e) {
 			logger.error(
-				`RiotHelper:getQueues - Error while fetching Queues from Riot-CDN: ${e}`,
+				{ error: e },
+				"RiotHelper:getQueues - Error while fetching Queues from Riot-CDN",
 			);
 			return [];
 		}
@@ -526,12 +554,14 @@ export class RiotHelper {
 			}
 
 			logger.debug(
-				`RiotHelper:getSummonerIcons - Fetched ${icons.length} Summoner Icons from Riot-CDN`,
+				{ amount: icons.length },
+				"RiotHelper:getSummonerIcons - Fetched Summoner Icons from Riot-CDN",
 			);
 			return icons;
 		} catch (e) {
 			logger.error(
-				`RiotHelper:getSummonerIcons - Error while fetching Summoner Icons from Riot-CDN: ${e}`,
+				{ error: e },
+				"RiotHelper:getSummonerIcons - Error while fetching Summoner Icons from Riot-CDN",
 			);
 			return [];
 		}
@@ -554,12 +584,14 @@ export class RiotHelper {
 			}
 
 			logger.debug(
-				`RiotHelper:getSummonerSpells - Fetched ${spells.length} Summoner Spells from Riot-CDN`,
+				{ amount: spells.length },
+				"RiotHelper:getSummonerSpells - Fetched Summoner Spells from Riot-CDN",
 			);
 			return spells;
 		} catch (e) {
 			logger.error(
-				`RiotHelper:getSummonerSpells - Error while fetching Summoner Spells from Riot-CDN: ${e}`,
+				{ error: e },
+				"RiotHelper:getSummonerSpells - Error while fetching Summoner Spells from Riot-CDN",
 			);
 			return [];
 		}

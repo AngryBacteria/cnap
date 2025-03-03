@@ -1,3 +1,5 @@
+import logger from "./Logger.js";
+
 /**
  * A simple cache implementation with max size and TTL functionality
  */
@@ -26,11 +28,16 @@ class SimpleCache<T> {
 	set(key: string, value: T): SimpleCache<T> {
 		// If the cache is at max capacity and this is a new key, remove oldest
 		if (this.cache.size >= this.maxSize && !this.cache.has(key)) {
+			logger.trace(
+				{ key, cacheSize: this.cache.size },
+				"SimpleCache:set is full, removing oldest entry",
+			);
 			this.removeOldest();
 		}
 
 		// Set/update the entry with current timestamp
 		this.cache.set(key, { value, timestamp: Date.now() });
+		logger.trace({ key }, "SimpleCache:set added key-value pair to cache");
 		return this;
 	}
 
@@ -41,14 +48,22 @@ class SimpleCache<T> {
 	 */
 	get(key: string): T | undefined {
 		const entry = this.cache.get(key);
-		if (!entry) return undefined;
+		if (!entry) {
+			logger.trace({ key }, "SimpleCache:get key not found in cache");
+			return undefined;
+		}
 
 		// Check if entry has expired
 		if (this.ttl !== 0 && Date.now() - entry.timestamp > this.ttl) {
+			logger.trace(
+				{ key },
+				"SimpleCache:get key has expired, removing from cache",
+			);
 			this.cache.delete(key);
 			return undefined;
 		}
 
+		logger.trace({ key }, "SimpleCache:get key found in cache");
 		return entry.value;
 	}
 
@@ -83,6 +98,7 @@ class SimpleCache<T> {
 	 * Clears the entire cache
 	 */
 	clear(): void {
+		logger.trace("SimpleCache:clear cache cleared");
 		this.cache.clear();
 	}
 

@@ -27,8 +27,9 @@ export class MatchTask {
 		}
 
 		if (!existingSummoners || existingSummoners.length === 0) {
-			logger.info(
-				"No Summoner data available to update match history. Stopping the loop",
+			logger.debug(
+				{ count, offset, puuid },
+				"Task:updateMatchData No Summoner data available to update match history. Stopping the loop",
 			);
 			return;
 		}
@@ -82,16 +83,24 @@ export class MatchTask {
 				);
 			}
 
-			logger.info(`Updated match data for ${summoner.puuid}`);
+			logger.debug(
+				{ puuid: summoner.puuid },
+				"Task:updateMatchData Updated match",
+			);
 		}
 
-		logger.info(`Updated match data for ${existingSummoners.length} summoners`);
+		logger.debug(
+			{ count, offset, puuid, amountUpdated: existingSummoners.length },
+			"Task:updateMatchData Updated match data summoners",
+		);
 	}
 
 	async fillMatchData(puuid: string) {
+		logger.debug({ puuid }, "Task:fillMatchData Starting to fill match data");
 		for (let i = 0; i < 2000; i += 69) {
 			await this.updateMatchData(69, i, puuid);
 		}
+		logger.debug({ puuid }, "Task:fillMatchData Finished filling match data");
 	}
 }
 

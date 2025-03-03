@@ -38,7 +38,10 @@ export class SummonerTask {
 					summonerObjects.push(summonerData);
 				}
 			} else {
-				logger.error(`Account ${account} is not valid, skipping it...`);
+				logger.error(
+					{ accountString: account },
+					"Task:fillSummoners - Account string is not valid, skipping it",
+				);
 			}
 		}
 
@@ -49,7 +52,7 @@ export class SummonerTask {
 			undefined,
 		);
 
-		logger.info("Database filled with summoners");
+		logger.debug("Task:fillSummoners - Database filled with summoners");
 	}
 
 	/**
@@ -72,7 +75,10 @@ export class SummonerTask {
 				undefined,
 			);
 
-			logger.info(`Summoner ${name}[${tag}] added to the database`);
+			logger.debug(
+				{ name, tag },
+				"Task:addSummoner - Summoner added to the database",
+			);
 		} else {
 			throw new Error("Summoner not found");
 		}
@@ -106,9 +112,11 @@ export class SummonerTask {
 				undefined,
 			);
 
-			logger.info("Summoner data updated");
+			logger.debug("Task:updateSummonerData - Summoner data updated");
 		} else {
-			logger.warn("No summoners found in the database, skipping update");
+			logger.warn(
+				"Task:updateSummonerData - No summoners found in the database, skipping update",
+			);
 		}
 	}
 }
