@@ -38,7 +38,7 @@ const appRouter = t.router({
 			simpleCache.get("championReduced"),
 		);
 		if (cachedResult.success) {
-			logger.debug({ cached: true }, "API:getChampionsReduced - Cache hit");
+			logger.info({ cached: true }, "API:getChampionsReduced - Cache hit");
 			return cachedResult.data;
 		}
 
@@ -59,7 +59,7 @@ const appRouter = t.router({
 			ChampionReducedSchema,
 		);
 		simpleCache.set("championReduced", result);
-		logger.debug(
+		logger.info(
 			{ cached: false },
 			"API:getChampionsReduced - Returning DB result and updating cache",
 		);
@@ -80,7 +80,7 @@ const appRouter = t.router({
 			);
 			throw new Error(`Champion not found: ${opts.input}`);
 		}
-		logger.debug(
+		logger.info(
 			{ operationInputs: opts.input, cached: false },
 			"API:getChampionByAlias - Returning DB result",
 		);
@@ -186,7 +186,7 @@ const appRouter = t.router({
 			const maxPage = Math.ceil(total / pageSize);
 			const data = (result[0]?.data || []) as MatchV5Participant[];
 
-			logger.debug(
+			logger.info(
 				{ operationInputs: opts.input, cached: false },
 				"API:getMatchesParticipant - Returning DB result",
 			);
@@ -201,7 +201,7 @@ const appRouter = t.router({
 			simpleCache.get("getQueues"),
 		);
 		if (cachedResult.success) {
-			logger.debug({ cached: true }, "API:getQueues - Cache hit");
+			logger.info({ cached: true }, "API:getQueues - Cache hit");
 			return cachedResult.data;
 		}
 
@@ -211,7 +211,7 @@ const appRouter = t.router({
 			QueueSchema,
 		);
 		simpleCache.set("getQueues", result);
-		logger.debug(
+		logger.info(
 			{ cached: false },
 			"API:getQueues - Returning DB result and updating cache",
 		);
@@ -222,7 +222,7 @@ const appRouter = t.router({
 			simpleCache.get("getItems"),
 		);
 		if (cachedResult.success) {
-			logger.debug({ cached: true }, "API:getItems - Cache hit");
+			logger.info({ cached: true }, "API:getItems - Cache hit");
 			return cachedResult.data;
 		}
 
@@ -232,7 +232,7 @@ const appRouter = t.router({
 			ItemSchema,
 		);
 		simpleCache.set("getItems", results);
-		logger.debug(
+		logger.info(
 			{ cached: false },
 			"API:getItems - Returning DB result and updating cache",
 		);
@@ -243,7 +243,7 @@ const appRouter = t.router({
 			simpleCache.get("getSummonerSpells"),
 		);
 		if (cachedResult.success) {
-			logger.debug({ cached: true }, "API:getSummonerSpells - Cache hit");
+			logger.info({ cached: true }, "API:getSummonerSpells - Cache hit");
 			return cachedResult.data;
 		}
 
@@ -253,7 +253,7 @@ const appRouter = t.router({
 			SummonerSpellSchema,
 		);
 		simpleCache.set("getSummonerSpells", result);
-		logger.debug(
+		logger.info(
 			{ cached: false },
 			"API:getSummonerSpells - Returning DB result and updating cache",
 		);
@@ -264,7 +264,7 @@ const appRouter = t.router({
 			simpleCache.get("getSummoners"),
 		);
 		if (cachedResult.success) {
-			logger.debug({ cached: true }, "API:getSummoners - Cache hit");
+			logger.info({ cached: true }, "API:getSummoners - Cache hit");
 			return cachedResult.data;
 		}
 
@@ -274,7 +274,7 @@ const appRouter = t.router({
 			SummonerDbSchema,
 		);
 		simpleCache.set("getSummoners", result);
-		logger.debug(
+		logger.info(
 			{ cached: false },
 			"API:getSummoners - Returning DB result and updating cache",
 		);
@@ -292,7 +292,7 @@ app.use(
 	}),
 );
 app.listen(3000);
-logger.debug(
+logger.info(
 	{
 		port: 3000,
 		baseUrl: "http://localhost",
