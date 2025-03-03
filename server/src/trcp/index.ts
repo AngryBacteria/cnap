@@ -146,20 +146,6 @@ const appRouter = t.router({
 
 			// Optionally filter unwinded documents again by summoner puuids
 			if (onlySummonersInDb) {
-				if (summonerPuuids.length === 0) {
-					const existingSummonerPuuids = await dbh.genericGet(
-						CollectionName.SUMMONER,
-						{
-							limit: 100000,
-							project: { puuid: 1 },
-						},
-						z.object({ puuid: z.string() }),
-					);
-
-					summonerPuuids = existingSummonerPuuids.map(
-						(summoner) => summoner.puuid,
-					);
-				}
 				pipeline.push({
 					$match: { "info.participants.puuid": { $in: summonerPuuids } },
 				});
@@ -284,6 +270,6 @@ app.use(
 	}),
 );
 app.listen(3000);
-logger.info("TRCP Server is running on http://localhost:3000/trpc");
+logger.info("tRPC Server is running on http://localhost:3000/trpc");
 
 export type AppRouter = typeof appRouter;

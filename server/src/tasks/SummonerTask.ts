@@ -34,7 +34,7 @@ export class SummonerTask {
 
 				const summonerData = await rh.getSummonerByAccountTag(name, tag);
 
-				if (summonerData !== null) {
+				if (summonerData) {
 					summonerObjects.push(summonerData);
 				}
 			} else {
@@ -48,6 +48,8 @@ export class SummonerTask {
 			CollectionName.SUMMONER,
 			undefined,
 		);
+
+		logger.info("Database filled with summoners");
 	}
 
 	/**
@@ -62,13 +64,15 @@ export class SummonerTask {
 			summonerData = await rh.getSummonerByAccountTag(name, tag);
 		}
 
-		if (summonerData !== null) {
+		if (summonerData) {
 			await dbh.genericUpsert(
 				[summonerData],
 				"puuid",
 				CollectionName.SUMMONER,
 				undefined,
 			);
+
+			logger.info(`Summoner ${name}[${tag}] added to the database`);
 		} else {
 			throw new Error("Summoner not found");
 		}
@@ -101,6 +105,10 @@ export class SummonerTask {
 				CollectionName.SUMMONER,
 				undefined,
 			);
+
+			logger.info("Summoner data updated");
+		} else {
+			logger.warn("No summoners found in the database, skipping update");
 		}
 	}
 }

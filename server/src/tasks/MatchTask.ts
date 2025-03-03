@@ -81,7 +81,15 @@ export class MatchTask {
 					undefined,
 				);
 			}
+
+			logger.info(
+				`Updated match data for ${summoner.puuid}`,
+			);
 		}
+
+		logger.info(
+			`Updated match data for ${existingSummoners.length} summoners`,
+		);
 	}
 
 	async fillMatchData(puuid: string) {
