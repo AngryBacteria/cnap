@@ -1,5 +1,3 @@
-import { z } from "zod";
-
 /**
  * A simple cache implementation with max size and TTL functionality
  */

@@ -39,7 +39,7 @@ const appRouter = t.router({
 		);
 		if (cachedResult.success) {
 			logger.debug("[/getChampionsReduced] Returning cached result");
-			return cachedResult;
+			return cachedResult.data;
 		}
 
 		const result = await dbh.genericGet(
@@ -206,7 +206,7 @@ const appRouter = t.router({
 		);
 		if (cachedResult.success) {
 			logger.debug("[/getQueues] Returning cached result");
-			return cachedResult;
+			return cachedResult.data;
 		}
 
 		const result = await dbh.genericGet(
@@ -224,7 +224,7 @@ const appRouter = t.router({
 		);
 		if (cachedResult.success) {
 			logger.debug("[/getItems] Returning cached result");
-			return cachedResult;
+			return cachedResult.data;
 		}
 
 		const results = await dbh.genericGet(
@@ -242,7 +242,7 @@ const appRouter = t.router({
 		);
 		if (cachedResult.success) {
 			logger.debug("[/getSummonerSpells] Returning cached result");
-			return cachedResult;
+			return cachedResult.data;
 		}
 
 		const result = await dbh.genericGet(
@@ -255,12 +255,12 @@ const appRouter = t.router({
 		return result;
 	}),
 	getSummoners: loggedProcedure.query(async () => {
-		const cachedResult = QueueSchema.array().safeParse(
+		const cachedResult = SummonerDbSchema.array().safeParse(
 			simpleCache.get("getSummoners"),
 		);
 		if (cachedResult.success) {
 			logger.debug("[/getSummoners] Returning cached result");
-			return cachedResult;
+			return cachedResult.data;
 		}
 
 		const result = await dbh.genericGet(
