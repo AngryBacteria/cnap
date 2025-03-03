@@ -38,7 +38,7 @@ const appRouter = t.router({
 			simpleCache.get("championReduced"),
 		);
 		if (cachedResult.success) {
-			logger.debug("[/getChampionsReduced] Returning cached result");
+			logger.debug("API:getChampionsReduced - Cache hit");
 			return cachedResult.data;
 		}
 
@@ -59,7 +59,9 @@ const appRouter = t.router({
 			ChampionReducedSchema,
 		);
 		simpleCache.set("championReduced", result);
-		logger.debug("[/getChampionsReduced] Returning DB result");
+		logger.debug(
+			"API:getChampionsReduced - Returning DB result and updating cache",
+		);
 		return result;
 	}),
 	getChampionByAlias: loggedProcedure.input(z.string()).query(async (opts) => {
@@ -71,10 +73,12 @@ const appRouter = t.router({
 			ChampionSchema,
 		);
 		if (!dbResult[0]) {
-			logger.error(`Champion not found: ${opts.input}`);
+			logger.error(
+				`API:getChampionByAlias - Champion not found: ${opts.input}`,
+			);
 			throw new Error(`Champion not found: ${opts.input}`);
 		}
-		logger.debug(`[/getChampionByAlias] Returning DB result: ${opts.input}`);
+		logger.debug(`API:getChampionByAlias - Returning DB result: ${opts.input}`);
 		return dbResult[0];
 	}),
 	getMatchesParticipant: loggedProcedure
@@ -178,7 +182,7 @@ const appRouter = t.router({
 			const data = (result[0]?.data || []) as MatchV5Participant[];
 
 			logger.debug(
-				`[/getMatchesParticipant] Returning DB result: ${opts.input}`,
+				`API:getMatchesParticipant - Returning DB result: ${opts.input}`,
 			);
 			return {
 				page,
@@ -191,7 +195,7 @@ const appRouter = t.router({
 			simpleCache.get("getQueues"),
 		);
 		if (cachedResult.success) {
-			logger.debug("[/getQueues] Returning cached result");
+			logger.debug("API:getQueues - Cache hit");
 			return cachedResult.data;
 		}
 
@@ -201,7 +205,7 @@ const appRouter = t.router({
 			QueueSchema,
 		);
 		simpleCache.set("getQueues", result);
-		logger.debug("[/getQueues] Returning DB result");
+		logger.debug("API:getQueues - Returning DB result and updating cache");
 		return result;
 	}),
 	getItems: loggedProcedure.query(async () => {
@@ -209,7 +213,7 @@ const appRouter = t.router({
 			simpleCache.get("getItems"),
 		);
 		if (cachedResult.success) {
-			logger.debug("[/getItems] Returning cached result");
+			logger.debug("API:getItems - Cache hit");
 			return cachedResult.data;
 		}
 
@@ -219,7 +223,7 @@ const appRouter = t.router({
 			ItemSchema,
 		);
 		simpleCache.set("getItems", results);
-		logger.debug("[/getItems] Returning DB result");
+		logger.debug("API:getItems - Returning DB result and updating cache");
 		return results;
 	}),
 	getSummonerSpells: loggedProcedure.query(async () => {
@@ -227,7 +231,7 @@ const appRouter = t.router({
 			simpleCache.get("getSummonerSpells"),
 		);
 		if (cachedResult.success) {
-			logger.debug("[/getSummonerSpells] Returning cached result");
+			logger.debug("API:getSummonerSpells - Cache hit");
 			return cachedResult.data;
 		}
 
@@ -237,7 +241,9 @@ const appRouter = t.router({
 			SummonerSpellSchema,
 		);
 		simpleCache.set("getSummonerSpells", result);
-		logger.debug("[/getSummonerSpells] Returning DB result");
+		logger.debug(
+			"API:getSummonerSpells - Returning DB result and updating cache",
+		);
 		return result;
 	}),
 	getSummoners: loggedProcedure.query(async () => {
@@ -245,7 +251,7 @@ const appRouter = t.router({
 			simpleCache.get("getSummoners"),
 		);
 		if (cachedResult.success) {
-			logger.debug("[/getSummoners] Returning cached result");
+			logger.debug("API:getSummoners - Cache hit");
 			return cachedResult.data;
 		}
 
@@ -255,7 +261,7 @@ const appRouter = t.router({
 			SummonerDbSchema,
 		);
 		simpleCache.set("getSummoners", result);
-		logger.debug("[/getSummoners] Returning DB result");
+		logger.debug("API:getSummoners - Returning DB result and updating cache");
 		return result;
 	}),
 });
@@ -270,6 +276,9 @@ app.use(
 	}),
 );
 app.listen(3000);
-logger.info("tRPC Server is running on http://localhost:3000/trpc");
+logger.info(
+	{url: "http://localhost:3000/trpc"},
+	"API:Startup - tRPC Server is running on http://localhost:3000/trpc",
+);
 
 export type AppRouter = typeof appRouter;

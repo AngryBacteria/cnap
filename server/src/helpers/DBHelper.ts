@@ -82,7 +82,7 @@ export class DBHelper {
 
 	async disconnect(): Promise<void> {
 		await this.mongoClient.close();
-		logger.info("Disconnected from MongoDB");
+		logger.debug("DBHelper:disconnect - Disconnected from MongoDB");
 	}
 
 	/**
@@ -94,11 +94,13 @@ export class DBHelper {
 		try {
 			// Ping the database
 			await this.database.command({ ping: 1 });
-			logger.info("Successfully connected to MongoDB");
+			logger.debug(
+				"DBHelper:testConnection - Successfully connected to MongoDB",
+			);
 			return true;
 		} catch (error) {
 			logger.error(
-				`MongoDB connection test failed. Review your connection string and internet connection: ${error}`,
+				`DBHelper:testConnection - MongoDB connection test failed. Review your connection string and internet connection: ${error}`,
 			);
 			return false;
 		}
@@ -114,7 +116,7 @@ export class DBHelper {
 			await this.getCollection(CollectionName.SUMMONER).createIndex("puuid", {
 				unique: true,
 			});
-			logger.info("Created summoner indexes");
+			logger.debug("DBHelper:initIndexes - Created summoner indexes");
 
 			await this.getCollection(CollectionName.MATCH).createIndex(
 				"metadata.matchId",
@@ -128,7 +130,7 @@ export class DBHelper {
 				"info.participants.championId",
 				{ unique: false },
 			);
-			logger.info("Created match indexes");
+			logger.debug("DBHelper:initIndexes - Created match indexes");
 
 			await this.getCollection(CollectionName.TIMELINE).createIndex(
 				"metadata.matchId",
@@ -138,7 +140,7 @@ export class DBHelper {
 				"metadata.participants",
 				{ unique: false },
 			);
-			logger.info("Created timeline indexes");
+			logger.debug("DBHelper:initIndexes - Created timeline indexes");
 
 			await this.getCollection(CollectionName.CHAMPION).createIndex("id", {
 				unique: true,
@@ -160,12 +162,12 @@ export class DBHelper {
 			await this.getCollection(CollectionName.QUEUE).createIndex("queueId", {
 				unique: true,
 			});
-			logger.info("Created static data indexes");
+			logger.debug("DBHelper:initIndexes - Created static data indexes");
 
-			logger.info("All indexes created successfully");
+			logger.debug("DBHelper:initIndexes - All indexes created successfully");
 			return true;
 		} catch (error) {
-			logger.error(`Error creating indexes: ${error}`);
+			logger.error(`DBHelper:initIndexes - Error creating indexes: ${error}`);
 			return false;
 		}
 	}
@@ -186,7 +188,7 @@ export class DBHelper {
 		try {
 			if (!ids.length) {
 				logger.warn(
-					"No ids provided, aborting operation and returning empty array",
+					"DBHelper:getNonExistingIds - No ids provided, aborting operation and returning empty array",
 				);
 				return [];
 			}
@@ -201,13 +203,13 @@ export class DBHelper {
 			const nonExistingIds = Array.from(idsSet).filter(
 				(id) => !existingIds.includes(id),
 			);
-			logger.info(
-				`${existingIds.length} of ${idsSet.size} ${collectionName} were already present in the database`,
+			logger.debug(
+				`DBHelper:getNonExistingIds - ${existingIds.length} of ${idsSet.size} ${collectionName} were already present in the database`,
 			);
 			return nonExistingIds;
 		} catch (error) {
 			logger.error(
-				`Error while checking for existing ${collectionName.toLowerCase()} ids: ${error}`,
+				`DBHelper:getNonExistingIds - Error while checking for existing ${collectionName.toLowerCase()} ids: ${error}`,
 			);
 			return [];
 		}
@@ -234,7 +236,9 @@ export class DBHelper {
 				.limit(baseFilter.limit);
 
 			const dataRaw = await cursor.toArray();
-			logger.info(`Got ${dataRaw.length} ${collectionName} objects from DB`);
+			logger.debug(
+				`DBHelper:genericGet - Got ${dataRaw.length} ${collectionName} objects from DB`,
+			);
 
 			if (validator) {
 				// Use validator to parse and convert the data to type T
@@ -242,7 +246,9 @@ export class DBHelper {
 			}
 			return dataRaw as unknown as T[];
 		} catch (error) {
-			logger.error(`Error getting data with MongoDB: ${error}`);
+			logger.error(
+				`DBHelper:genericGet - Error getting data with MongoDB: ${error}`,
+			);
 			return [];
 		}
 	}
@@ -278,7 +284,9 @@ export class DBHelper {
 	): Promise<boolean> {
 		try {
 			if (data.length === 0) {
-				logger.warn(`No ${collectionName} data to upsert, aborted operation`);
+				logger.warn(
+					`DBHelper:genericUpsert - No ${collectionName} data to upsert, aborted operation`,
+				);
 				return false;
 			}
 
@@ -300,12 +308,14 @@ export class DBHelper {
 			const result =
 				await this.getCollection(collectionName).bulkWrite(bulkOps);
 
-			logger.info(
-				`Upserted ${result.upsertedCount} | Modified ${result.modifiedCount} | Matched ${result.matchedCount} --> ${collectionName}`,
+			logger.debug(
+				`DBHelper:genericUpsert - Upserted ${result.upsertedCount} | Modified ${result.modifiedCount} | Matched ${result.matchedCount}: ${collectionName}`,
 			);
 			return true;
 		} catch (error) {
-			logger.error(`Error uploading ${collectionName} to MongoDB: ${error}`);
+			logger.error(
+				`DBHelper:genericUpsert - Error uploading ${collectionName} to MongoDB: ${error}`,
+			);
 			return false;
 		}
 	}
