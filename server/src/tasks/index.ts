@@ -1,3 +1,4 @@
+import logger from "../helpers/Logger.js";
 import gameDataTask from "./GameDataTask.js";
 import matchTask from "./MatchTask.js";
 import summonerTask from "./SummonerTask.js";
@@ -13,7 +14,7 @@ async function intervalUpdate(
 ): Promise<void> {
 	let iteration = initialIteration;
 
-	console.log(`Starting interval update iteration: ${iteration}`);
+	logger.info(`Starting interval update iteration: ${iteration}`);
 	if (iteration % 25 === 0) {
 		await summonerTask.updateSummonerData();
 		await gameDataTask.updateEverything();
@@ -30,4 +31,4 @@ async function intervalUpdate(
 }
 
 // Start at iteration 0 and run every hour
-intervalUpdate(0, 60 * 60 * 1000).catch(console.error);
+intervalUpdate(0, 60 * 60 * 1000).catch(logger.error);

@@ -2,6 +2,7 @@ import { BasicFilterSchema, CollectionName } from "../helpers/DBHelper.js";
 import "dotenv/config";
 import { z } from "zod";
 import dbh from "../helpers/DBHelper.js";
+import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
 import { type SummonerDb, SummonerDbSchema } from "../model/SummonerDb.js";
 
@@ -37,7 +38,7 @@ export class SummonerTask {
 					summonerObjects.push(summonerData);
 				}
 			} else {
-				console.error(`Account ${account} is not valid, skipping it...`);
+				logger.error(`Account ${account} is not valid, skipping it...`);
 			}
 		}
 

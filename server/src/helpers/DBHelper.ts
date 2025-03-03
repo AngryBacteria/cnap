@@ -7,6 +7,7 @@
 import "dotenv/config";
 import { type Collection, type Db, MongoClient } from "mongodb";
 import { z } from "zod";
+import logger from "./Logger.js";
 
 /**
  * Enum representing the names of various collections in the MongoDB database.
@@ -81,7 +82,7 @@ export class DBHelper {
 
 	async disconnect(): Promise<void> {
 		await this.mongoClient.close();
-		console.log("Disconnected from MongoDB");
+		logger.info("Disconnected from MongoDB");
 	}
 
 	/**
@@ -93,10 +94,10 @@ export class DBHelper {
 		try {
 			// Ping the database
 			await this.database.command({ ping: 1 });
-			console.log("Successfully connected to MongoDB");
+			logger.info("Successfully connected to MongoDB");
 			return true;
 		} catch (error) {
-			console.error(
+			logger.error(
 				`MongoDB connection test failed. Review your connection string and internet connection: ${error}`,
 			);
 			return false;
@@ -113,7 +114,7 @@ export class DBHelper {
 			await this.getCollection(CollectionName.SUMMONER).createIndex("puuid", {
 				unique: true,
 			});
-			console.log("Created summoner indexes");
+			logger.info("Created summoner indexes");
 
 			await this.getCollection(CollectionName.MATCH).createIndex(
 				"metadata.matchId",
@@ -127,7 +128,7 @@ export class DBHelper {
 				"info.participants.championId",
 				{ unique: false },
 			);
-			console.log("Created match indexes");
+			logger.info("Created match indexes");
 
 			await this.getCollection(CollectionName.TIMELINE).createIndex(
 				"metadata.matchId",
@@ -137,7 +138,7 @@ export class DBHelper {
 				"metadata.participants",
 				{ unique: false },
 			);
-			console.log("Created timeline indexes");
+			logger.info("Created timeline indexes");
 
 			await this.getCollection(CollectionName.CHAMPION).createIndex("id", {
 				unique: true,
@@ -159,12 +160,12 @@ export class DBHelper {
 			await this.getCollection(CollectionName.QUEUE).createIndex("queueId", {
 				unique: true,
 			});
-			console.log("Created static data indexes");
+			logger.info("Created static data indexes");
 
-			console.log("All indexes created successfully");
+			logger.info("All indexes created successfully");
 			return true;
 		} catch (error) {
-			console.error(`Error creating indexes: ${error}`);
+			logger.error(`Error creating indexes: ${error}`);
 			return false;
 		}
 	}
@@ -184,7 +185,7 @@ export class DBHelper {
 	): Promise<string[]> {
 		try {
 			if (!ids.length) {
-				console.warn(
+				logger.warn(
 					"No ids provided, aborting operation and returning empty array",
 				);
 				return [];
@@ -200,12 +201,12 @@ export class DBHelper {
 			const nonExistingIds = Array.from(idsSet).filter(
 				(id) => !existingIds.includes(id),
 			);
-			console.log(
+			logger.info(
 				`${existingIds.length} of ${idsSet.size} ${collectionName} were already present in the database`,
 			);
 			return nonExistingIds;
 		} catch (error) {
-			console.error(
+			logger.error(
 				`Error while checking for existing ${collectionName.toLowerCase()} ids: ${error}`,
 			);
 			return [];
@@ -233,7 +234,7 @@ export class DBHelper {
 				.limit(baseFilter.limit);
 
 			const dataRaw = await cursor.toArray();
-			console.log(`Got ${dataRaw.length} ${collectionName} objects from DB`);
+			logger.info(`Got ${dataRaw.length} ${collectionName} objects from DB`);
 
 			if (validator) {
 				// Use validator to parse and convert the data to type T
@@ -241,7 +242,7 @@ export class DBHelper {
 			}
 			return dataRaw as unknown as T[];
 		} catch (error) {
-			console.error(`Error getting data with MongoDB: ${error}`);
+			logger.error(`Error getting data with MongoDB: ${error}`);
 			return [];
 		}
 	}
@@ -277,7 +278,7 @@ export class DBHelper {
 	): Promise<boolean> {
 		try {
 			if (data.length === 0) {
-				console.warn(`No ${collectionName} data to upsert, aborted operation`);
+				logger.warn(`No ${collectionName} data to upsert, aborted operation`);
 				return false;
 			}
 
@@ -299,12 +300,12 @@ export class DBHelper {
 			const result =
 				await this.getCollection(collectionName).bulkWrite(bulkOps);
 
-			console.log(
+			logger.info(
 				`Upserted ${result.upsertedCount} | Modified ${result.modifiedCount} | Matched ${result.matchedCount} --> ${collectionName}`,
 			);
 			return true;
 		} catch (error) {
-			console.error(`Error uploading ${collectionName} to MongoDB: ${error}`);
+			logger.error(`Error uploading ${collectionName} to MongoDB: ${error}`);
 			return false;
 		}
 	}

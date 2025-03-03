@@ -7,6 +7,7 @@ import cors from "cors";
 import express from "express";
 import { z } from "zod";
 import dbh, { CollectionName } from "../helpers/DBHelper.js";
+import logger from "../helpers/Logger.js";
 import simpleCache from "../helpers/SimpleCache.js";
 import { ChampionReducedSchema, ChampionSchema } from "../model/Champion.js";
 import { ItemSchema } from "../model/Item.js";
@@ -37,6 +38,7 @@ const appRouter = t.router({
 			simpleCache.get("championReduced"),
 		);
 		if (cachedResult.success) {
+			logger.debug("[/getChampionsReduced] Returning cached result");
 			return cachedResult;
 		}
 
@@ -57,6 +59,7 @@ const appRouter = t.router({
 			ChampionReducedSchema,
 		);
 		simpleCache.set("championReduced", result);
+		logger.debug("[/getChampionsReduced] Returning DB result");
 		return result;
 	}),
 	getChampionByAlias: loggedProcedure.input(z.string()).query(async (opts) => {
@@ -68,8 +71,10 @@ const appRouter = t.router({
 			ChampionSchema,
 		);
 		if (!dbResult[0]) {
-			throw new Error("Champion not found");
+			logger.error(`Champion not found: ${opts.input}`);
+			throw new Error(`Champion not found: ${opts.input}`);
 		}
+		logger.debug(`[/getChampionByAlias] Returning DB result: ${opts.input}`);
 		return dbResult[0];
 	}),
 	getMatchesParticipant: loggedProcedure
@@ -186,6 +191,9 @@ const appRouter = t.router({
 			const maxPage = Math.ceil(total / pageSize);
 			const data = (result[0]?.data || []) as MatchV5Participant[];
 
+			logger.debug(
+				`[/getMatchesParticipant] Returning DB result: ${opts.input}`,
+			);
 			return {
 				page,
 				maxPage,
@@ -197,6 +205,7 @@ const appRouter = t.router({
 			simpleCache.get("getQueues"),
 		);
 		if (cachedResult.success) {
+			logger.debug("[/getQueues] Returning cached result");
 			return cachedResult;
 		}
 
@@ -206,6 +215,7 @@ const appRouter = t.router({
 			QueueSchema,
 		);
 		simpleCache.set("getQueues", result);
+		logger.debug("[/getQueues] Returning DB result");
 		return result;
 	}),
 	getItems: loggedProcedure.query(async () => {
@@ -213,6 +223,7 @@ const appRouter = t.router({
 			simpleCache.get("getItems"),
 		);
 		if (cachedResult.success) {
+			logger.debug("[/getItems] Returning cached result");
 			return cachedResult;
 		}
 
@@ -222,6 +233,7 @@ const appRouter = t.router({
 			ItemSchema,
 		);
 		simpleCache.set("getItems", results);
+		logger.debug("[/getItems] Returning DB result");
 		return results;
 	}),
 	getSummonerSpells: loggedProcedure.query(async () => {
@@ -229,6 +241,7 @@ const appRouter = t.router({
 			simpleCache.get("getSummonerSpells"),
 		);
 		if (cachedResult.success) {
+			logger.debug("[/getSummonerSpells] Returning cached result");
 			return cachedResult;
 		}
 
@@ -238,6 +251,7 @@ const appRouter = t.router({
 			SummonerSpellSchema,
 		);
 		simpleCache.set("getSummonerSpells", result);
+		logger.debug("[/getSummonerSpells] Returning DB result");
 		return result;
 	}),
 	getSummoners: loggedProcedure.query(async () => {
@@ -245,6 +259,7 @@ const appRouter = t.router({
 			simpleCache.get("getSummoners"),
 		);
 		if (cachedResult.success) {
+			logger.debug("[/getSummoners] Returning cached result");
 			return cachedResult;
 		}
 
@@ -254,6 +269,7 @@ const appRouter = t.router({
 			SummonerDbSchema,
 		);
 		simpleCache.set("getSummoners", result);
+		logger.debug("[/getSummoners] Returning DB result");
 		return result;
 	}),
 });
@@ -268,6 +284,6 @@ app.use(
 	}),
 );
 app.listen(3000);
-console.log("TRCP Server is running on http://localhost:3000/trpc");
+logger.info("TRCP Server is running on http://localhost:3000/trpc");
 
 export type AppRouter = typeof appRouter;

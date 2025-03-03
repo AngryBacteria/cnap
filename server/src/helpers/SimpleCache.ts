@@ -13,10 +13,7 @@ class SimpleCache<T> {
 	 * @param maxSize Maximum number of keys allowed in the cache
 	 * @param ttl Time to live in milliseconds (0 for no expiration)
 	 */
-	constructor(
-		maxSize = 10,
-		ttl: number = 1000 * 2
-	) {
+	constructor(maxSize = 10, ttl: number = 1000 * 60 * 60 * 2) {
 		this.cache = new Map();
 		this.maxSize = maxSize;
 		this.ttl = ttl;

@@ -1,4 +1,5 @@
 import dbh, { CollectionName } from "../helpers/DBHelper.js";
+import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
 import type { SummonerDb } from "../model/SummonerDb.js";
 
@@ -26,7 +27,7 @@ export class MatchTask {
 		}
 
 		if (!existingSummoners || existingSummoners.length === 0) {
-			console.log(
+			logger.info(
 				"No Summoner data available to update match history. Stopping the loop",
 			);
 			return;
