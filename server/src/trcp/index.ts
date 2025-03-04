@@ -38,7 +38,7 @@ const appRouter = t.router({
 			simpleCache.get("championReduced"),
 		);
 		if (cachedResult.success) {
-			logger.info({ cached: true }, "API:getChampionsReduced - Cache hit");
+			logger.info({ cached: true }, "API:getChampionsReduced");
 			return cachedResult.data;
 		}
 
@@ -59,10 +59,7 @@ const appRouter = t.router({
 			ChampionReducedSchema,
 		);
 		simpleCache.set("championReduced", result);
-		logger.info(
-			{ cached: false },
-			"API:getChampionsReduced - Returning DB result and updating cache",
-		);
+		logger.info({ cached: false }, "API:getChampionsReduced");
 		return result;
 	}),
 	getChampionByAlias: loggedProcedure.input(z.string()).query(async (opts) => {
@@ -75,14 +72,14 @@ const appRouter = t.router({
 		);
 		if (!dbResult[0]) {
 			logger.error(
-				{ operationInputs: opts.input, cached: false },
+				{ operationInputs: opts.input },
 				"API:getChampionByAlias - Champion not found",
 			);
 			throw new Error(`Champion not found: ${opts.input}`);
 		}
 		logger.info(
 			{ operationInputs: opts.input, cached: false },
-			"API:getChampionByAlias - Returning DB result",
+			"API:getChampionByAlias",
 		);
 		return dbResult[0];
 	}),
@@ -188,7 +185,7 @@ const appRouter = t.router({
 
 			logger.info(
 				{ operationInputs: opts.input, cached: false },
-				"API:getMatchesParticipant - Returning DB result",
+				"API:getMatchesParticipant",
 			);
 			return {
 				page,
@@ -201,7 +198,7 @@ const appRouter = t.router({
 			simpleCache.get("getQueues"),
 		);
 		if (cachedResult.success) {
-			logger.info({ cached: true }, "API:getQueues - Cache hit");
+			logger.info({ cached: true }, "API:getQueues");
 			return cachedResult.data;
 		}
 
@@ -211,10 +208,7 @@ const appRouter = t.router({
 			QueueSchema,
 		);
 		simpleCache.set("getQueues", result);
-		logger.info(
-			{ cached: false },
-			"API:getQueues - Returning DB result and updating cache",
-		);
+		logger.info({ cached: false }, "API:getQueues");
 		return result;
 	}),
 	getItems: loggedProcedure.query(async () => {
@@ -222,7 +216,7 @@ const appRouter = t.router({
 			simpleCache.get("getItems"),
 		);
 		if (cachedResult.success) {
-			logger.info({ cached: true }, "API:getItems - Cache hit");
+			logger.info({ cached: true }, "API:getItems");
 			return cachedResult.data;
 		}
 
@@ -232,10 +226,7 @@ const appRouter = t.router({
 			ItemSchema,
 		);
 		simpleCache.set("getItems", results);
-		logger.info(
-			{ cached: false },
-			"API:getItems - Returning DB result and updating cache",
-		);
+		logger.info({ cached: false }, "API:getItems");
 		return results;
 	}),
 	getSummonerSpells: loggedProcedure.query(async () => {
@@ -243,7 +234,7 @@ const appRouter = t.router({
 			simpleCache.get("getSummonerSpells"),
 		);
 		if (cachedResult.success) {
-			logger.info({ cached: true }, "API:getSummonerSpells - Cache hit");
+			logger.info({ cached: true }, "API:getSummonerSpells");
 			return cachedResult.data;
 		}
 
@@ -253,10 +244,7 @@ const appRouter = t.router({
 			SummonerSpellSchema,
 		);
 		simpleCache.set("getSummonerSpells", result);
-		logger.info(
-			{ cached: false },
-			"API:getSummonerSpells - Returning DB result and updating cache",
-		);
+		logger.info({ cached: false }, "API:getSummonerSpells");
 		return result;
 	}),
 	getSummoners: loggedProcedure.query(async () => {
@@ -264,7 +252,7 @@ const appRouter = t.router({
 			simpleCache.get("getSummoners"),
 		);
 		if (cachedResult.success) {
-			logger.info({ cached: true }, "API:getSummoners - Cache hit");
+			logger.info({ cached: true }, "API:getSummoners");
 			return cachedResult.data;
 		}
 
@@ -274,10 +262,7 @@ const appRouter = t.router({
 			SummonerDbSchema,
 		);
 		simpleCache.set("getSummoners", result);
-		logger.info(
-			{ cached: false },
-			"API:getSummoners - Returning DB result and updating cache",
-		);
+		logger.info({ cached: false }, "API:getSummoners");
 		return result;
 	}),
 });

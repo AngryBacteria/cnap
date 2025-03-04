@@ -82,7 +82,7 @@ export class DBHelper {
 
 	async disconnect(): Promise<void> {
 		await this.mongoClient.close();
-		logger.debug("DBHelper:disconnect - Disconnected from MongoDB");
+		logger.debug("DBHelper:disconnect");
 	}
 
 	/**
@@ -94,15 +94,10 @@ export class DBHelper {
 		try {
 			// Ping the database
 			await this.database.command({ ping: 1 });
-			logger.debug(
-				"DBHelper:testConnection - Successfully connected to MongoDB",
-			);
+			logger.debug({ connectec: true }, "DBHelper:testConnection");
 			return true;
 		} catch (e) {
-			logger.error(
-				{ error: e },
-				"DBHelper:testConnection - MongoDB connection test failed. Review your connection string and internet connection",
-			);
+			logger.error({ connectec: false, error: e }, "DBHelper:testConnection");
 			return false;
 		}
 	}
@@ -210,14 +205,11 @@ export class DBHelper {
 					total: idsSet.size,
 					collectionName,
 				},
-				"DBHelper:getNonExistingIds -  Some ids were already present in the database",
+				"DBHelper:getNonExistingIds",
 			);
 			return nonExistingIds;
 		} catch (error) {
-			logger.error(
-				{ error, collectionName },
-				"DBHelper:getNonExistingIds - Error while checking for existing ids",
-			);
+			logger.error({ error, collectionName }, "DBHelper:getNonExistingIds");
 			return [];
 		}
 	}
@@ -245,7 +237,7 @@ export class DBHelper {
 			const dataRaw = await cursor.toArray();
 			logger.debug(
 				{ length: dataRaw.length, collectionName },
-				`DBHelper:genericGet - Got ${collectionName} objects from DB`,
+				"DBHelper:genericGet",
 			);
 
 			if (validator) {
@@ -254,10 +246,7 @@ export class DBHelper {
 			}
 			return dataRaw as unknown as T[];
 		} catch (error) {
-			logger.error(
-				{ error, collectionName },
-				"DBHelper:genericGet - Error getting data with MongoDB",
-			);
+			logger.error({ error, collectionName }, "DBHelper:genericGet");
 			return [];
 		}
 	}
@@ -325,14 +314,11 @@ export class DBHelper {
 					matched: result.matchedCount,
 					collectionName,
 				},
-				"DBHelper:genericUpsert - Upserted data to MongoDB",
+				"DBHelper:genericUpsert",
 			);
 			return true;
 		} catch (error) {
-			logger.error(
-				{ error, collectionName },
-				"DBHelper:genericUpsert - Error upserting to MongoDB",
-			);
+			logger.error({ error, collectionName }, "DBHelper:genericUpsert");
 			return false;
 		}
 	}
