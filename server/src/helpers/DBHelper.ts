@@ -238,27 +238,27 @@ export class DBHelper {
 				.skip(baseFilter.offset)
 				.limit(baseFilter.limit);
 
-			const dataRaw = await cursor.toArray();
+			const dbResultRaw = await cursor.toArray();
 
-			let result: T[];
+			let output: T[];
 			if (validator) {
 				// Use validator to parse and convert the data to type T
-				result = validator.array().parse(dataRaw);
+				output = validator.array().parse(dbResultRaw);
 			} else {
-				result = dataRaw as unknown as T[];
+				output = dbResultRaw as unknown as T[];
 			}
 
 			const processingTime = performance.now() - startTime;
 			logger.debug(
 				{
-					length: dataRaw.length,
+					length: dbResultRaw.length,
 					collectionName,
 					processingTimeMS: processingTime.toFixed(2),
 				},
 				"DBHelper:genericGet",
 			);
 
-			return result;
+			return output;
 		} catch (error) {
 			logger.error({ error, collectionName }, "DBHelper:genericGet");
 			return [];
@@ -319,15 +319,15 @@ export class DBHelper {
 				},
 			}));
 
-			const result =
+			const dbResult =
 				await this.getCollection(collectionName).bulkWrite(bulkOps);
 
 			const processingTime = performance.now() - startTime;
 			logger.debug(
 				{
-					upserted: result.upsertedCount,
-					modified: result.modifiedCount,
-					matched: result.matchedCount,
+					upserted: dbResult.upsertedCount,
+					modified: dbResult.modifiedCount,
+					matched: dbResult.matchedCount,
 					collectionName,
 					processingTimeMS: processingTime.toFixed(2),
 				},
@@ -337,6 +337,40 @@ export class DBHelper {
 		} catch (error) {
 			logger.error({ error, collectionName }, "DBHelper:genericUpsert");
 			return false;
+		}
+	}
+
+	async genericPipeline<T extends object>(
+		pipeline: Record<string, unknown>[],
+		collectionName: CollectionName,
+		validator?: z.ZodType<T>,
+	) {
+		try {
+			const startTime = performance.now();
+			const cursor = this.getCollection(CollectionName.MATCH).aggregate(
+				pipeline,
+			);
+
+			const dbResultRaw = await cursor.toArray();
+			let output: T[];
+			if (validator) {
+				// Use validator to parse and convert the data to type T
+				output = validator.array().parse(dbResultRaw);
+			} else {
+				output = dbResultRaw as unknown as T[];
+			}
+			const processingTime = performance.now() - startTime;
+			logger.debug(
+				{
+					collectionName,
+					processingTimeMS: processingTime.toFixed(2),
+				},
+				"DBHelper:genericPipeline",
+			);
+			return output;
+		} catch (error) {
+			logger.error({ error, collectionName }, "DBHelper:genericPipeline");
+			return [];
 		}
 	}
 }

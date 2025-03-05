@@ -5,6 +5,7 @@ import { initTRPC } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import cors from "cors";
 import express from "express";
+import { SummonerSummarySchema } from "src/model/SummonerSummary.js";
 import { z } from "zod";
 import dbh, { CollectionName } from "../helpers/DBHelper.js";
 import logger from "../helpers/Logger.js";
@@ -172,6 +173,7 @@ const appRouter = t.router({
 				},
 			);
 
+			// TODO: use helper function
 			const collection = dbh.getCollection(CollectionName.MATCH);
 			const cursor = collection.aggregate(pipeline);
 
@@ -263,6 +265,88 @@ const appRouter = t.router({
 		);
 		simpleCache.set("getSummoners", result);
 		logger.info({ cached: false }, "API:getSummoners");
+		return result;
+	}),
+	getSummonerSummary: loggedProcedure.input(z.string()).query(async (opts) => {
+		const pipeline = [
+			{
+				$match: {
+					"info.participants.puuid": opts.input,
+				},
+			},
+			{
+				$unwind: {
+					path: "$info.participants",
+				},
+			},
+			{
+				$match: {
+					"info.participants.puuid": opts.input,
+				},
+			},
+			{
+				$group: {
+					_id: {
+						champion: "$info.participants.championName",
+						queueId: "$info.queueId",
+						teamPosition: "$info.participants.teamPosition",
+					},
+					totalMatches: {
+						$sum: 1,
+					},
+					wins: {
+						$sum: {
+							$cond: [
+								{
+									$eq: ["$info.participants.win", true],
+								},
+								1,
+								0,
+							],
+						},
+					},
+					secondsPlayed: {
+						$sum: "$info.gameDuration",
+					},
+					kills: {
+						$sum: "$info.participants.kills",
+					},
+					deaths: {
+						$sum: "$info.participants.deaths",
+					},
+					assists: {
+						$sum: "$info.participants.assists",
+					},
+					doubleKills: {
+						$sum: "$info.participants.doubleKills",
+					},
+					tripleKills: {
+						$sum: "$info.participants.tripleKills",
+					},
+					quadraKills: {
+						$sum: "$info.participants.quadraKills",
+					},
+					pentaKills: {
+						$sum: "$info.participants.pentaKills",
+					},
+					totalVisionScore: {
+						$sum: "$info.participants.visionScore",
+					},
+				},
+			},
+			{
+				$sort: {
+					totalMatches: -1,
+				},
+			},
+		];
+
+		const result = await dbh.genericPipeline(
+			pipeline,
+			CollectionName.MATCH,
+			SummonerSummarySchema,
+		);
+		logger.info({ cached: false }, "API:getSummonerSummary");
 		return result;
 	}),
 });
