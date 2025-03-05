@@ -6,6 +6,7 @@
 
 import "dotenv/config";
 import { type Collection, type Db, MongoClient } from "mongodb";
+import { PaginatedDBResponseSchema } from "src/model/PaginatedDBResponse.js";
 import { z } from "zod";
 import logger from "./Logger.js";
 
@@ -347,9 +348,7 @@ export class DBHelper {
 	) {
 		try {
 			const startTime = performance.now();
-			const cursor = this.getCollection(CollectionName.MATCH).aggregate(
-				pipeline,
-			);
+			const cursor = this.getCollection(collectionName).aggregate(pipeline);
 
 			const dbResultRaw = await cursor.toArray();
 			let output: T[];
@@ -368,6 +367,59 @@ export class DBHelper {
 				"DBHelper:genericPipeline",
 			);
 			return output;
+		} catch (error) {
+			logger.error({ error, collectionName }, "DBHelper:genericPipeline");
+			return [];
+		}
+	}
+
+	async genericPaginatedPipeline<T extends object>(
+		pipeline: Record<string, unknown>[],
+		collectionName: CollectionName,
+		page: number,
+		pageSize = 10,
+		validator?: z.ZodType<T>,
+	) {
+		try {
+			const startTime = performance.now();
+
+			const amountToSkip = (page - 1) * pageSize;
+			const cursor = this.getCollection(collectionName).aggregate([
+				...pipeline,
+				{
+					$facet: {
+						metadata: [{ $count: "total" }],
+						data: [
+							{ $skip: amountToSkip },
+							{ $limit: pageSize },
+							{ $project: { _id: 0 } },
+						],
+					},
+				},
+			]);
+			const dbResultRaw = await cursor.toArray();
+			const dbResult = PaginatedDBResponseSchema.parse(dbResultRaw);
+
+			const { data, metadata } = dbResult[0];
+			const total = metadata[0].total;
+			const maxPage = Math.ceil(total / pageSize);
+
+			let outputData: T[];
+			if (validator) {
+				// Use validator to parse and convert the data to type T
+				outputData = validator.array().parse(data);
+			} else {
+				outputData = data as unknown as T[];
+			}
+			const processingTime = performance.now() - startTime;
+			logger.debug(
+				{
+					collectionName,
+					processingTimeMS: processingTime.toFixed(2),
+				},
+				"DBHelper:genericPaginatedPipeline",
+			);
+			return { page, maxPage, data: outputData };
 		} catch (error) {
 			logger.error({ error, collectionName }, "DBHelper:genericPipeline");
 			return [];

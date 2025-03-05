@@ -5,7 +5,6 @@ import { initTRPC } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import cors from "cors";
 import express from "express";
-import { SummonerDbSchema } from "../model/Summoner.js";
 import { z } from "zod";
 import dbh, { CollectionName } from "../helpers/DBHelper.js";
 import logger from "../helpers/Logger.js";
@@ -14,6 +13,7 @@ import { ChampionReducedSchema, ChampionSchema } from "../model/Champion.js";
 import { ItemSchema } from "../model/Item.js";
 import type { MatchV5Participant } from "../model/MatchV5.js";
 import { QueueSchema } from "../model/Queue.js";
+import { SummonerDbSchema } from "../model/Summoner.js";
 import { SummonerSpellSchema } from "../model/SummonerSpell.js";
 import { SummonerSummarySchema } from "../model/SummonerSummary.js";
 import { loggedProcedure } from "./middlewares/executionTime.js";
@@ -25,6 +25,8 @@ const staticFilesPath = join(__dirname, "..", "..", "..", "static");
 if (!fs.existsSync(staticFilesPath)) {
 	throw new Error(`The folder at ${staticFilesPath} does not exist.`);
 }
+
+//TODO: handle erorrs better
 
 const t = initTRPC.create();
 const appRouter = t.router({
@@ -96,10 +98,6 @@ const appRouter = t.router({
 		.query(async (opts) => {
 			const { championId, queueId, onlySummonersInDb, page } = opts.input;
 
-			// Pagination
-			const pageSize = 10;
-			const skip = (page - 1) * pageSize;
-
 			// Init the pipeline
 			const pipeline: Record<string, unknown>[] = [];
 
@@ -158,42 +156,20 @@ const appRouter = t.router({
 				});
 			}
 
-			// Sort and paginate
-			pipeline.push(
-				{ $sort: { "info.gameCreation": -1 } },
-				{
-					$facet: {
-						metadata: [{ $count: "total" }],
-						data: [
-							{ $skip: skip },
-							{ $limit: pageSize },
-							{ $project: { _id: 0 } },
-						],
-					},
-				},
+			// Sort
+			pipeline.push({ $sort: { "info.gameCreation": -1 } });
+
+			const dbResult = await dbh.genericPaginatedPipeline<MatchV5Participant>(
+				pipeline,
+				CollectionName.MATCH,
+				page,
 			);
-
-			// TODO: use helper function
-			const collection = dbh.getCollection(CollectionName.MATCH);
-			const cursor = collection.aggregate(pipeline);
-
-			const result = await cursor.toArray();
-
-			const metadata = result[0]?.metadata || [];
-			const total = metadata[0]?.total || 0;
-
-			const maxPage = Math.ceil(total / pageSize);
-			const data = (result[0]?.data || []) as MatchV5Participant[];
 
 			logger.info(
 				{ operationInputs: opts.input, cached: false },
 				"API:getMatchesParticipant",
 			);
-			return {
-				page,
-				maxPage,
-				data,
-			};
+			return dbResult;
 		}),
 	getQueues: loggedProcedure.query(async () => {
 		const cachedResult = QueueSchema.array().safeParse(
