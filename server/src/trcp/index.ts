@@ -5,7 +5,7 @@ import { initTRPC } from "@trpc/server";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import cors from "cors";
 import express from "express";
-import { SummonerSummarySchema } from "src/model/SummonerSummary.js";
+import { SummonerSummarySchema } from "../model/SummonerSummary.js";
 import { z } from "zod";
 import dbh, { CollectionName } from "../helpers/DBHelper.js";
 import logger from "../helpers/Logger.js";
