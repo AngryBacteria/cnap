@@ -27,7 +27,7 @@ export function ChampionMatchesLoader({ championId }: Props) {
 		page,
 		championId,
 		selectedQueue,
-		false,
+		true,
 	);
 	const itemQuery = useItems();
 	const queuesQuery = useQueues();

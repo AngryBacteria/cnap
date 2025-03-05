@@ -182,6 +182,7 @@ export class DBHelper {
 		idField: string,
 	): Promise<string[]> {
 		try {
+			const startTime = performance.now();
 			if (!ids.length) {
 				logger.warn(
 					"DBHelper:getNonExistingIds - No ids provided, aborting operation and returning empty array",
@@ -199,11 +200,13 @@ export class DBHelper {
 			const nonExistingIds = Array.from(idsSet).filter(
 				(id) => !existingIds.includes(id),
 			);
+			const processingTime = performance.now() - startTime;
 			logger.debug(
 				{
 					existing: existingIds.length,
 					total: idsSet.size,
 					collectionName,
+					processingTimeMS: processingTime.toFixed(2),
 				},
 				"DBHelper:getNonExistingIds",
 			);
@@ -228,6 +231,7 @@ export class DBHelper {
 		validator?: z.ZodType<T>,
 	): Promise<T[]> {
 		try {
+			const startTime = performance.now();
 			const baseFilter = BasicFilterSchema.parse(partialFilter);
 			const cursor = this.getCollection(collectionName)
 				.find(baseFilter.filter, { projection: baseFilter.project })
@@ -235,16 +239,26 @@ export class DBHelper {
 				.limit(baseFilter.limit);
 
 			const dataRaw = await cursor.toArray();
+
+			let result: T[];
+			if (validator) {
+				// Use validator to parse and convert the data to type T
+				result = validator.array().parse(dataRaw);
+			} else {
+				result = dataRaw as unknown as T[];
+			}
+
+			const processingTime = performance.now() - startTime;
 			logger.debug(
-				{ length: dataRaw.length, collectionName },
+				{
+					length: dataRaw.length,
+					collectionName,
+					processingTimeMS: processingTime.toFixed(2),
+				},
 				"DBHelper:genericGet",
 			);
 
-			if (validator) {
-				// Use validator to parse and convert the data to type T
-				return validator.array().parse(dataRaw);
-			}
-			return dataRaw as unknown as T[];
+			return result;
 		} catch (error) {
 			logger.error({ error, collectionName }, "DBHelper:genericGet");
 			return [];
@@ -281,6 +295,7 @@ export class DBHelper {
 		validator?: z.ZodType<T>,
 	): Promise<boolean> {
 		try {
+			const startTime = performance.now();
 			if (data.length === 0) {
 				logger.warn(
 					{ collectionName },
@@ -307,12 +322,14 @@ export class DBHelper {
 			const result =
 				await this.getCollection(collectionName).bulkWrite(bulkOps);
 
+			const processingTime = performance.now() - startTime;
 			logger.debug(
 				{
 					upserted: result.upsertedCount,
 					modified: result.modifiedCount,
 					matched: result.matchedCount,
 					collectionName,
+					processingTimeMS: processingTime.toFixed(2),
 				},
 				"DBHelper:genericUpsert",
 			);

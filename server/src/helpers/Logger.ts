@@ -1,3 +1,3 @@
 import { pino } from "pino";
 
-export default pino({ level: "debug" });
+export default pino({ level: "trace" });

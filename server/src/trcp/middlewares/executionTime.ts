@@ -6,7 +6,7 @@ export const loggedProcedure = publicProcedure.use(async (opts) => {
 	const result = await opts.next();
 	const processingTime = performance.now() - startTime;
 	logger.trace(
-		{ processingTime: processingTime.toFixed(2) },
+		{ processingTimeMS: processingTime.toFixed(2), path: opts.path },
 		"Middleware:loggedProcedure",
 	);
 	return result;
