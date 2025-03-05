@@ -1,7 +1,7 @@
 import dbh, { CollectionName } from "../helpers/DBHelper.js";
 import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
-import type { SummonerDb } from "../model/SummonerDb.js";
+import type { SummonerDb } from "src/model/Summoner.js";
 
 export class MatchTask {
 	async updateMatchData(count = 69, offset = 0, puuid = ""): Promise<void> {

@@ -14,7 +14,7 @@ import { ChampionReducedSchema, ChampionSchema } from "../model/Champion.js";
 import { ItemSchema } from "../model/Item.js";
 import type { MatchV5Participant } from "../model/MatchV5.js";
 import { QueueSchema } from "../model/Queue.js";
-import { SummonerDbSchema } from "../model/SummonerDb.js";
+import { SummonerDbSchema } from "src/model/Summoner.js";
 import { SummonerSpellSchema } from "../model/SummonerSpell.js";
 import { loggedProcedure } from "./middlewares/executionTime.js";
 
