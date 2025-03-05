@@ -12,7 +12,7 @@ import { type Item, ItemSchema } from "src/model/Item.js";
 import { type LeagueMap, LeagueMapSchema } from "src/model/Map.js";
 import { type Queue, QueueSchema } from "src/model/Queue.js";
 import { SummonerSchema } from "src/model/Summoner.js";
-import { type SummonerDb } from "src/model/Summoner.js";
+import type { SummonerDb } from "src/model/Summoner.js";
 import { SummonerDbSchema } from "src/model/Summoner.js";
 import {
 	type SummonerIcon,

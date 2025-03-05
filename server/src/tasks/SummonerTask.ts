@@ -1,11 +1,11 @@
 import { BasicFilterSchema, CollectionName } from "../helpers/DBHelper.js";
 import "dotenv/config";
+import type { SummonerDb } from "src/model/Summoner.js";
+import { SummonerDbSchema } from "src/model/Summoner.js";
 import { z } from "zod";
 import dbh from "../helpers/DBHelper.js";
 import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
-import { type SummonerDb } from "src/model/Summoner.js";
-import { SummonerDbSchema } from "src/model/Summoner.js";
 
 export class SummonerTask {
 	private accountsString: string;

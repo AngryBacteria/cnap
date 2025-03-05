@@ -20,6 +20,5 @@ export const SummonerDbSchema = z.object({
 	revisionDate: z.number(),
 	summonerLevel: z.number(),
 	tagLine: z.string(),
-
-});export type SummonerDb = z.infer<typeof SummonerDbSchema>;
-
+});
+export type SummonerDb = z.infer<typeof SummonerDbSchema>;
