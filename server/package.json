@@ -22,19 +22,19 @@
     "@types/express": "5.0.0",
     "@types/node": "22.13.5",
     "nodemon": "3.1.9",
-    "pino-pretty": "^13.0.0",
+    "pino-pretty": "13.0.0",
     "tsx": "4.19.3",
     "typescript": "5.7.3"
   },
   "dependencies": {
     "@trpc/client": "11.0.0-rc.824",
     "@trpc/server": "11.0.0-rc.824",
-    "cors": "^2.8.5",
+    "cors": "2.8.5",
     "dotenv": "16.4.7",
     "express": "4.21.2",
     "limiter": "3.0.0",
     "mongodb": "6.13.1",
-    "pino": "^9.6.0",
+    "pino": "9.6.0",
     "zod": "3.24.2"
   }
 }

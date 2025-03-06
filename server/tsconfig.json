@@ -1,17 +1,24 @@
 {
     "compilerOptions": {
+      // Base
       "target": "ES2024",
       "module": "NodeNext",
       "moduleResolution": "NodeNext",
       "esModuleInterop": true,
-      "strict": true,
       "outDir": "dist",
       "sourceMap": true,
       "resolveJsonModule": true,
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true,
+      "moduleDetection": "force",
+      "isolatedModules": true,
+      "verbatimModuleSyntax": true,
       "removeComments": true,
-      "baseUrl": ".",
+      "baseUrl": "./src",
+
+      // Strictness
+      "noUncheckedIndexedAccess": true,
+      "strict": true,
 
       // Fix for type character exceeding limit
       "declaration": false

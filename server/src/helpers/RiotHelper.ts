@@ -1,28 +1,30 @@
 import { RateLimiter } from "limiter";
 import "dotenv/config";
-import { type Account, AccountSchema } from "src/model/Account.js";
+import { z } from "zod";
+import { type Account, AccountSchema } from "../model/Account.js";
 import {
 	type Champion,
 	ChampionSchema,
 	ChampionSummarySchema,
-} from "src/model/Champion.js";
-import { type GameMode, GameModeSchema } from "src/model/GameMode.js";
-import { type GameType, GameTypeSchema } from "src/model/GameType.js";
-import { type Item, ItemSchema } from "src/model/Item.js";
-import { type LeagueMap, LeagueMapSchema } from "src/model/Map.js";
-import { type Queue, QueueSchema } from "src/model/Queue.js";
-import { SummonerSchema } from "src/model/Summoner.js";
-import type { SummonerDb } from "src/model/Summoner.js";
-import { SummonerDbSchema } from "src/model/Summoner.js";
+} from "../model/Champion.js";
+import { type GameMode, GameModeSchema } from "../model/GameMode.js";
+import { type GameType, GameTypeSchema } from "../model/GameType.js";
+import { type Item, ItemSchema } from "../model/Item.js";
+import { type LeagueMap, LeagueMapSchema } from "../model/Map.js";
+import { type Queue, QueueSchema } from "../model/Queue.js";
+import {
+	type SummonerDb,
+	SummonerDbSchema,
+	SummonerSchema,
+} from "../model/Summoner.js";
 import {
 	type SummonerIcon,
 	SummonerIconSchema,
-} from "src/model/SummonerIcon.js";
+} from "../model/SummonerIcon.js";
 import {
 	type SummonerSpell,
 	SummonerSpellSchema,
-} from "src/model/SummonerSpell.js";
-import { z } from "zod";
+} from "../model/SummonerSpell.js";
 import logger from "./Logger.js";
 
 /**
@@ -331,7 +333,7 @@ export class RiotHelper {
 					false,
 				);
 
-				if (champion.skins.length > 0) {
+				if (champion.skins[0]) {
 					champion.uncenteredSplashPath =
 						champion.skins[0].uncenteredSplashPath;
 				} else {

@@ -1,7 +1,7 @@
-import type { SummonerDb } from "src/model/Summoner.js";
 import dbh, { CollectionName } from "../helpers/DBHelper.js";
 import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
+import type { SummonerDb } from "../model/Summoner.js";
 
 export class MatchTask {
 	async updateMatchData(count = 69, offset = 0, puuid = ""): Promise<void> {
@@ -12,7 +12,7 @@ export class MatchTask {
 				{ limit: 100000, filter: { puuid } },
 				undefined,
 			);
-			if (summoner && summoner.length > 0) {
+			if (summoner[0]) {
 				existingSummoners.push(summoner[0]);
 			}
 		} else {

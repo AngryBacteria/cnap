@@ -6,8 +6,8 @@
 
 import "dotenv/config";
 import { type Collection, type Db, MongoClient } from "mongodb";
-import { PaginatedDBResponseSchema } from "../model/PaginatedDBResponse.js";
 import { z } from "zod";
+import { PaginatedDBResponseSchema } from "../model/PaginatedDBResponse.js";
 import logger from "./Logger.js";
 
 /**
@@ -409,7 +409,14 @@ export class DBHelper {
 			const dbResultRaw = await cursor.toArray();
 			const dbResult = PaginatedDBResponseSchema.parse(dbResultRaw);
 
+			if (!dbResult[0]) {
+				throw new Error("Paginated DB Response is empty");
+			}
 			const { data, metadata } = dbResult[0];
+
+			if (!metadata[0]) {
+				throw new Error("Paginated DB Response is empty");
+			}
 			const total = metadata[0].total;
 			const maxPage = Math.ceil(total / pageSize);
 

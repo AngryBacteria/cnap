@@ -1,11 +1,10 @@
-import { BasicFilterSchema, CollectionName } from "../helpers/DBHelper.js";
+import { CollectionName } from "../helpers/DBHelper.js";
 import "dotenv/config";
-import type { SummonerDb } from "src/model/Summoner.js";
-import { SummonerDbSchema } from "src/model/Summoner.js";
 import { z } from "zod";
 import dbh from "../helpers/DBHelper.js";
 import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
+import { type SummonerDb, SummonerDbSchema } from "../model/Summoner.js";
 
 export class SummonerTask {
 	private accountsString: string;
@@ -29,7 +28,7 @@ export class SummonerTask {
 		for (const account of accountsStringSeparated) {
 			const parts = account.trim().split("_");
 
-			if (parts.length > 1) {
+			if (parts[0] && parts[1]) {
 				const name = parts[0];
 				const tag = parts[1];
 
