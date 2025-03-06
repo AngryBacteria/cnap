@@ -8,7 +8,7 @@ import type { Outputs } from "../../utils/trcp.ts";
 import styles from "./ChampionReducedCard.module.css";
 
 interface ChampionCardProps {
-	champion: Outputs["getChampionsReduced"][number];
+	champion: Outputs["lol"]["getChampionsReduced"][number];
 }
 
 export function ChampionReducedCard({ champion }: ChampionCardProps) {

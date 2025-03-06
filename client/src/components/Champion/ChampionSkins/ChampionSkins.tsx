@@ -7,15 +7,17 @@ import { useState } from "react";
 import type { Outputs } from "../../../utils/trcp.ts";
 
 interface Props {
-	champion: Outputs["getChampionByAlias"];
+	champion: Outputs["lol"]["getChampionByAlias"];
 }
 export function ChampionSkins({ champion }: Props) {
 	const [opened, { open, close }] = useDisclosure(false);
 	const [focusedSkin, setFocusedSkin] = useState<
-		undefined | Outputs["getChampionByAlias"]["skins"][number]
+		undefined | Outputs["lol"]["getChampionByAlias"]["skins"][number]
 	>();
 
-	function openSkinModal(skin: Outputs["getChampionByAlias"]["skins"][number]) {
+	function openSkinModal(
+		skin: Outputs["lol"]["getChampionByAlias"]["skins"][number],
+	) {
 		setFocusedSkin(skin);
 		open();
 	}

@@ -4,8 +4,8 @@ import type { Outputs } from "../../../utils/trcp.ts";
 import styles from "./LeagueItemGrid.module.css";
 
 interface Props {
-	participant: Outputs["getMatchesParticipant"]["data"][number]["info"]["participants"];
-	items: Outputs["getItems"];
+	participant: Outputs["lol"]["getMatchesParticipant"]["data"][number]["info"]["participants"];
+	items: Outputs["lol"]["getItems"];
 }
 
 interface PreparedItem {

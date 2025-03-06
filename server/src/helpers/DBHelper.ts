@@ -6,7 +6,7 @@
 
 import "dotenv/config";
 import { type Collection, type Db, MongoClient } from "mongodb";
-import { PaginatedDBResponseSchema } from "src/model/PaginatedDBResponse.js";
+import { PaginatedDBResponseSchema } from "../model/PaginatedDBResponse.js";
 import { z } from "zod";
 import logger from "./Logger.js";
 

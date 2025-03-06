@@ -5,10 +5,10 @@ import { LeagueItemGrid } from "../LeagueItemGrid/LeagueItemGrid";
 import styles from "./MatchBannerSummary.module.css";
 
 interface Props {
-	match: Outputs["getMatchesParticipant"]["data"][number];
-	queues: Outputs["getQueues"];
-	summonerSpells: Outputs["getSummonerSpells"];
-	items: Outputs["getItems"];
+	match: Outputs["lol"]["getMatchesParticipant"]["data"][number];
+	queues: Outputs["lol"]["getQueues"];
+	summonerSpells: Outputs["lol"]["getSummonerSpells"];
+	items: Outputs["lol"]["getItems"];
 }
 
 export function MatchBannerSummary({

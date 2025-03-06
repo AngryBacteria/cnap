@@ -3,8 +3,8 @@ import type { Outputs } from "../../../utils/trcp.ts";
 
 interface Props {
 	championAbility:
-		| Outputs["getChampionByAlias"]["passive"]
-		| Outputs["getChampionByAlias"]["spells"][number];
+		| Outputs["lol"]["getChampionByAlias"]["passive"]
+		| Outputs["lol"]["getChampionByAlias"]["spells"][number];
 }
 
 export function ChampionAbility({ championAbility }: Props) {
