@@ -16,6 +16,7 @@ export function SummonerCard({ summoner }: Props) {
 					src={summonerIconPath}
 					alt={summoner.gameName}
 					key={summoner.puuid}
+					className={styles.imageContainer}
 				/>
 			</Card.Section>
 

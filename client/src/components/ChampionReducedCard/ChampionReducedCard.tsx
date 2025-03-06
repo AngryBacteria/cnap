@@ -24,7 +24,10 @@ export function ChampionReducedCard({ champion }: ChampionCardProps) {
 			onClick={goToChampionDetail}
 		>
 			<Card.Section>
-				<Image src={champion.uncenteredSplashPath} />
+				<Image
+					src={champion.uncenteredSplashPath}
+					className={styles.imageContainer}
+				/>
 			</Card.Section>
 
 			<section>

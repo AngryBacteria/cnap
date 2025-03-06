@@ -2,3 +2,9 @@
 	max-width: 350px;
 	cursor: pointer;
 }
+
+.imageContainer {
+	aspect-ratio: 1215 / 717;
+	width: 100%;
+	font-size: 0;
+}
