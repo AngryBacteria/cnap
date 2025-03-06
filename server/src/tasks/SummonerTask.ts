@@ -59,7 +59,7 @@ export class SummonerTask {
 	 * Add a single summoner to the summoners collection
 	 */
 	async addSummoner(name: string, tag: string, puuid?: string): Promise<void> {
-		let summonerData: SummonerDb | null = null;
+		let summonerData: SummonerDb | undefined = undefined;
 
 		if (puuid) {
 			summonerData = await rh.getSummonerByPuuidRiot(puuid);

@@ -58,6 +58,8 @@ export type BasicFilter = z.infer<typeof BasicFilterSchema>;
 export const PartialBasicFilter = BasicFilterSchema.partial();
 export type PartialBasicFilter = z.infer<typeof PartialBasicFilter>;
 
+//TODO: differentiate between noting was found or error that the callers can react to it (especially api)
+
 export class DBHelper {
 	private mongoClient: MongoClient;
 	private database: Db;

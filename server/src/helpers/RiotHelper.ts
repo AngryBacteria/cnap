@@ -27,6 +27,8 @@ import {
 } from "../model/SummonerSpell.js";
 import logger from "./Logger.js";
 
+//TODO: differentiate between noting was found or error that the callers can react to it
+
 /**
  * Maps an asset path to the correct URL for the Community Dragon CDN.
  */
@@ -105,8 +107,8 @@ export class RiotHelper {
 
 		const jsonData = await response.json();
 
-		if (jsonData === null) {
-			throw new Error("No data returned");
+		if (!jsonData) {
+			throw new Error("API Request returned no data");
 		}
 
 		if (schema) {
@@ -138,7 +140,7 @@ export class RiotHelper {
 	 * @param matchId The match id of the match to fetch
 	 * @returns Dict representation of the match
 	 */
-	async getMatch(matchId: string): Promise<unknown | null> {
+	async getMatch(matchId: string): Promise<unknown | undefined> {
 		try {
 			const url = `https://europe.api.riotgames.com/lol/match/v5/matches/${matchId}`;
 			const match = await this.makeRequest(url);
@@ -146,7 +148,7 @@ export class RiotHelper {
 			return match;
 		} catch (e) {
 			logger.error({ matchId, error: e }, "RiotHelper:getMatch");
-			return null;
+			return undefined;
 		}
 	}
 
@@ -155,7 +157,7 @@ export class RiotHelper {
 	 * @param timelineId The id of the timeline to fetch
 	 * @returns Dict representation of the timeline
 	 */
-	async getTimeline(timelineId: string): Promise<unknown | null> {
+	async getTimeline(timelineId: string): Promise<unknown | undefined> {
 		try {
 			const url = `https://europe.api.riotgames.com/lol/match/v5/matches/${timelineId}/timeline`;
 			const timeline = await this.makeRequest(url);
@@ -163,7 +165,7 @@ export class RiotHelper {
 			return timeline;
 		} catch (e) {
 			logger.error({ timelineId, error: e }, "RiotHelper:getTimeline");
-			return null;
+			return undefined;
 		}
 	}
 
@@ -195,7 +197,7 @@ export class RiotHelper {
 	async getRiotAccountByTag(
 		name: string,
 		tag: string,
-	): Promise<Account | null> {
+	): Promise<Account | undefined> {
 		try {
 			const properTag = tag.replace("#", "");
 			const url = `https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${name}/${properTag}`;
@@ -204,7 +206,7 @@ export class RiotHelper {
 			return account;
 		} catch (e) {
 			logger.error({ name, tag, error: e }, "RiotHelper:getRiotAccountByTag");
-			return null;
+			return undefined;
 		}
 	}
 
@@ -213,7 +215,7 @@ export class RiotHelper {
 	 * @param puuid The puuid of the account
 	 * @returns AccountDTO object
 	 */
-	async getRiotAccountByPuuid(puuid: string): Promise<Account | null> {
+	async getRiotAccountByPuuid(puuid: string): Promise<Account | undefined> {
 		try {
 			const url = `https://europe.api.riotgames.com/riot/account/v1/accounts/by-puuid/${puuid}`;
 			const account = await this.makeRequest(url, AccountSchema);
@@ -221,7 +223,7 @@ export class RiotHelper {
 			return account;
 		} catch (e) {
 			logger.error({ puuid, error: e }, "RiotHelper:getRiotAccountByPuuid");
-			return null;
+			return undefined;
 		}
 	}
 
@@ -234,15 +236,15 @@ export class RiotHelper {
 	 */
 	async getSummonerByPuuidRiot(
 		puuid: string,
-		account?: Account | null,
-	): Promise<SummonerDb | null> {
+		account?: Account | undefined,
+	): Promise<SummonerDb | undefined> {
 		try {
 			const url = `https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`;
 			const summonerRiot = await this.makeRequest(url, SummonerSchema);
 			logger.debug({ puuid }, "RiotHelper:getSummonerByPuuidRiot");
 
 			// check if account provided
-			let properAccount: Account | null | undefined = account;
+			let properAccount: Account | undefined = account;
 			if (!account) {
 				properAccount = await this.getRiotAccountByPuuid(summonerRiot.puuid);
 			}
@@ -256,10 +258,10 @@ export class RiotHelper {
 				{ puuid },
 				"RiotHelper:getSummonerByPuuidRiot - not able to merge data",
 			);
-			return null;
+			return undefined;
 		} catch (e) {
 			logger.error({ puuid, error: e }, "RiotHelper:getSummonerByPuuidRiot");
-			return null;
+			return undefined;
 		}
 	}
 
@@ -273,20 +275,20 @@ export class RiotHelper {
 	async getSummonerByAccountTag(
 		name: string,
 		tag: string,
-	): Promise<SummonerDb | null> {
+	): Promise<SummonerDb | undefined> {
 		try {
 			const account = await this.getRiotAccountByTag(name, tag);
 			if (account) {
 				return this.getSummonerByPuuidRiot(account.puuid, account);
 			}
 			logger.error({ name, tag }, "RiotHelper:getSummonerByAccountTag");
-			return null;
+			return undefined;
 		} catch (e) {
 			logger.error(
 				{ name, tag, error: e },
 				"RiotHelper:getSummonerByAccountTag",
 			);
-			return null;
+			return undefined;
 		}
 	}
 
