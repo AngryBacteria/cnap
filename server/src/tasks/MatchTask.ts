@@ -1,33 +1,34 @@
-import dbh, { CollectionName } from "../helpers/DBHelper.js";
+import dbh from "../helpers/DBHelper.js";
 import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
+import { CollectionName } from "../model/Database.js";
 import type { SummonerDb } from "../model/Summoner.js";
 
 export class MatchTask {
 	async updateMatchData(count = 69, offset = 0, puuid = ""): Promise<void> {
 		const existingSummoners: SummonerDb[] = [];
 		if (puuid) {
-			const summoner = await dbh.genericGet<SummonerDb>(
+			const summonerResponse = await dbh.genericGet<SummonerDb>(
 				CollectionName.SUMMONER,
 				{ limit: 100000, filter: { puuid } },
 				undefined,
 			);
-			if (summoner[0]) {
-				existingSummoners.push(summoner[0]);
+			if (summonerResponse.data[0]) {
+				existingSummoners.push(summonerResponse.data[0]);
 			}
 		} else {
-			const dbSummoners = await dbh.genericGet<SummonerDb>(
+			const summonersResponse = await dbh.genericGet<SummonerDb>(
 				CollectionName.SUMMONER,
 				{ limit: 100000 },
 				undefined,
 			);
-			if (dbSummoners && dbSummoners.length > 0) {
-				existingSummoners.push(...dbSummoners);
+			if (summonersResponse && summonersResponse.data.length > 0) {
+				existingSummoners.push(...summonersResponse.data);
 			}
 		}
 
 		if (!existingSummoners || existingSummoners.length === 0) {
-			logger.debug(
+			logger.warn(
 				{ count, offset, puuid },
 				"Task:updateMatchData No Summoner data available to update match history. Stopping the loop",
 			);
@@ -37,17 +38,21 @@ export class MatchTask {
 		for (const summoner of existingSummoners) {
 			const riotMatchIds = await rh.getMatchList(summoner.puuid, count, offset);
 
-			const filteredMatchIds = await dbh.getNonExistingIds(
-				riotMatchIds,
-				CollectionName.MATCH,
-				"metadata.matchId",
-			);
+			const filteredMatchIds = (
+				await dbh.getNonExistingIds(
+					riotMatchIds,
+					CollectionName.MATCH,
+					"metadata.matchId",
+				)
+			).data;
 
-			const filteredTimelineIds = await dbh.getNonExistingIds(
-				riotMatchIds,
-				CollectionName.TIMELINE,
-				"metadata.matchId",
-			);
+			const filteredTimelineIds = (
+				await dbh.getNonExistingIds(
+					riotMatchIds,
+					CollectionName.TIMELINE,
+					"metadata.matchId",
+				)
+			).data;
 
 			const matchData = [];
 			for (const matchId of filteredMatchIds) {

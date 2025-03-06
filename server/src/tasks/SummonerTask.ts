@@ -1,4 +1,4 @@
-import { CollectionName } from "../helpers/DBHelper.js";
+import { CollectionName } from "../model/Database.js";
 import "dotenv/config";
 import { z } from "zod";
 import dbh from "../helpers/DBHelper.js";
@@ -88,16 +88,16 @@ export class SummonerTask {
 	 * Update the summoner data of all summoners in the summoners collection
 	 */
 	async updateSummonerData(): Promise<void> {
-		const existingSummoners = await dbh.genericGet<SummonerDb>(
+		const summonersResponse = await dbh.genericGet<SummonerDb>(
 			CollectionName.SUMMONER,
 			{ limit: 100000 },
 			SummonerDbSchema,
 		);
 
-		if (existingSummoners && existingSummoners.length > 0) {
+		if (summonersResponse && summonersResponse.data.length > 0) {
 			const newSummoners: SummonerDb[] = [];
 
-			for (const summoner of existingSummoners) {
+			for (const summoner of summonersResponse.data) {
 				const summonerRiot = await rh.getSummonerByPuuidRiot(summoner.puuid);
 
 				if (summonerRiot) {

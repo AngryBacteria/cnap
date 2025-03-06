@@ -1,8 +1,10 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import dbh, { CollectionName } from "../../helpers/DBHelper.js";
+import dbh from "../../helpers/DBHelper.js";
 import logger from "../../helpers/Logger.js";
 import simpleCache from "../../helpers/SimpleCache.js";
 import { ChampionReducedSchema, ChampionSchema } from "../../model/Champion.js";
+import { CollectionName } from "../../model/Database.js";
 import { ItemSchema } from "../../model/Item.js";
 import type { MatchV5Participant } from "../../model/MatchV5.js";
 import { QueueSchema } from "../../model/Queue.js";
@@ -13,12 +15,6 @@ import { loggedProcedure } from "../middlewares/executionTime.js";
 import { router } from "../trcp.js";
 
 export const lolRouter = router({
-	userList: loggedProcedure.query(() => {
-		return [
-			{ id: 1, name: "John Doe" },
-			{ id: 2, name: "Jane Doe" },
-		];
-	}),
 	getChampionsReduced: loggedProcedure.query(async () => {
 		const cachedResult = ChampionReducedSchema.array().safeParse(
 			simpleCache.get("championReduced"),
@@ -44,9 +40,17 @@ export const lolRouter = router({
 			},
 			ChampionReducedSchema,
 		);
-		simpleCache.set("championReduced", result);
+		if (!result.success) {
+			logger.error({ error: result.error }, "API:getChampionsReduced");
+			throw new TRPCError({
+				message: `Champions couldn't be fetched`,
+				code: "INTERNAL_SERVER_ERROR",
+			});
+		}
+
+		simpleCache.set("championReduced", result.data);
 		logger.info({ cached: false }, "API:getChampionsReduced");
-		return result;
+		return result.data;
 	}),
 	getChampionByAlias: loggedProcedure.input(z.string()).query(async (opts) => {
 		const dbResult = await dbh.genericGet(
@@ -56,18 +60,27 @@ export const lolRouter = router({
 			},
 			ChampionSchema,
 		);
-		if (!dbResult[0]) {
-			logger.error(
-				{ operationInputs: opts.input },
-				"API:getChampionByAlias - Champion not found",
-			);
-			throw new Error(`Champion not found: ${opts.input}`);
+
+		if (!dbResult.success) {
+			logger.error({ error: dbResult.error }, "API:getChampionByAlias");
+			throw new TRPCError({
+				message: `Champion couldn't be fetched`,
+				code: "INTERNAL_SERVER_ERROR",
+			});
+		}
+
+		if (!dbResult.data[0]) {
+			logger.error({ operationInputs: opts.input }, "API:getChampionByAlias");
+			throw new TRPCError({
+				message: `Champion not found: ${opts.input}`,
+				code: "NOT_FOUND",
+			});
 		}
 		logger.info(
 			{ operationInputs: opts.input, cached: false },
 			"API:getChampionByAlias",
 		);
-		return dbResult[0];
+		return dbResult.data[0];
 	}),
 	getMatchesParticipant: loggedProcedure
 		.input(
@@ -94,7 +107,7 @@ export const lolRouter = router({
 			// Optionally Filter by summoner puuids
 			let summonerPuuids: string[] = [];
 			if (onlySummonersInDb) {
-				const existingSummonerPuuids = await dbh.genericGet(
+				const existingSummonersResponse = await dbh.genericGet(
 					CollectionName.SUMMONER,
 					{
 						limit: 100000,
@@ -102,8 +115,18 @@ export const lolRouter = router({
 					},
 					z.object({ puuid: z.string() }),
 				);
+				if (!existingSummonersResponse.success) {
+					logger.error(
+						{ error: existingSummonersResponse.error },
+						"API:getMatchesParticipant",
+					);
+					throw new TRPCError({
+						message: `Summoners couldn't be fetched`,
+						code: "INTERNAL_SERVER_ERROR",
+					});
+				}
 
-				summonerPuuids = existingSummonerPuuids.map(
+				summonerPuuids = existingSummonersResponse.data.map(
 					(summoner) => summoner.puuid,
 				);
 
@@ -147,12 +170,19 @@ export const lolRouter = router({
 				CollectionName.MATCH,
 				page,
 			);
+			if (!dbResult.success) {
+				logger.error({ error: dbResult.error }, "API:getMatchesParticipant");
+				throw new TRPCError({
+					message: `Matches couldn't be fetched`,
+					code: "INTERNAL_SERVER_ERROR",
+				});
+			}
 
 			logger.info(
 				{ operationInputs: opts.input, cached: false },
 				"API:getMatchesParticipant",
 			);
-			return dbResult;
+			return dbResult.data;
 		}),
 	getQueues: loggedProcedure.query(async () => {
 		const cachedResult = QueueSchema.array().safeParse(
@@ -168,9 +198,17 @@ export const lolRouter = router({
 			{ limit: 1000 },
 			QueueSchema,
 		);
-		simpleCache.set("getQueues", result);
+		if (!result.success) {
+			logger.error({ error: result.error }, "API:getQueues");
+			throw new TRPCError({
+				message: `Queues couldn't be fetched`,
+				code: "INTERNAL_SERVER_ERROR",
+			});
+		}
+
+		simpleCache.set("getQueues", result.data);
 		logger.info({ cached: false }, "API:getQueues");
-		return result;
+		return result.data;
 	}),
 	getItems: loggedProcedure.query(async () => {
 		const cachedResult = ItemSchema.array().safeParse(
@@ -186,9 +224,17 @@ export const lolRouter = router({
 			{ limit: 1000 },
 			ItemSchema,
 		);
-		simpleCache.set("getItems", results);
+		if (!results.success) {
+			logger.error({ error: results.error }, "API:getItems");
+			throw new TRPCError({
+				message: `Items couldn't be fetched`,
+				code: "INTERNAL_SERVER_ERROR",
+			});
+		}
+
+		simpleCache.set("getItems", results.data);
 		logger.info({ cached: false }, "API:getItems");
-		return results;
+		return results.data;
 	}),
 	getSummonerSpells: loggedProcedure.query(async () => {
 		const cachedResult = SummonerSpellSchema.array().safeParse(
@@ -204,9 +250,17 @@ export const lolRouter = router({
 			{ limit: 1000 },
 			SummonerSpellSchema,
 		);
-		simpleCache.set("getSummonerSpells", result);
+		if (!result.success) {
+			logger.error({ error: result.error }, "API:getSummonerSpells");
+			throw new TRPCError({
+				message: `SummonerSpells couldn't be fetched`,
+				code: "INTERNAL_SERVER_ERROR",
+			});
+		}
+
+		simpleCache.set("getSummonerSpells", result.data);
 		logger.info({ cached: false }, "API:getSummonerSpells");
-		return result;
+		return result.data;
 	}),
 	getSummoners: loggedProcedure.query(async () => {
 		const cachedResult = SummonerDbSchema.array().safeParse(
@@ -222,9 +276,17 @@ export const lolRouter = router({
 			{ limit: 1000 },
 			SummonerDbSchema,
 		);
-		simpleCache.set("getSummoners", result);
+		if (!result.success) {
+			logger.error({ error: result.error }, "API:getSummoners");
+			throw new TRPCError({
+				message: `Summoners couldn't be fetched`,
+				code: "INTERNAL_SERVER_ERROR",
+			});
+		}
+
+		simpleCache.set("getSummoners", result.data);
 		logger.info({ cached: false }, "API:getSummoners");
-		return result;
+		return result.data;
 	}),
 	getSummonerSummary: loggedProcedure.input(z.string()).query(async (opts) => {
 		const pipeline = [
@@ -305,7 +367,15 @@ export const lolRouter = router({
 			CollectionName.MATCH,
 			SummonerSummarySchema,
 		);
+		if (!result.success) {
+			logger.error({ error: result.error }, "API:getSummonerSummary");
+			throw new TRPCError({
+				message: `Summoner summary couldn't be fetched`,
+				code: "INTERNAL_SERVER_ERROR",
+			});
+		}
+
 		logger.info({ cached: false }, "API:getSummonerSummary");
-		return result;
+		return result.data;
 	}),
 });

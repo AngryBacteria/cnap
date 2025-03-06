@@ -11,8 +11,7 @@
     "lint": "biome lint --write ./src/",
     "type-check": "tsc -b",
     "biome": "biome check --write ./src/",
-    "start": "node dist/trcp/routers/_app.js",
-    "start-tasks": "node dist/tasks/index.js"
+    "start": "node dist/trcp/routers/_app.js"
   },
   "author": "",
   "license": "MIT",

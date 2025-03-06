@@ -6,57 +6,16 @@
 
 import "dotenv/config";
 import { type Collection, type Db, MongoClient } from "mongodb";
-import { z } from "zod";
-import { PaginatedDBResponseSchema } from "../model/PaginatedDBResponse.js";
+import type { z } from "zod";
+import {
+	BasicFilterSchema,
+	CollectionName,
+	type DBResponse,
+	type DBResponsePaginated,
+	MongoDBPaginationSchema,
+	type PartialBasicFilter,
+} from "../model/Database.js";
 import logger from "./Logger.js";
-
-/**
- * Enum representing the names of various collections in the MongoDB database.
- */
-export enum CollectionName {
-	CHAMPION = "champion",
-	GAME_MODE = "game_mode",
-	GAME_TYPE = "game_type",
-	ITEM = "item",
-	MAP = "map",
-	MATCH = "match_v5",
-	QUEUE = "queue",
-	SUMMONER = "summoner",
-	SUMMONER_ICON = "summoner_icon",
-	SUMMONER_SPELL = "summoner_spell",
-	TIMELINE = "timeline_v5",
-}
-
-/**
- * Zod schema for basic filtering options.
- * Validates filtering input for database queries.
- */
-export const BasicFilterSchema = z.object({
-	offset: z
-		.number()
-		.int()
-		.nonnegative()
-		.default(0)
-		.describe("Number of items to skip"),
-	limit: z
-		.number()
-		.int()
-		.positive()
-		.default(5)
-		.describe("Maximum number of items to return"),
-	project: z
-		.record(z.string(), z.number())
-		.default({ _id: 0 })
-		.describe("Fields to return"),
-	filter: z.record(z.string(), z.any()).default({}).describe("Filter to apply"),
-});
-export type BasicFilter = z.infer<typeof BasicFilterSchema>;
-
-/**
- * Partial version of BasicFilter.
- */
-export const PartialBasicFilter = BasicFilterSchema.partial();
-export type PartialBasicFilter = z.infer<typeof PartialBasicFilter>;
 
 //TODO: differentiate between noting was found or error that the callers can react to it (especially api)
 
@@ -192,14 +151,17 @@ export class DBHelper {
 		ids: string[],
 		collectionName: CollectionName,
 		idField: string,
-	): Promise<string[]> {
+	): Promise<DBResponse<string>> {
 		try {
 			const startTime = performance.now();
 			if (!ids.length) {
 				logger.warn(
 					"DBHelper:getNonExistingIds - No ids provided, aborting operation and returning empty array",
 				);
-				return [];
+				return {
+					data: [],
+					success: true,
+				};
 			}
 
 			const idsSet = new Set(ids);
@@ -222,10 +184,16 @@ export class DBHelper {
 				},
 				"DBHelper:getNonExistingIds",
 			);
-			return nonExistingIds;
+			return {
+				data: nonExistingIds,
+				success: true,
+			};
 		} catch (error) {
 			logger.error({ error, collectionName }, "DBHelper:getNonExistingIds");
-			return [];
+			return {
+				data: [],
+				success: false,
+			};
 		}
 	}
 
@@ -241,7 +209,7 @@ export class DBHelper {
 		collectionName: CollectionName,
 		partialFilter: PartialBasicFilter = {},
 		validator?: z.ZodType<T>,
-	): Promise<T[]> {
+	): Promise<DBResponse<T>> {
 		try {
 			const startTime = performance.now();
 			const baseFilter = BasicFilterSchema.parse(partialFilter);
@@ -270,10 +238,17 @@ export class DBHelper {
 				"DBHelper:genericGet",
 			);
 
-			return output;
+			return {
+				data: output,
+				success: true,
+			};
 		} catch (error) {
 			logger.error({ error, collectionName }, "DBHelper:genericGet");
-			return [];
+			return {
+				data: [],
+				success: false,
+				error: error instanceof Error ? error : new Error(String(error)),
+			};
 		}
 	}
 
@@ -313,7 +288,7 @@ export class DBHelper {
 					{ collectionName },
 					"DBHelper:genericUpsert - No data to upsert, aborted operation",
 				);
-				return false;
+				return true;
 			}
 
 			// Validate data if validator is provided
@@ -356,7 +331,7 @@ export class DBHelper {
 		pipeline: Record<string, unknown>[],
 		collectionName: CollectionName,
 		validator?: z.ZodType<T>,
-	) {
+	): Promise<DBResponse<T>> {
 		try {
 			const startTime = performance.now();
 			const cursor = this.getCollection(collectionName).aggregate(pipeline);
@@ -377,10 +352,17 @@ export class DBHelper {
 				},
 				"DBHelper:genericPipeline",
 			);
-			return output;
+			return {
+				data: output,
+				success: true,
+			};
 		} catch (error) {
 			logger.error({ error, collectionName }, "DBHelper:genericPipeline");
-			return [];
+			return {
+				data: [],
+				success: false,
+				error: error instanceof Error ? error : new Error(String(error)),
+			};
 		}
 	}
 
@@ -390,7 +372,7 @@ export class DBHelper {
 		page: number,
 		pageSize = 10,
 		validator?: z.ZodType<T>,
-	) {
+	): Promise<DBResponsePaginated<T>> {
 		try {
 			const startTime = performance.now();
 
@@ -409,7 +391,7 @@ export class DBHelper {
 				},
 			]);
 			const dbResultRaw = await cursor.toArray();
-			const dbResult = PaginatedDBResponseSchema.parse(dbResultRaw);
+			const dbResult = MongoDBPaginationSchema.parse(dbResultRaw);
 
 			if (!dbResult[0]) {
 				throw new Error("Paginated DB Response is empty");
@@ -437,13 +419,23 @@ export class DBHelper {
 				},
 				"DBHelper:genericPaginatedPipeline",
 			);
-			return { page, maxPage, data: outputData };
+			return {
+				success: true,
+				data: {
+					page,
+					maxPage,
+					data: outputData,
+				},
+			};
 		} catch (error) {
 			logger.error({ error, collectionName }, "DBHelper:genericPipeline");
 			return {
-				page: 0,
-				maxPage: 0,
-				data: [],
+				success: false,
+				data: {
+					page: 0,
+					maxPage: 0,
+					data: [],
+				},
 			};
 		}
 	}

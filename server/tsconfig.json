@@ -14,7 +14,6 @@
       "isolatedModules": true,
       "verbatimModuleSyntax": true,
       "removeComments": true,
-      "baseUrl": "./src",
 
       // Strictness
       "noUncheckedIndexedAccess": true,

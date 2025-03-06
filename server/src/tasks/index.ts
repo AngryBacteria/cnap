@@ -8,7 +8,7 @@ import summonerTask from "./SummonerTask.js";
  * @param initialIteration Initial iteration
  * @param intervalTime Time between iterations in milliseconds
  */
-async function intervalUpdate(
+export async function intervalUpdate(
 	initialIteration: number,
 	intervalTime: number,
 ): Promise<void> {
@@ -32,6 +32,3 @@ async function intervalUpdate(
 	iteration += 1;
 	await intervalUpdate(iteration, intervalTime);
 }
-
-// Start at iteration 0 and run every hour
-intervalUpdate(0, 60 * 60 * 1000).catch(logger.error);

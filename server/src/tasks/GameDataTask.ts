@@ -1,7 +1,7 @@
-import { CollectionName } from "../helpers/DBHelper.js";
 import dbh from "../helpers/DBHelper.js";
 import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
+import { CollectionName } from "../model/Database.js";
 
 export class GameDataTask {
 	async updateChampions(): Promise<void> {
