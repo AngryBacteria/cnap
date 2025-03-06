@@ -110,11 +110,13 @@ export class DBHelper {
 	 */
 	async initIndexes(): Promise<boolean> {
 		try {
+			await this.getCollection(CollectionName.SUMMONER).dropIndexes();
 			await this.getCollection(CollectionName.SUMMONER).createIndex("puuid", {
 				unique: true,
 			});
 			logger.debug("DBHelper:initIndexes - Created summoner indexes");
 
+			await this.getCollection(CollectionName.MATCH).dropIndexes();
 			await this.getCollection(CollectionName.MATCH).createIndex(
 				"metadata.matchId",
 				{ unique: true },
@@ -129,6 +131,7 @@ export class DBHelper {
 			);
 			logger.debug("DBHelper:initIndexes - Created match indexes");
 
+			await this.getCollection(CollectionName.TIMELINE).dropIndexes();
 			await this.getCollection(CollectionName.TIMELINE).createIndex(
 				"metadata.matchId",
 				{ unique: true },
@@ -139,23 +142,29 @@ export class DBHelper {
 			);
 			logger.debug("DBHelper:initIndexes - Created timeline indexes");
 
+			await this.getCollection(CollectionName.CHAMPION).dropIndexes();
 			await this.getCollection(CollectionName.CHAMPION).createIndex("id", {
 				unique: true,
 			});
+			await this.getCollection(CollectionName.GAME_MODE).dropIndexes();
 			await this.getCollection(CollectionName.GAME_MODE).createIndex(
 				"gameMode",
 				{ unique: true },
 			);
+			await this.getCollection(CollectionName.GAME_TYPE).dropIndexes();
 			await this.getCollection(CollectionName.GAME_TYPE).createIndex(
 				"gametype",
 				{ unique: true },
 			);
+			await this.getCollection(CollectionName.ITEM).dropIndexes();
 			await this.getCollection(CollectionName.ITEM).createIndex("id", {
 				unique: true,
 			});
+			await this.getCollection(CollectionName.MAP).dropIndexes();
 			await this.getCollection(CollectionName.MAP).createIndex("mapId", {
 				unique: true,
 			});
+			await this.getCollection(CollectionName.QUEUE).dropIndexes();
 			await this.getCollection(CollectionName.QUEUE).createIndex("queueId", {
 				unique: true,
 			});
@@ -422,7 +431,11 @@ export class DBHelper {
 			return { page, maxPage, data: outputData };
 		} catch (error) {
 			logger.error({ error, collectionName }, "DBHelper:genericPipeline");
-			return [];
+			return {
+				page: 0,
+				maxPage: 0,
+				data: [],
+			};
 		}
 	}
 }

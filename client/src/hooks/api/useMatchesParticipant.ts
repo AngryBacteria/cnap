@@ -8,7 +8,7 @@ export const useMatchesParticipant = (
 	onlySummonersInDb = true,
 ) => {
 	return useQuery(
-		trpc.getMatchesParticipant.queryOptions({
+		trpc.lol.getMatchesParticipant.queryOptions({
 			championId,
 			queueId: queueId ? Number.parseInt(queueId) : undefined,
 			onlySummonersInDb,

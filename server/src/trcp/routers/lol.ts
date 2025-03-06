@@ -1,35 +1,18 @@
-import fs from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { initTRPC } from "@trpc/server";
-import * as trpcExpress from "@trpc/server/adapters/express";
-import cors from "cors";
-import express from "express";
 import { z } from "zod";
-import dbh, { CollectionName } from "../helpers/DBHelper.js";
-import logger from "../helpers/Logger.js";
-import simpleCache from "../helpers/SimpleCache.js";
-import { ChampionReducedSchema, ChampionSchema } from "../model/Champion.js";
-import { ItemSchema } from "../model/Item.js";
-import type { MatchV5Participant } from "../model/MatchV5.js";
-import { QueueSchema } from "../model/Queue.js";
-import { SummonerDbSchema } from "../model/Summoner.js";
-import { SummonerSpellSchema } from "../model/SummonerSpell.js";
-import { SummonerSummarySchema } from "../model/SummonerSummary.js";
-import { loggedProcedure } from "./middlewares/executionTime.js";
+import dbh, { CollectionName } from "../../helpers/DBHelper.js";
+import logger from "../../helpers/Logger.js";
+import simpleCache from "../../helpers/SimpleCache.js";
+import { ChampionReducedSchema, ChampionSchema } from "../../model/Champion.js";
+import { ItemSchema } from "../../model/Item.js";
+import type { MatchV5Participant } from "../../model/MatchV5.js";
+import { QueueSchema } from "../../model/Queue.js";
+import { SummonerDbSchema } from "../../model/Summoner.js";
+import { SummonerSpellSchema } from "../../model/SummonerSpell.js";
+import { SummonerSummarySchema } from "../../model/SummonerSummary.js";
+import { loggedProcedure } from "../middlewares/executionTime.js";
+import { router } from "../trcp.js";
 
-// Static file paths
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const staticFilesPath = join(__dirname, "..", "..", "..", "static");
-if (!fs.existsSync(staticFilesPath)) {
-	throw new Error(`The folder at ${staticFilesPath} does not exist.`);
-}
-
-//TODO: handle erorrs better
-
-const t = initTRPC.create();
-const appRouter = t.router({
+export const lolRouter = router({
 	userList: loggedProcedure.query(() => {
 		return [
 			{ id: 1, name: "John Doe" },
@@ -326,24 +309,3 @@ const appRouter = t.router({
 		return result;
 	}),
 });
-
-const app = express();
-app.use(cors());
-app.use("/static", express.static(staticFilesPath));
-app.use(
-	"/trpc",
-	trpcExpress.createExpressMiddleware({
-		router: appRouter,
-	}),
-);
-app.listen(3000);
-logger.info(
-	{
-		port: 3000,
-		baseUrl: "http://localhost",
-		url: "http://localhost:3000/trpc",
-	},
-	"API:Startup - tRPC Server is running",
-);
-
-export type AppRouter = typeof appRouter;

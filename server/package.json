@@ -5,13 +5,13 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "dev": "tsx watch src/trcp/index.ts | pino-pretty",
+    "dev": "tsx watch src/trcp/routers/_app.ts | pino-pretty",
     "build": "tsc",
     "format": "biome format --write ./src/",
     "lint": "biome lint --write ./src/",
     "type-check": "tsc -b",
     "biome": "biome check --write ./src/",
-    "start": "node dist/trcp/index.js",
+    "start": "node dist/trcp/routers/_app.js",
     "start-tasks": "node dist/tasks/index.js"
   },
   "author": "",
