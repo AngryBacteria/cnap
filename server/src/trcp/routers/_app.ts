@@ -5,6 +5,7 @@ import * as trpcExpress from "@trpc/server/adapters/express";
 import cors from "cors";
 import express from "express";
 import logger from "../../helpers/Logger.js";
+import { intervalUpdate } from "../../tasks/MainTask.js";
 import { router } from "../trcp.js";
 import { lolRouter } from "./lol.js";
 
@@ -39,3 +40,8 @@ logger.info(
 );
 
 export type AppRouter = typeof appRouter;
+
+const RUN_TASKS = process.env.RUN_TASKS;
+if (RUN_TASKS && RUN_TASKS.toLowerCase() === "true") {
+	intervalUpdate(0, 60 * 60 * 1000).catch(logger.error);
+}
