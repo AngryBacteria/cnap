@@ -1,0 +1,37 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    # user: "1000:1000"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: <USERNAME_HERE>
+      MONGO_INITDB_ROOT_PASSWORD: <PASSWORD_HERE>
+    ports:
+      - "27017:27017"
+    volumes:
+      - <LOCAL_PATH_HERE>:/data/db
+    command: mongod --auth --bind_ip_all
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+
+  cnap:
+    image: ghcr.io/angrybacteria/cnap:latest
+    container_name: cnap
+    # user: "1000:1000"
+    depends_on:
+      - mongodb
+    environment:
+      MONGODB_CONNECTION_STRING: <CONNECTION_STRING_HERE>
+      RIOT_API_KEY: <RIOT-API-KEY-HERE>
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"

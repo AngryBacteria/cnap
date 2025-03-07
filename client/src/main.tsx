@@ -19,7 +19,7 @@ import { routeTree } from "./routeTree.gen";
 import { queryClient } from "./utils/trcp.ts";
 
 // Create a new router instance
-const router = createRouter({ routeTree });
+const router = createRouter({ routeTree, defaultPendingMinMs: 0 });
 
 // Register the router instance for type safety
 declare module "@tanstack/react-router" {

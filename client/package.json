@@ -5,12 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "biome": "biome check --write ./src/",
     "type-check": "tsc -b",
     "preview": "vite preview",
-    "format": "biome format --write ./src/",
-    "lint": "biome lint --write ./src/",
-    "biome": "biome check --write ./src/"
+    "build": "tsc -b && vite build",
+    "start": "serve -p 4173 -s dist"
   },
   "dependencies": {
     "@mantine/carousel": "7.16.2",
@@ -30,7 +29,8 @@
     "embla-carousel-react": "7.1.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "recharts": "2.15.1"
+    "recharts": "2.15.1",
+    "serve": "14.2.4"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",

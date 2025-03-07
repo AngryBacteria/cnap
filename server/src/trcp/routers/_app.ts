@@ -12,8 +12,15 @@ import { lolRouter } from "./lol.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const staticFilesPath = join(__dirname, "..", "..", "..", "..", "static");
+const spaFilesPath = join(__dirname, "..", "..", "..", "..", "client", "dist");
+
+// Validate paths exist
 if (!fs.existsSync(staticFilesPath)) {
 	throw new Error(`The folder at ${staticFilesPath} does not exist.`);
+}
+
+if (!fs.existsSync(spaFilesPath)) {
+	throw new Error(`The client/dist folder at ${spaFilesPath} does not exist.`);
 }
 
 const appRouter = router({
@@ -29,6 +36,24 @@ app.use(
 		router: appRouter,
 	}),
 );
+// Serve SPA files
+app.use(express.static(spaFilesPath));
+
+// Fallback route for SPA client-side routing
+app.get("*", (req, res, next) => {
+	// Exclude API routes
+	if (req.path.startsWith("/trpc") || req.path.startsWith("/static")) {
+		return next();
+	}
+
+	// Serve the SPA's index.html for all other routes
+	res.sendFile(join(spaFilesPath, "index.html"), (err) => {
+		if (err) {
+			next(err);
+		}
+	});
+});
+
 app.listen(3000);
 logger.info(
 	{
