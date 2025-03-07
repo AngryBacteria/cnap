@@ -3,7 +3,7 @@ import styles from "./SummonerCard.module.css";
 
 export function SummonerCardSkeleton() {
 	return (
-		<Card shadow={"md"} withBorder w={"100%"} className={styles.summonerCard}>
+		<Card shadow={"md"} withBorder className={styles.summonerCard}>
 			<Card.Section>
 				<Skeleton className={styles.imageContainer} />
 			</Card.Section>

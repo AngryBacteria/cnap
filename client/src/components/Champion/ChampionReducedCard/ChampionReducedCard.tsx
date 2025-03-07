@@ -3,8 +3,8 @@ import { useNavigate } from "@tanstack/react-router";
 import {
 	capitalizeFirstLetter,
 	truncateText,
-} from "../../utils/GeneralUtil.ts";
-import type { Outputs } from "../../utils/trcp.ts";
+} from "../../../utils/GeneralUtil.ts";
+import type { Outputs } from "../../../utils/trcp.ts";
 import styles from "./ChampionReducedCard.module.css";
 
 interface ChampionCardProps {

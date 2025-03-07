@@ -10,7 +10,7 @@ export function SummonerCard({ summoner }: Props) {
 	const summonerIconPath = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${summoner.profileIconId}.jpg`;
 
 	return (
-		<Card shadow={"md"} withBorder w={"100%"} className={styles.summonerCard}>
+		<Card shadow={"md"} withBorder className={styles.summonerCard}>
 			<Card.Section>
 				<Image
 					src={summonerIconPath}

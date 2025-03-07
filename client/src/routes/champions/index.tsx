@@ -1,7 +1,7 @@
 import { Alert, Loader, TextInput, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { ChampionReducedCard } from "../../components/ChampionReducedCard/ChampionReducedCard.tsx";
+import { ChampionReducedCard } from "../../components/Champion/ChampionReducedCard/ChampionReducedCard.tsx";
 import { useChampions } from "../../hooks/api/useChampions.ts";
 import styles from "./index.module.css";
 
