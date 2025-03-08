@@ -25,11 +25,9 @@ export const MongoDBPaginationSchema = z
 			.object({
 				total: z.number(),
 			})
-			.array()
-			.min(1),
+			.array(),
 	})
-	.array()
-	.min(1);
+	.array();
 
 export type MongoDBPagination = z.infer<typeof MongoDBPaginationSchema>;
 

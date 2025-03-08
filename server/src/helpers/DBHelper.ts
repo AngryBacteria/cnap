@@ -398,10 +398,7 @@ export class DBHelper {
 			}
 			const { data, metadata } = dbResult[0];
 
-			if (!metadata[0]) {
-				throw new Error("Paginated DB Response is empty");
-			}
-			const total = metadata[0].total;
+			const total = metadata[0]?.total || 0;
 			const maxPage = Math.ceil(total / pageSize);
 
 			let outputData: T[];
@@ -428,7 +425,10 @@ export class DBHelper {
 				},
 			};
 		} catch (error) {
-			logger.error({ error, collectionName }, "DBHelper:genericPipeline");
+			logger.error(
+				{ error, collectionName },
+				"DBHelper:genericPaginatedPipeline",
+			);
 			return {
 				success: false,
 				data: {
