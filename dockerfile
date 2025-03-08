@@ -10,4 +10,4 @@ RUN npm install && npm run build
 # Expose the ports for both backend and frontend
 EXPOSE 3000
 
-CMD ["npm", "run", "start:server"]
+CMD ["npm", "run", "start"]
