@@ -1,0 +1,28 @@
+{
+  "name": "cnap-monorepo",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "npm-run-all --parallel dev:server dev:client",
+    "dev:server": "npm run dev --workspace=server",
+    "dev:client": "npm run dev --workspace=client",
+    "biome": "npm-run-all --parallel biome:server biome:client",
+    "biome:server": "npm run biome --workspace=server",
+    "biome:client": "npm run biome --workspace=client",
+    "type-check": "npm-run-all --parallel type-check:server type-check:client",
+    "type-check:server": "npm run type-check --workspace=server",
+    "type-check:client": "npm run type-check --workspace=client",
+    "build": "npm-run-all build:server build:client",
+    "build:server": "npm run build --workspace=server",
+    "build:client": "npm run build --workspace=client",
+    "start": "npm-run-all --parallel start:server start:client",
+    "start:server": "npm run start --workspace=server",
+    "start:client": "npm run start --workspace=client"
+  },
+  "devDependencies": {
+    "npm-run-all": "4.1.5"
+  }
+}
