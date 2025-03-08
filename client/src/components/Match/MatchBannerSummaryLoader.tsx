@@ -8,12 +8,13 @@ import { useSummonerSpells } from "../../hooks/api/useSummonerSpells";
 import { MatchBannerSummary } from "./MatchBannerSummary/MatchBannerSummary";
 
 export interface Props {
-	championId: number;
+	championId?: number;
 }
 
-export function ChampionMatchesLoader({ championId }: Props) {
+export function MatchBannerSummaryLoader({ championId }: Props) {
 	//TODO: replace with router search param
 	//TODO: put in own component
+	//TODO scroll to title
 	const [selectedQueue, setSelectedQueue] = useState<string | null>(null);
 	const { page } = useSearch({ from: "/champions/$championAlias" });
 	const navigate = useNavigate({ from: "/champions/$championAlias" });
@@ -67,7 +68,7 @@ export function ChampionMatchesLoader({ championId }: Props) {
 		queuesQuery.status === "error" ||
 		summonerSpellsQuery.status === "error"
 	) {
-		return <Alert title={"Error loading champion matches"} variant={"light"} />;
+		return <Alert title={"Error loading matches"} variant={"light"} />;
 	}
 
 	return (
