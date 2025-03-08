@@ -1,6 +1,6 @@
 import { Alert, Flex, TextInput, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { SummonerCard } from "../../components/Summoner/SummonerCard.tsx";
 import { SummonerCardSkeleton } from "../../components/Summoner/SummonerCardSkeleton.tsx";
 import { useSummoners } from "../../hooks/api/useSummoners.ts";
@@ -14,6 +14,19 @@ function SummonersPage() {
 	const [nameSearch, setNameSearch] = useState("");
 
 	const query = useSummoners();
+
+	const filteredSummoners = useMemo(() => {
+		if (!query.data) {
+			return [];
+		}
+
+		return query.data.filter((summoner) => {
+			return (
+				summoner.gameName.toLowerCase().includes(nameSearch.toLowerCase()) ||
+				summoner.tagLine.toLowerCase().includes(nameSearch.toLowerCase())
+			);
+		});
+	}, [query.data, nameSearch]);
 
 	if (query.status === "pending") {
 		return (
@@ -43,13 +56,6 @@ function SummonersPage() {
 			</Alert>
 		);
 	}
-
-	const filteredSummoners = query.data.filter((summoner) => {
-		return (
-			summoner.gameName.toLowerCase().includes(nameSearch.toLowerCase()) ||
-			summoner.tagLine.toLowerCase().includes(nameSearch.toLowerCase())
-		);
-	});
 
 	return (
 		<>

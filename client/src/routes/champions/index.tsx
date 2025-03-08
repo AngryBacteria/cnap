@@ -1,7 +1,8 @@
-import { Alert, Loader, TextInput, Title } from "@mantine/core";
+import { Alert, TextInput, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { ChampionReducedCard } from "../../components/Champion/ChampionReducedCard/ChampionReducedCard.tsx";
+import { ChampionReducedCardSkeleton } from "../../components/Champion/ChampionReducedCard/ChampionReducedCardSkeleton.tsx";
 import { useChampions } from "../../hooks/api/useChampions.ts";
 import styles from "./index.module.css";
 
@@ -37,7 +38,25 @@ export function ChampionsPage() {
 	}, [query.data, nameSearch]);
 
 	if (query.status === "pending") {
-		return <Loader color={"teal"} />;
+		return (
+			<section>
+				<Title order={1} pb={"sm"}>
+					League of legends Champions
+				</Title>
+				<section className={styles.filters}>
+					<TextInput
+						placeholder="Champion Name"
+						onChange={(event) => setNameSearch(event.currentTarget.value)}
+					/>
+				</section>
+
+				<section className={styles.champions}>
+					{[...Array(10).keys()].map((value) => {
+						return <ChampionReducedCardSkeleton key={value} />;
+					})}
+				</section>
+			</section>
+		);
 	}
 
 	if (query.status === "error") {
