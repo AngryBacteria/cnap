@@ -4,7 +4,12 @@ WORKDIR /app
 # Copy all files
 COPY . .
 
-# Install dependencies
+# Install dependencies for backend
+WORKDIR /app/server
+RUN npm install && npm run build
+
+# Install dependencies for frontend
+WORKDIR /app/client
 RUN npm install && npm run build
 
 # Expose the ports for both backend and frontend
