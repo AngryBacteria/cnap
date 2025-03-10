@@ -13,8 +13,12 @@ export const queryClient = new QueryClient({
 	},
 });
 
+const trpcURL =
+	import.meta.env.MODE === "production"
+		? "https://cnap.ch/trpc"
+		: "http://localhost:3000/trpc";
 const trpcClient = createTRPCClient<AppRouter>({
-	links: [httpBatchLink({ url: "http://localhost:3000/trpc" })],
+	links: [httpBatchLink({ url: trpcURL })],
 });
 
 export const trpc = createTRPCOptionsProxy<AppRouter>({
