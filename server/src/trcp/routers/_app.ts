@@ -7,8 +7,8 @@ import express from "express";
 import logger from "../../helpers/Logger.js";
 import { intervalUpdate } from "../../tasks/MainTask.js";
 import { router } from "../trcp.js";
+import { generalRouter } from "./general.js";
 import { lolRouter } from "./lol.js";
-import {generalRouter} from "./general.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -26,7 +26,7 @@ if (!fs.existsSync(spaFilesPath)) {
 
 const appRouter = router({
 	lol: lolRouter,
-	general: generalRouter
+	general: generalRouter,
 });
 
 const app = express();
