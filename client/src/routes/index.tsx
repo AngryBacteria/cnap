@@ -1,14 +1,7 @@
-import {
-	Alert,
-	Card,
-	Flex,
-	Grid,
-	Image,
-	Loader,
-	Text,
-	Title,
-} from "@mantine/core";
+import { Alert, Box, Flex, Grid, Loader, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
+import { useMemo } from "react";
+import { MemberCard } from "../components/Member/MemberCard/MemberCard.tsx";
 import { useMembers } from "../hooks/api/useMembers.ts";
 
 export const Route = createFileRoute("/")({
@@ -16,7 +9,25 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-	const membersQuery = useMembers(true);
+	const membersQuery = useMembers(false);
+
+	const cnapMembers = useMemo(() => {
+		if (!membersQuery.data) {
+			return [];
+		}
+		return membersQuery.data.filter((member) => {
+			return member.core;
+		});
+	}, [membersQuery.data]);
+
+	const otherMembers = useMemo(() => {
+		if (!membersQuery.data) {
+			return [];
+		}
+		return membersQuery.data.filter((member) => {
+			return !member.core;
+		});
+	}, [membersQuery.data]);
 
 	if (membersQuery.status === "pending") {
 		return (
@@ -40,30 +51,36 @@ function Index() {
 	}
 
 	return (
-		<Grid>
-			{membersQuery.data.map((member) => {
-				return (
-					<Grid.Col span={{ base: 12, md: 6 }} key={member.gameName}>
-						<Card shadow={"md"} withBorder padding={0}>
-							<Flex direction={"row"} gap={"md"} align={"center"}>
-								<Image
-									h={100}
-									w={100}
-									src={
-										"https://www.kurin.com/wp-content/uploads/placeholder-square.jpg"
-									}
-								/>
-								<Flex direction={"column"}>
-									<Title order={2}>{member.gameName}</Title>
-									{member.punchline && (
-										<Text c={"dimmed"}>{member.punchline}</Text>
-									)}
-								</Flex>
-							</Flex>
-						</Card>
-					</Grid.Col>
-				);
-			})}
-		</Grid>
+		<Box pr={"md"} pl={"md"}>
+			<section>
+				<Flex>
+					<Title pb={"md"}>CnAP Members</Title>
+				</Flex>
+				<Grid>
+					{cnapMembers.map((member) => {
+						return (
+							<Grid.Col span={{ base: 12, sm: 6 }} key={member.gameName}>
+								<MemberCard member={member} />
+							</Grid.Col>
+						);
+					})}
+				</Grid>
+			</section>
+
+			<section>
+				<Flex>
+					<Title py={"md"}>Friends of the CnAP</Title>
+				</Flex>
+				<Grid>
+					{otherMembers.map((member) => {
+						return (
+							<Grid.Col span={{ base: 12, md: 6 }} key={member.gameName}>
+								<MemberCard member={member} />
+							</Grid.Col>
+						);
+					})}
+				</Grid>
+			</section>
+		</Box>
 	);
 }

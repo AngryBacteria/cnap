@@ -1,0 +1,9 @@
+h2 {
+	word-break: break-word;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+}
+
+.memberCard {
+	height: 100%;
+}
