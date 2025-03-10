@@ -2,40 +2,29 @@ import dbh from "../helpers/DBHelper.js";
 import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
 import { CollectionName } from "../model/Database.js";
-import type { SummonerDb } from "../model/Summoner.js";
+import { type Member, MemberSchema } from "../model/Member.js";
 
 export class MatchTask {
 	async updateMatchData(count = 69, offset = 0, puuid = ""): Promise<void> {
-		const existingSummoners: SummonerDb[] = [];
-		if (puuid) {
-			const summonerResponse = await dbh.genericGet<SummonerDb>(
-				CollectionName.SUMMONER,
-				{ limit: 100000, filter: { puuid } },
-				undefined,
-			);
-			if (summonerResponse.data[0]) {
-				existingSummoners.push(summonerResponse.data[0]);
-			}
-		} else {
-			const summonersResponse = await dbh.genericGet<SummonerDb>(
-				CollectionName.SUMMONER,
-				{ limit: 100000 },
-				undefined,
-			);
-			if (summonersResponse && summonersResponse.data.length > 0) {
-				existingSummoners.push(...summonersResponse.data);
-			}
-		}
+		// Optionally filter by puuid
+		const memberResponse = await dbh.genericGet<Member>(
+			CollectionName.MEMBER,
+			{ limit: 100000, filter: puuid ? { puuid } : undefined },
+			MemberSchema,
+		);
 
-		if (!existingSummoners || existingSummoners.length === 0) {
+		if (!memberResponse.success || memberResponse.data.length === 0) {
 			logger.warn(
 				{ count, offset, puuid },
-				"Task:updateMatchData No Summoner data available to update match history. Stopping the loop",
+				"Task:updateMatchData No Summoner data available to update match history. Stopping the task",
 			);
 			return;
 		}
 
-		for (const summoner of existingSummoners) {
+		const summoners = memberResponse.data.flatMap(
+			(member) => member.leagueSummoners,
+		);
+		for (const summoner of summoners) {
 			const riotMatchIds = await rh.getMatchList(summoner.puuid, count, offset);
 
 			const filteredMatchIds = (
@@ -95,7 +84,7 @@ export class MatchTask {
 		}
 
 		logger.debug(
-			{ count, offset, puuid, amountUpdated: existingSummoners.length },
+			{ count, offset, puuid, amountUpdated: summoners.length },
 			"Task:updateMatchData Updated match data summoners",
 		);
 	}

@@ -71,8 +71,14 @@ export class DBHelper {
 	 */
 	async initIndexes(): Promise<boolean> {
 		try {
-			await this.getCollection(CollectionName.SUMMONER).dropIndexes();
-			await this.getCollection(CollectionName.SUMMONER).createIndex("puuid", {
+			await this.getCollection(CollectionName.MEMBER).dropIndexes();
+			await this.getCollection(CollectionName.MEMBER).createIndex(
+				"leagueSummoners.puuid",
+				{
+					unique: true,
+				},
+			);
+			await this.getCollection(CollectionName.MEMBER).createIndex("gameName", {
 				unique: true,
 			});
 			logger.debug("DBHelper:initIndexes - Created summoner indexes");

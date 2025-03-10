@@ -27,6 +27,7 @@ services:
     environment:
       MONGODB_CONNECTION_STRING: <CONNECTION_STRING_HERE>
       RIOT_API_KEY: <RIOT-API-KEY-HERE>
+      RUN_TASKS: true
     ports:
       - "3000:3000"
     restart: unless-stopped

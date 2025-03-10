@@ -7,6 +7,7 @@ import { ChampionReducedSchema, ChampionSchema } from "../../model/Champion.js";
 import { CollectionName } from "../../model/Database.js";
 import { ItemSchema } from "../../model/Item.js";
 import type { MatchV5Participant } from "../../model/MatchV5.js";
+import { MemberSchema } from "../../model/Member.js";
 import { QueueSchema } from "../../model/Queue.js";
 import { SummonerDbSchema } from "../../model/Summoner.js";
 import { SummonerSpellSchema } from "../../model/SummonerSpell.js";
@@ -107,29 +108,29 @@ export const lolRouter = router({
 			// Optionally Filter by summoner puuids
 			let summonerPuuids: string[] = [];
 			if (onlySummonersInDb) {
-				const existingSummonersResponse = await dbh.genericGet(
-					CollectionName.SUMMONER,
+				const existingMembersResponse = await dbh.genericGet(
+					CollectionName.MEMBER,
 					{
 						limit: 100000,
-						project: { puuid: 1 },
+						project: { "leagueSummoners.puuid": 1 },
 					},
-					z.object({ puuid: z.string() }),
+					z.object({
+						leagueSummoners: z.object({ puuid: z.string() }).array(),
+					}),
 				);
-				if (!existingSummonersResponse.success) {
+				if (!existingMembersResponse.success) {
 					logger.error(
-						{ error: existingSummonersResponse.error },
+						{ error: existingMembersResponse.error },
 						"API:getMatchesParticipant",
 					);
 					throw new TRPCError({
-						message: `Summoners couldn't be fetched`,
+						message: `Members couldn't be fetched`,
 						code: "INTERNAL_SERVER_ERROR",
 					});
 				}
-
-				summonerPuuids = existingSummonersResponse.data.map(
-					(summoner) => summoner.puuid,
+				summonerPuuids = existingMembersResponse.data.flatMap((member) =>
+					member.leagueSummoners.map((summoner) => summoner.puuid),
 				);
-
 				pipeline.push({
 					$match: { "info.participants.puuid": { $in: summonerPuuids } },
 				});
@@ -271,22 +272,23 @@ export const lolRouter = router({
 			return cachedResult.data;
 		}
 
-		const result = await dbh.genericGet(
-			CollectionName.SUMMONER,
+		const resultRaw = await dbh.genericGet(
+			CollectionName.MEMBER,
 			{ limit: 1000 },
-			SummonerDbSchema,
+			MemberSchema,
 		);
-		if (!result.success) {
-			logger.error({ error: result.error }, "API:getSummoners");
+		if (!resultRaw.success) {
+			logger.error({ error: resultRaw.error }, "API:getSummoners");
 			throw new TRPCError({
 				message: `Summoners couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
 			});
 		}
+		const result = resultRaw.data.flatMap((member) => member.leagueSummoners);
 
-		simpleCache.set("getSummoners", result.data);
+		simpleCache.set("getSummoners", result);
 		logger.info({ cached: false }, "API:getSummoners");
-		return result.data;
+		return result;
 	}),
 	getSummonerSummary: loggedProcedure.input(z.string()).query(async (opts) => {
 		const pipeline = [
