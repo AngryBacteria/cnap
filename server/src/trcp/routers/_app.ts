@@ -8,6 +8,7 @@ import logger from "../../helpers/Logger.js";
 import { intervalUpdate } from "../../tasks/MainTask.js";
 import { router } from "../trcp.js";
 import { lolRouter } from "./lol.js";
+import {generalRouter} from "./general.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -25,6 +26,7 @@ if (!fs.existsSync(spaFilesPath)) {
 
 const appRouter = router({
 	lol: lolRouter,
+	general: generalRouter
 });
 
 const app = express();
@@ -54,19 +56,23 @@ app.get("*", (req, res, next) => {
 	});
 });
 
-app.listen(3000);
+const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
+app.listen(PORT);
 logger.info(
 	{
-		port: 3000,
+		port: PORT,
 		baseUrl: "http://localhost",
-		url: "http://localhost:3000/trpc",
+		url: `http://localhost:${PORT}/trpc`,
 	},
 	"API:Startup - tRPC Server is running",
 );
 
 export type AppRouter = typeof appRouter;
 
-const RUN_TASKS = process.env.RUN_TASKS;
-if (RUN_TASKS && RUN_TASKS.toLowerCase() === "true") {
-	intervalUpdate(0, 60 * 60 * 1000).catch(logger.error);
+const RUN_TASKS = process.env.RUN_TASKS?.toLowerCase() === "true";
+if (RUN_TASKS) {
+	const UPDATE_INTERVAL = process.env.UPDATE_INTERVAL
+		? Number(process.env.UPDATE_INTERVAL)
+		: 3600000;
+	intervalUpdate(0, UPDATE_INTERVAL).catch(logger.error);
 }

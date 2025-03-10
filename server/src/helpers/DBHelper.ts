@@ -17,8 +17,6 @@ import {
 } from "../model/Database.js";
 import logger from "./Logger.js";
 
-//TODO: differentiate between noting was found or error that the callers can react to it (especially api)
-
 export class DBHelper {
 	private mongoClient: MongoClient;
 	private database: Db;

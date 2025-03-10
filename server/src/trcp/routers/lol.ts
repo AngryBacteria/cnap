@@ -9,9 +9,11 @@ import { ItemSchema } from "../../model/Item.js";
 import type { MatchV5Participant } from "../../model/MatchV5.js";
 import { MemberSchema } from "../../model/Member.js";
 import { QueueSchema } from "../../model/Queue.js";
-import { SummonerDbSchema } from "../../model/Summoner.js";
+import {
+	SummonerDbSchema,
+	SummonerSummarySchema,
+} from "../../model/Summoner.js";
 import { SummonerSpellSchema } from "../../model/SummonerSpell.js";
-import { SummonerSummarySchema } from "../../model/SummonerSummary.js";
 import { loggedProcedure } from "../middlewares/executionTime.js";
 import { router } from "../trcp.js";
 

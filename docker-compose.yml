@@ -30,6 +30,8 @@ services:
       RUN_TASKS: true
     ports:
       - "3000:3000"
+    volumes:
+      - <LOCAL_PATH_HERE>:/app/static
     restart: unless-stopped
     logging:
       driver: "json-file"
