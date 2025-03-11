@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import type { Outputs } from "../../utils/trcp.ts";
 
 interface Props {
-	champion: Outputs["lol"]["getChampionByAlias"];
+	champion: Outputs["lol"]["getChampionById"];
 }
 
 export function ChampionAttributeRadar({ champion }: Props) {

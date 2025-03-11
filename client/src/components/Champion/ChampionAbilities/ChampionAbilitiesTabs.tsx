@@ -5,7 +5,7 @@ import { ChampionAbility } from "./ChampionAbility.tsx";
 import { ChampionAbilityStats } from "./ChampionAbilityStats.tsx";
 
 interface Props {
-	champion: Outputs["lol"]["getChampionByAlias"];
+	champion: Outputs["lol"]["getChampionById"];
 }
 
 export function ChampionAbilitiesTabs({ champion }: Props) {
