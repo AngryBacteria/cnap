@@ -5,5 +5,10 @@ h2 {
 }
 
 .memberCard {
+	width: 100%;
 	height: 100%;
+}
+
+.memberImage {
+	aspect-ratio: 1 / 1;
 }
