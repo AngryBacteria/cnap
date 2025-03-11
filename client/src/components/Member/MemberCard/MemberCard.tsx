@@ -31,8 +31,8 @@ export function MemberCard({ member }: Props) {
 					<Image
 						h={125}
 						w={125}
-						src={`https://cnap.ch/static${member.pixelPictureURL}`}
-						fallbackSrc={"https://cnap.ch/static/pixelPictures/unknown.png"}
+						src={`https://cnap.ch/static${member.profilePictureURL}`}
+						fallbackSrc={"https://cnap.ch/static/profilePictures/unknown.png"}
 						className={styles.memberImage}
 					/>
 					<Flex direction={"column"}>

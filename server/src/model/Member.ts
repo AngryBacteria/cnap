@@ -6,7 +6,7 @@ export const MemberSchema = z.object({
 	gameName: z.string(),
 	punchline: z.string().nullish(),
 	core: z.boolean(),
-	pixelPictureURL: z.string().nullish(),
+	profilePictureURL: z.string().nullish(),
 	//affiliations: z.string().array(),
 	leagueSummoners: SummonerDbSchema.array(),
 });

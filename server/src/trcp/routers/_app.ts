@@ -56,7 +56,7 @@ app.get("*", (req, res, next) => {
 	});
 });
 
-const PORT = process.env.PORT ? Number(process.env.PORT) : 3000;
+const PORT = process.env.PROD_PORT ? Number(process.env.PROD_PORT) : 3000;
 app.listen(PORT);
 logger.info(
 	{

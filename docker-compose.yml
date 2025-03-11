@@ -25,9 +25,11 @@ services:
     depends_on:
       - mongodb
     environment:
-      MONGODB_CONNECTION_STRING: <CONNECTION_STRING_HERE>
-      RIOT_API_KEY: <RIOT-API-KEY-HERE>
+      PROD_PORT: 3000
       RUN_TASKS: true
+      RIOT_API_KEY: <RIOT-API-KEY-HERE>
+      UPDATE_INTERVAL: 3600000
+      MONGODB_CONNECTION_STRING: <CONNECTION_STRING_HERE>
     ports:
       - "3000:3000"
     volumes:
