@@ -14,7 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as SummonersIndexImport } from './routes/summoners/index'
 import { Route as ChampionsIndexImport } from './routes/champions/index'
-import { Route as ChampionsChampionAliasImport } from './routes/champions/$championAlias'
+import { Route as ChampionsChampionIdImport } from './routes/champions/$championId'
 
 // Create/Update Routes
 
@@ -36,9 +36,9 @@ const ChampionsIndexRoute = ChampionsIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const ChampionsChampionAliasRoute = ChampionsChampionAliasImport.update({
-  id: '/champions/$championAlias',
-  path: '/champions/$championAlias',
+const ChampionsChampionIdRoute = ChampionsChampionIdImport.update({
+  id: '/champions/$championId',
+  path: '/champions/$championId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -53,11 +53,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexImport
       parentRoute: typeof rootRoute
     }
-    '/champions/$championAlias': {
-      id: '/champions/$championAlias'
-      path: '/champions/$championAlias'
-      fullPath: '/champions/$championAlias'
-      preLoaderRoute: typeof ChampionsChampionAliasImport
+    '/champions/$championId': {
+      id: '/champions/$championId'
+      path: '/champions/$championId'
+      fullPath: '/champions/$championId'
+      preLoaderRoute: typeof ChampionsChampionIdImport
       parentRoute: typeof rootRoute
     }
     '/champions/': {
@@ -81,14 +81,14 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/champions/$championAlias': typeof ChampionsChampionAliasRoute
+  '/champions/$championId': typeof ChampionsChampionIdRoute
   '/champions': typeof ChampionsIndexRoute
   '/summoners': typeof SummonersIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/champions/$championAlias': typeof ChampionsChampionAliasRoute
+  '/champions/$championId': typeof ChampionsChampionIdRoute
   '/champions': typeof ChampionsIndexRoute
   '/summoners': typeof SummonersIndexRoute
 }
@@ -96,20 +96,20 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
-  '/champions/$championAlias': typeof ChampionsChampionAliasRoute
+  '/champions/$championId': typeof ChampionsChampionIdRoute
   '/champions/': typeof ChampionsIndexRoute
   '/summoners/': typeof SummonersIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/champions/$championAlias' | '/champions' | '/summoners'
+  fullPaths: '/' | '/champions/$championId' | '/champions' | '/summoners'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/champions/$championAlias' | '/champions' | '/summoners'
+  to: '/' | '/champions/$championId' | '/champions' | '/summoners'
   id:
     | '__root__'
     | '/'
-    | '/champions/$championAlias'
+    | '/champions/$championId'
     | '/champions/'
     | '/summoners/'
   fileRoutesById: FileRoutesById
@@ -117,14 +117,14 @@ export interface FileRouteTypes {
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ChampionsChampionAliasRoute: typeof ChampionsChampionAliasRoute
+  ChampionsChampionIdRoute: typeof ChampionsChampionIdRoute
   ChampionsIndexRoute: typeof ChampionsIndexRoute
   SummonersIndexRoute: typeof SummonersIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ChampionsChampionAliasRoute: ChampionsChampionAliasRoute,
+  ChampionsChampionIdRoute: ChampionsChampionIdRoute,
   ChampionsIndexRoute: ChampionsIndexRoute,
   SummonersIndexRoute: SummonersIndexRoute,
 }
@@ -140,7 +140,7 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/champions/$championAlias",
+        "/champions/$championId",
         "/champions/",
         "/summoners/"
       ]
@@ -148,8 +148,8 @@ export const routeTree = rootRoute
     "/": {
       "filePath": "index.tsx"
     },
-    "/champions/$championAlias": {
-      "filePath": "champions/$championAlias.tsx"
+    "/champions/$championId": {
+      "filePath": "champions/$championId.tsx"
     },
     "/champions/": {
       "filePath": "champions/index.tsx"

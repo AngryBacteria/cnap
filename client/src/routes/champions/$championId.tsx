@@ -5,12 +5,16 @@ import { ChampionHeader } from "../../components/Champion/ChampionHeader.tsx";
 import { ChampionSkins } from "../../components/Champion/ChampionSkins/ChampionSkins.tsx";
 import { MatchBannerSummaryLoader } from "../../components/Match/MatchBannerSummaryLoader.tsx";
 import { useChampion } from "../../hooks/api/useChampion.ts";
+import { useItems } from "../../hooks/api/useItems.ts";
+import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts";
+import { useQueues } from "../../hooks/api/useQueues.ts";
+import { useSummonerSpells } from "../../hooks/api/useSummonerSpells.ts";
 
 type ChampionSearch = {
 	page: number;
 };
 
-export const Route = createFileRoute("/champions/$championAlias")({
+export const Route = createFileRoute("/champions/$championId")({
 	component: ChampionPage,
 	validateSearch: (search: Record<string, unknown>): ChampionSearch => {
 		return {
@@ -20,9 +24,17 @@ export const Route = createFileRoute("/champions/$championAlias")({
 });
 
 export function ChampionPage() {
-	const { championAlias } = Route.useParams();
+	const { championId } = Route.useParams();
+	const { page } = Route.useSearch();
 
-	const query = useChampion(championAlias);
+	// Fetch champion
+	const query = useChampion(Number(championId));
+
+	// Prefetch data for the next page
+	useMatchesParticipant(page, Number(championId), "", true, true);
+	useItems(true);
+	useQueues(true);
+	useSummonerSpells(true);
 
 	if (query.status === "pending") {
 		return (
@@ -40,7 +52,7 @@ export function ChampionPage() {
 	if (query.status === "error") {
 		return (
 			<Alert title={"No champions found"} variant={"light"}>
-				The Champion with Name: {championAlias} does not exist.
+				The Champion with ID: {championId} does not exist.
 			</Alert>
 		);
 	}

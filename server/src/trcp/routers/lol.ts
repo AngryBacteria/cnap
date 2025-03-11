@@ -55,17 +55,17 @@ export const lolRouter = router({
 		logger.info({ cached: false }, "API:getChampionsReduced");
 		return result.data;
 	}),
-	getChampionByAlias: loggedProcedure.input(z.string()).query(async (opts) => {
+	getChampionById: loggedProcedure.input(z.number()).query(async (opts) => {
 		const dbResult = await dbh.genericGet(
 			CollectionName.CHAMPION,
 			{
-				filter: { alias: { $regex: `^${opts.input}$`, $options: "i" } },
+				filter: { id: opts.input },
 			},
 			ChampionSchema,
 		);
 
 		if (!dbResult.success) {
-			logger.error({ error: dbResult.error }, "API:getChampionByAlias");
+			logger.error({ error: dbResult.error }, "API:getChampionById");
 			throw new TRPCError({
 				message: `Champion couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
@@ -73,7 +73,7 @@ export const lolRouter = router({
 		}
 
 		if (!dbResult.data[0]) {
-			logger.error({ operationInputs: opts.input }, "API:getChampionByAlias");
+			logger.error({ operationInputs: opts.input }, "API:getChampionById");
 			throw new TRPCError({
 				message: `Champion not found: ${opts.input}`,
 				code: "NOT_FOUND",
@@ -81,7 +81,7 @@ export const lolRouter = router({
 		}
 		logger.info(
 			{ operationInputs: opts.input, cached: false },
-			"API:getChampionByAlias",
+			"API:getChampionById",
 		);
 		return dbResult.data[0];
 	}),

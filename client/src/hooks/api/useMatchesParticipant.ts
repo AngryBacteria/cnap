@@ -6,13 +6,21 @@ export const useMatchesParticipant = (
 	championId?: number,
 	queueId?: string | null,
 	onlySummonersInDb = true,
+	prefetchOnly?: boolean,
 ) => {
-	return useQuery(
-		trpc.lol.getMatchesParticipant.queryOptions({
-			championId,
-			queueId: queueId ? Number.parseInt(queueId) : undefined,
-			onlySummonersInDb,
-			page,
-		}),
-	);
+	const queryParams = {
+		championId,
+		queueId: queueId ? Number.parseInt(queueId) : undefined,
+		onlySummonersInDb,
+		page,
+	};
+
+	if (prefetchOnly) {
+		return useQuery(
+			trpc.lol.getMatchesParticipant.queryOptions(queryParams, {
+				notifyOnChangeProps: [],
+			}),
+		);
+	}
+	return useQuery(trpc.lol.getMatchesParticipant.queryOptions(queryParams));
 };

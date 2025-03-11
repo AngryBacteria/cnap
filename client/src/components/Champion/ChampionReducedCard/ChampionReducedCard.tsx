@@ -14,7 +14,7 @@ interface ChampionCardProps {
 export function ChampionReducedCard({ champion }: ChampionCardProps) {
 	const navigate = useNavigate({});
 	const goToChampionDetail = () => {
-		void navigate({ to: `/champions/${champion.alias}` });
+		void navigate({ to: `/champions/${champion.id}` });
 	};
 	return (
 		<Card

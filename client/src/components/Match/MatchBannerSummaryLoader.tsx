@@ -16,8 +16,8 @@ export function MatchBannerSummaryLoader({ championId }: Props) {
 	//TODO: put in own component
 	//TODO scroll to title
 	const [selectedQueue, setSelectedQueue] = useState<string | null>(null);
-	const { page } = useSearch({ from: "/champions/$championAlias" });
-	const navigate = useNavigate({ from: "/champions/$championAlias" });
+	const { page } = useSearch({ from: "/champions/$championId" });
+	const navigate = useNavigate({ from: "/champions/$championId" });
 	const handlePageChange = (newPage: number) => {
 		navigate({
 			search: { page: newPage },
