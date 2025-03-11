@@ -29,8 +29,6 @@ export function MemberCard({ member }: Props) {
 					wrap={"wrap"}
 				>
 					<Image
-						h={125}
-						w={125}
 						src={`https://cnap.ch/static${member.profilePictureURL}`}
 						fallbackSrc={"https://cnap.ch/static/profilePictures/unknown.png"}
 						className={styles.memberImage}

@@ -20,3 +20,9 @@
 	max-height: 100%;
 	object-fit: contain;
 }
+
+.carouselImage {
+	aspect-ratio: 16 / 9;
+	height: 100%;
+	width: 100%;
+}

@@ -30,7 +30,6 @@ export function ChampionSkins({ champion }: Props) {
 				</Title>
 
 				<Carousel
-					style={{ flex: 1 }}
 					slideSize={{ sm: "50%", lg: "33.333333%", xl: "25%" }}
 					slideGap={{ base: 0, sm: "sm" }}
 					align={"start"}
@@ -42,8 +41,7 @@ export function ChampionSkins({ champion }: Props) {
 							<Carousel.Slide key={skin.id}>
 								<Image
 									src={skin.splashPath}
-									mah={"25vh"}
-									fit={"contain"}
+									className={styles.carouselImage}
 									onClick={() => openSkinModal(skin)}
 								/>
 							</Carousel.Slide>

@@ -11,4 +11,6 @@ h2 {
 
 .memberImage {
 	aspect-ratio: 1 / 1;
+	height: 125px;
+	width: 125px;
 }
