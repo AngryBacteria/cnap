@@ -1,0 +1,15 @@
+.navigationItem {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: var(--mantine-spacing-xs);
+}
+
+a {
+	color: inherit;
+	text-decoration: none;
+}
+
+a[data-status="active"] {
+	color: var(--mantine-primary-color-filled);
+}

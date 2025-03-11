@@ -15,18 +15,16 @@ function Index() {
 		if (!membersQuery.data) {
 			return [];
 		}
-		return membersQuery.data.filter((member) => {
-			return member.core;
-		});
+		const filtered = membersQuery.data.filter((member) => member.core);
+		return [...filtered].sort(() => Math.random() - 0.5);
 	}, [membersQuery.data]);
 
 	const otherMembers = useMemo(() => {
 		if (!membersQuery.data) {
 			return [];
 		}
-		return membersQuery.data.filter((member) => {
-			return !member.core;
-		});
+		const filtered = membersQuery.data.filter((member) => !member.core);
+		return [...filtered].sort(() => Math.random() - 0.5);
 	}, [membersQuery.data]);
 
 	if (membersQuery.status === "pending") {
