@@ -14,12 +14,13 @@ export function MemberCard({ member }: Props) {
 			initial={{ opacity: 0, scale: 0.9 }}
 			animate={{ opacity: 1, scale: 1 }}
 			transition={{ duration: 0.25 }}
+			className={styles.memberCard}
 		>
 			<Card
+				className={styles.memberCard}
 				shadow={"md"}
 				withBorder
 				padding={"xs"}
-				className={styles.memberCard}
 			>
 				<Flex
 					direction={{ base: "column", md: "row" }}

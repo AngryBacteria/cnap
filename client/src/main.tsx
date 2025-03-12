@@ -9,6 +9,9 @@ import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 
+// Global styles
+import "./assets/main.css";
+
 // Mantine theme
 const theme = createTheme({
 	primaryColor: "teal",

@@ -1,5 +1,6 @@
 import { Alert, Flex, Loader, TextInput, Title } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
+import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { ChampionReducedCard } from "../../components/Champion/ChampionReducedCard/ChampionReducedCard.tsx";
 import { useChampions } from "../../hooks/api/useChampions.ts";
@@ -71,11 +72,22 @@ export function ChampionsPage() {
 				</section>
 
 				<section className={styles.champions}>
-					{filteredChampions.map((champion) => {
-						return (
-							<ChampionReducedCard champion={champion} key={champion.id} />
-						);
-					})}
+					<AnimatePresence mode={"popLayout"}>
+						{filteredChampions.map((champion) => {
+							return (
+								<motion.div
+									className={"fillSpacePointer"}
+									initial={{ opacity: 0, scale: 0.9 }}
+									animate={{ opacity: 1, scale: 1 }}
+									exit={{ opacity: 0, scale: 0.9 }}
+									transition={{ duration: 0.25 }}
+									key={champion.id}
+								>
+									<ChampionReducedCard champion={champion} />
+								</motion.div>
+							);
+						})}
+					</AnimatePresence>
 				</section>
 			</section>
 		</>

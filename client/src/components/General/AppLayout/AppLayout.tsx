@@ -35,7 +35,12 @@ export function AppLayout() {
 								justify={"center"}
 								align={"center"}
 							>
-								<Image src="/cnap_flag.png" h={30} w={"auto"} radius={"50%"} />
+								<Image
+									src="/cnap_flag_round.png"
+									h={30}
+									w={"auto"}
+									radius={"50%"}
+								/>
 								<Title order={1}>CnAP</Title>
 							</Flex>
 						</Flex>
@@ -47,7 +52,12 @@ export function AppLayout() {
 								justify={"center"}
 								align={"center"}
 							>
-								<Image src="/cnap_flag.png" h={30} w={"auto"} radius={"50%"} />
+								<Image
+									src="/cnap_flag_round.png"
+									h={30}
+									w={"auto"}
+									radius={"50%"}
+								/>
 								<Title order={1}>CnAP</Title>
 							</Flex>
 							<Flex gap={"xl"} align={"center"}>

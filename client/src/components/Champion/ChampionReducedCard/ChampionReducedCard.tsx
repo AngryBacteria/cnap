@@ -1,6 +1,5 @@
 import { Card, Image, Text, Title } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
-import { motion } from "motion/react";
 import {
 	capitalizeFirstLetter,
 	truncateText,
@@ -18,34 +17,28 @@ export function ChampionReducedCard({ champion }: ChampionCardProps) {
 		void navigate({ to: `/champions/${champion.id}` });
 	};
 	return (
-		<motion.div
-			initial={{ opacity: 0, scale: 0.9 }}
-			animate={{ opacity: 1, scale: 1 }}
-			transition={{ duration: 0.25 }}
+		<Card
+			className={"fillSpacePointer"}
+			withBorder
+			shadow="sm"
+			onClick={goToChampionDetail}
 		>
-			<Card
-				withBorder
-				className={styles.championCard}
-				shadow="sm"
-				onClick={goToChampionDetail}
-			>
-				<Card.Section>
-					<Image
-						src={champion.uncenteredSplashPath}
-						className={styles.imageContainer}
-					/>
-				</Card.Section>
+			<Card.Section>
+				<Image
+					src={champion.uncenteredSplashPath}
+					className={styles.imageContainer}
+				/>
+			</Card.Section>
 
-				<section>
-					<Title order={2} pt={"xs"} ta={"center"}>
-						{champion.name}
-					</Title>
-					<Title order={5} c={"dimmed"} pb={"sm"} ta={"center"}>
-						{capitalizeFirstLetter(champion.title)}
-					</Title>
-					<Text ta={"center"}>{truncateText(champion.shortBio, 100)}</Text>
-				</section>
-			</Card>
-		</motion.div>
+			<section>
+				<Title order={2} pt={"xs"} ta={"center"}>
+					{champion.name}
+				</Title>
+				<Title order={5} c={"dimmed"} pb={"sm"} ta={"center"}>
+					{capitalizeFirstLetter(champion.title)}
+				</Title>
+				<Text ta={"center"}>{truncateText(champion.shortBio, 100)}</Text>
+			</section>
+		</Card>
 	);
 }
