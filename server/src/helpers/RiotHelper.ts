@@ -27,8 +27,6 @@ import {
 } from "../model/SummonerSpell.js";
 import logger from "./Logger.js";
 
-//TODO: differentiate between noting was found or error that the callers can react to it
-
 /**
  * Maps an asset path to the correct URL for the Community Dragon CDN.
  */

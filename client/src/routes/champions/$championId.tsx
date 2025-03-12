@@ -1,4 +1,5 @@
 import { Alert, Flex, Loader } from "@mantine/core";
+import { IconAlertSquareRounded } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { ChampionAbilitiesTabs } from "../../components/Champion/ChampionAbilities/ChampionAbilitiesTabs.tsx";
 import { ChampionHeader } from "../../components/Champion/ChampionHeader.tsx";
@@ -51,8 +52,14 @@ export function ChampionPage() {
 
 	if (query.status === "error") {
 		return (
-			<Alert title={"No champions found"} variant={"light"}>
-				The Champion with ID: {championId} does not exist.
+			<Alert
+				title={"Fehler beim Laden des Champions"}
+				variant={"light"}
+				color={"red"}
+				icon={<IconAlertSquareRounded />}
+			>
+				Der Champion mit der ID ${championId} konnte nicht geladen werden. Bitte
+				versuche es später nochmal.
 			</Alert>
 		);
 	}

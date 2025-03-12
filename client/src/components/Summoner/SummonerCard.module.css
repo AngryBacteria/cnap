@@ -3,3 +3,8 @@
 	width: 100%;
 	font-size: 0;
 }
+
+.navigationItem {
+	text-decoration: none;
+	color: inherit;
+}

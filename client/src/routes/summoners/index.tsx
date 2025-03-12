@@ -1,4 +1,5 @@
 import { Alert, Flex, Loader, TextInput, Title } from "@mantine/core";
+import { IconAlertSquareRounded } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
@@ -43,8 +44,14 @@ function SummonersPage() {
 
 	if (query.status === "error") {
 		return (
-			<Alert title={"No summoners found"} variant={"light"}>
-				Right now no summoners are available. Try again later.
+			<Alert
+				title={"Fehler beim Laden der Summoners"}
+				variant={"light"}
+				color={"red"}
+				icon={<IconAlertSquareRounded />}
+			>
+				Momentan können keine Summoners geladen werden. Bitte versuche es später
+				nochmal.
 			</Alert>
 		);
 	}

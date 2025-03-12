@@ -14,6 +14,7 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as SummonersIndexImport } from './routes/summoners/index'
 import { Route as ChampionsIndexImport } from './routes/champions/index'
+import { Route as SummonersSummonerPuuidImport } from './routes/summoners/$summonerPuuid'
 import { Route as ChampionsChampionIdImport } from './routes/champions/$championId'
 
 // Create/Update Routes
@@ -33,6 +34,12 @@ const SummonersIndexRoute = SummonersIndexImport.update({
 const ChampionsIndexRoute = ChampionsIndexImport.update({
   id: '/champions/',
   path: '/champions/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const SummonersSummonerPuuidRoute = SummonersSummonerPuuidImport.update({
+  id: '/summoners/$summonerPuuid',
+  path: '/summoners/$summonerPuuid',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -60,6 +67,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChampionsChampionIdImport
       parentRoute: typeof rootRoute
     }
+    '/summoners/$summonerPuuid': {
+      id: '/summoners/$summonerPuuid'
+      path: '/summoners/$summonerPuuid'
+      fullPath: '/summoners/$summonerPuuid'
+      preLoaderRoute: typeof SummonersSummonerPuuidImport
+      parentRoute: typeof rootRoute
+    }
     '/champions/': {
       id: '/champions/'
       path: '/champions'
@@ -82,6 +96,7 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/champions/$championId': typeof ChampionsChampionIdRoute
+  '/summoners/$summonerPuuid': typeof SummonersSummonerPuuidRoute
   '/champions': typeof ChampionsIndexRoute
   '/summoners': typeof SummonersIndexRoute
 }
@@ -89,6 +104,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/champions/$championId': typeof ChampionsChampionIdRoute
+  '/summoners/$summonerPuuid': typeof SummonersSummonerPuuidRoute
   '/champions': typeof ChampionsIndexRoute
   '/summoners': typeof SummonersIndexRoute
 }
@@ -97,19 +113,31 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/champions/$championId': typeof ChampionsChampionIdRoute
+  '/summoners/$summonerPuuid': typeof SummonersSummonerPuuidRoute
   '/champions/': typeof ChampionsIndexRoute
   '/summoners/': typeof SummonersIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/champions/$championId' | '/champions' | '/summoners'
+  fullPaths:
+    | '/'
+    | '/champions/$championId'
+    | '/summoners/$summonerPuuid'
+    | '/champions'
+    | '/summoners'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/champions/$championId' | '/champions' | '/summoners'
+  to:
+    | '/'
+    | '/champions/$championId'
+    | '/summoners/$summonerPuuid'
+    | '/champions'
+    | '/summoners'
   id:
     | '__root__'
     | '/'
     | '/champions/$championId'
+    | '/summoners/$summonerPuuid'
     | '/champions/'
     | '/summoners/'
   fileRoutesById: FileRoutesById
@@ -118,6 +146,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ChampionsChampionIdRoute: typeof ChampionsChampionIdRoute
+  SummonersSummonerPuuidRoute: typeof SummonersSummonerPuuidRoute
   ChampionsIndexRoute: typeof ChampionsIndexRoute
   SummonersIndexRoute: typeof SummonersIndexRoute
 }
@@ -125,6 +154,7 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChampionsChampionIdRoute: ChampionsChampionIdRoute,
+  SummonersSummonerPuuidRoute: SummonersSummonerPuuidRoute,
   ChampionsIndexRoute: ChampionsIndexRoute,
   SummonersIndexRoute: SummonersIndexRoute,
 }
@@ -141,6 +171,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/champions/$championId",
+        "/summoners/$summonerPuuid",
         "/champions/",
         "/summoners/"
       ]
@@ -150,6 +181,9 @@ export const routeTree = rootRoute
     },
     "/champions/$championId": {
       "filePath": "champions/$championId.tsx"
+    },
+    "/summoners/$summonerPuuid": {
+      "filePath": "summoners/$summonerPuuid.tsx"
     },
     "/champions/": {
       "filePath": "champions/index.tsx"

@@ -292,7 +292,70 @@ export const lolRouter = router({
 		logger.info({ cached: false }, "API:getSummoners");
 		return result;
 	}),
-	getSummonerSummary: loggedProcedure.input(z.string()).query(async (opts) => {
+	getSummonerByPuuid: loggedProcedure.input(z.string()).query(async (opts) => {
+		const dbResult = await dbh.genericGet(
+			CollectionName.MEMBER,
+			{
+				filter: { "leagueSummoners.puuid": opts.input },
+			},
+			MemberSchema,
+		);
+
+		if (!dbResult.success) {
+			logger.error(
+				{
+					error: dbResult.error,
+					puuid: opts.input,
+					code: "INTERNAL_SERVER_ERROR",
+				},
+				"API:getSummonerByPuuid",
+			);
+			throw new TRPCError({
+				message: `Summoner couldn't be fetched`,
+				code: "INTERNAL_SERVER_ERROR",
+			});
+		}
+
+		if (!dbResult.data[0]) {
+			logger.warn(
+				{
+					puuid: opts.input,
+					code: "NOT_FOUND",
+					message: `Database returned no members for PUUID: ${opts.input}`,
+				},
+				"API:getSummonerByPuuid",
+			);
+			throw new TRPCError({
+				message: `Database returned no members for PUUID: ${opts.input}`,
+				code: "NOT_FOUND",
+			});
+		}
+
+		const summoner = dbResult.data[0].leagueSummoners.find(
+			(summoner) => summoner.puuid === opts.input,
+		);
+		if (!summoner) {
+			logger.error(
+				{
+					puuid: opts.input,
+					code: "INTERNAL_SERVER_ERROR",
+					message: `Returned Member has no matching Summoner: ${opts.input}`,
+				},
+				"API:getSummonerByPuuid",
+			);
+			throw new TRPCError({
+				message: `Returned Member has no matching Summoner: ${opts.input}`,
+				code: "INTERNAL_SERVER_ERROR",
+			});
+		}
+
+		logger.info(
+			{ operationInputs: opts.input, cached: false },
+			"API:getSummonerByPuuid",
+		);
+		return summoner;
+	}),
+	getSummonerSummaryByPuuid: loggedProcedure.input(z.string()).query(async (opts) => {
 		const pipeline = [
 			{
 				$match: {
@@ -372,14 +435,14 @@ export const lolRouter = router({
 			SummonerSummarySchema,
 		);
 		if (!result.success) {
-			logger.error({ error: result.error }, "API:getSummonerSummary");
+			logger.error({ error: result.error }, "API:getSummonerSummaryByPuuid");
 			throw new TRPCError({
 				message: `Summoner summary couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
 			});
 		}
 
-		logger.info({ cached: false }, "API:getSummonerSummary");
+		logger.info({ cached: false }, "API:getSummonerSummaryByPuuid");
 		return result.data;
 	}),
 });

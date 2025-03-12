@@ -1,4 +1,5 @@
 import { Alert, Box, Flex, Grid, Loader, Title } from "@mantine/core";
+import { IconAlertSquareRounded } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { MemberCard } from "../components/Member/MemberCard/MemberCard.tsx";
@@ -42,8 +43,14 @@ function Index() {
 
 	if (membersQuery.status === "error") {
 		return (
-			<Alert title={"No Members found"} variant={"light"}>
-				Right now no members are available. Try again later.
+			<Alert
+				title={"Fehler beim Laden der Mitglieder"}
+				variant={"light"}
+				color={"red"}
+				icon={<IconAlertSquareRounded />}
+			>
+				Momentan können keine Mitglieder geladen werden. Bitte versuche es
+				später nochmal.
 			</Alert>
 		);
 	}
@@ -52,7 +59,7 @@ function Index() {
 		<Box pr={"md"} pl={"md"}>
 			<section>
 				<Flex>
-					<Title pb={"md"}>CnAP Members</Title>
+					<Title pb={"md"}>Mitglieder der CnAP</Title>
 				</Flex>
 				<Grid>
 					{cnapMembers.map((member) => {
@@ -67,7 +74,7 @@ function Index() {
 
 			<section>
 				<Flex>
-					<Title py={"md"}>Friends of the CnAP</Title>
+					<Title py={"md"}>Freunde der CnAP</Title>
 				</Flex>
 				<Grid>
 					{otherMembers.map((member) => {

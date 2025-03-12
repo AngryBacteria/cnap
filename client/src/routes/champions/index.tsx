@@ -1,4 +1,5 @@
 import { Alert, Flex, Loader, TextInput, Title } from "@mantine/core";
+import { IconAlertSquareRounded } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
@@ -52,8 +53,14 @@ export function ChampionsPage() {
 
 	if (query.status === "error") {
 		return (
-			<Alert title={"No champions found"} variant={"light"}>
-				Right now no champions are available. Try again later.
+			<Alert
+				title={"Fehler beim Laden der Champions"}
+				variant={"light"}
+				color={"red"}
+				icon={<IconAlertSquareRounded />}
+			>
+				Momentan können keine Champions geladen werden. Bitte versuche es später
+				nochmal.
 			</Alert>
 		);
 	}

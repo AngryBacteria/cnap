@@ -1,4 +1,5 @@
 import { Alert, Loader, Pagination, Select, Title } from "@mantine/core";
+import { IconAlertSquareRounded } from "@tabler/icons-react";
 import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useItems } from "../../hooks/api/useItems";
@@ -68,7 +69,17 @@ export function MatchBannerSummaryLoader({ championId }: Props) {
 		queuesQuery.status === "error" ||
 		summonerSpellsQuery.status === "error"
 	) {
-		return <Alert title={"Error loading matches"} variant={"light"} />;
+		return (
+			<Alert
+				title={"Fehler beim Laden der Matches"}
+				variant={"light"}
+				color={"red"}
+				icon={<IconAlertSquareRounded />}
+			>
+				Momentan können keine Matches geladen werden. Bitte versuche es später
+				nochmal.
+			</Alert>
+		);
 	}
 
 	return (

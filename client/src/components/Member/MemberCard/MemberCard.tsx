@@ -7,7 +7,6 @@ interface Props {
 	member: Outputs["general"]["getMembers"][number];
 }
 
-//TODO: animations with motion
 export function MemberCard({ member }: Props) {
 	return (
 		<motion.div
