@@ -79,7 +79,7 @@ function Index() {
 				<Grid>
 					{otherMembers.map((member) => {
 						return (
-							<Grid.Col span={{ base: 12, md: 6 }} key={member.gameName}>
+							<Grid.Col span={{ base: 12, sm: 6 }} key={member.gameName}>
 								<MemberCard member={member} />
 							</Grid.Col>
 						);
