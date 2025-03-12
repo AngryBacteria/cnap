@@ -355,94 +355,96 @@ export const lolRouter = router({
 		);
 		return summoner;
 	}),
-	getSummonerSummaryByPuuid: loggedProcedure.input(z.string()).query(async (opts) => {
-		const pipeline = [
-			{
-				$match: {
-					"info.participants.puuid": opts.input,
-				},
-			},
-			{
-				$unwind: {
-					path: "$info.participants",
-				},
-			},
-			{
-				$match: {
-					"info.participants.puuid": opts.input,
-				},
-			},
-			{
-				$group: {
-					_id: {
-						champion: "$info.participants.championName",
-						queueId: "$info.queueId",
-						teamPosition: "$info.participants.teamPosition",
+	getSummonerSummaryByPuuid: loggedProcedure
+		.input(z.string())
+		.query(async (opts) => {
+			const pipeline = [
+				{
+					$match: {
+						"info.participants.puuid": opts.input,
 					},
-					totalMatches: {
-						$sum: 1,
+				},
+				{
+					$unwind: {
+						path: "$info.participants",
 					},
-					wins: {
-						$sum: {
-							$cond: [
-								{
-									$eq: ["$info.participants.win", true],
-								},
-								1,
-								0,
-							],
+				},
+				{
+					$match: {
+						"info.participants.puuid": opts.input,
+					},
+				},
+				{
+					$group: {
+						_id: {
+							champion: "$info.participants.championName",
+							queueId: "$info.queueId",
+							teamPosition: "$info.participants.teamPosition",
+						},
+						totalMatches: {
+							$sum: 1,
+						},
+						wins: {
+							$sum: {
+								$cond: [
+									{
+										$eq: ["$info.participants.win", true],
+									},
+									1,
+									0,
+								],
+							},
+						},
+						secondsPlayed: {
+							$sum: "$info.gameDuration",
+						},
+						kills: {
+							$sum: "$info.participants.kills",
+						},
+						deaths: {
+							$sum: "$info.participants.deaths",
+						},
+						assists: {
+							$sum: "$info.participants.assists",
+						},
+						doubleKills: {
+							$sum: "$info.participants.doubleKills",
+						},
+						tripleKills: {
+							$sum: "$info.participants.tripleKills",
+						},
+						quadraKills: {
+							$sum: "$info.participants.quadraKills",
+						},
+						pentaKills: {
+							$sum: "$info.participants.pentaKills",
+						},
+						totalVisionScore: {
+							$sum: "$info.participants.visionScore",
 						},
 					},
-					secondsPlayed: {
-						$sum: "$info.gameDuration",
-					},
-					kills: {
-						$sum: "$info.participants.kills",
-					},
-					deaths: {
-						$sum: "$info.participants.deaths",
-					},
-					assists: {
-						$sum: "$info.participants.assists",
-					},
-					doubleKills: {
-						$sum: "$info.participants.doubleKills",
-					},
-					tripleKills: {
-						$sum: "$info.participants.tripleKills",
-					},
-					quadraKills: {
-						$sum: "$info.participants.quadraKills",
-					},
-					pentaKills: {
-						$sum: "$info.participants.pentaKills",
-					},
-					totalVisionScore: {
-						$sum: "$info.participants.visionScore",
+				},
+				{
+					$sort: {
+						totalMatches: -1,
 					},
 				},
-			},
-			{
-				$sort: {
-					totalMatches: -1,
-				},
-			},
-		];
+			];
 
-		const result = await dbh.genericPipeline(
-			pipeline,
-			CollectionName.MATCH,
-			SummonerSummarySchema,
-		);
-		if (!result.success) {
-			logger.error({ error: result.error }, "API:getSummonerSummaryByPuuid");
-			throw new TRPCError({
-				message: `Summoner summary couldn't be fetched`,
-				code: "INTERNAL_SERVER_ERROR",
-			});
-		}
+			const result = await dbh.genericPipeline(
+				pipeline,
+				CollectionName.MATCH,
+				SummonerSummarySchema,
+			);
+			if (!result.success) {
+				logger.error({ error: result.error }, "API:getSummonerSummaryByPuuid");
+				throw new TRPCError({
+					message: `Summoner summary couldn't be fetched`,
+					code: "INTERNAL_SERVER_ERROR",
+				});
+			}
 
-		logger.info({ cached: false }, "API:getSummonerSummaryByPuuid");
-		return result.data;
-	}),
+			logger.info({ cached: false }, "API:getSummonerSummaryByPuuid");
+			return result.data;
+		}),
 });
