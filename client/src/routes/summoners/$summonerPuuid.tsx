@@ -1,6 +1,7 @@
 import { Alert, Flex, Loader } from "@mantine/core";
 import { IconAlertSquareRounded } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts";
 import { useSummoner } from "../../hooks/api/useSummoner.ts";
 import { useSummonerSummary } from "../../hooks/api/useSummonerSummary.ts";
 
@@ -13,10 +14,15 @@ export function SummonerPage() {
 
 	const summonerQuery = useSummoner(summonerPuuid);
 	const summonerSummaryQuery = useSummonerSummary(summonerPuuid);
+	const summonerMatchesQuery = useMatchesParticipant({
+		page: 1,
+		summonerPuuid,
+	});
 
 	if (
 		summonerQuery.status === "pending" ||
-		summonerSummaryQuery.status === "pending"
+		summonerSummaryQuery.status === "pending" ||
+		summonerMatchesQuery.status === "pending"
 	) {
 		return (
 			<Flex
@@ -32,7 +38,8 @@ export function SummonerPage() {
 
 	if (
 		summonerQuery.status === "error" ||
-		summonerSummaryQuery.status === "error"
+		summonerSummaryQuery.status === "error" ||
+		summonerMatchesQuery.status === "error"
 	) {
 		return (
 			<Alert

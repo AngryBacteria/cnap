@@ -32,7 +32,7 @@ export function ChampionPage() {
 	const query = useChampion(Number(championId));
 
 	// Prefetch data for the next page
-	useMatchesParticipant(page, Number(championId), "", true, true);
+	useMatchesParticipant({ page, championId: Number(championId) }, true);
 	useItems(true);
 	useQueues(true);
 	useSummonerSpells(true);

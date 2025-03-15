@@ -9,7 +9,7 @@ import { useSummonerSpells } from "../../hooks/api/useSummonerSpells";
 import { MatchBannerSummary } from "./MatchBannerSummary/MatchBannerSummary";
 
 export interface Props {
-	championId?: number;
+	championId: number;
 }
 
 export function MatchBannerSummaryLoader({ championId }: Props) {
@@ -25,12 +25,11 @@ export function MatchBannerSummaryLoader({ championId }: Props) {
 		});
 	};
 
-	const matchesParticipantQuery = useMatchesParticipant(
+	const matchesParticipantQuery = useMatchesParticipant({
 		page,
 		championId,
-		selectedQueue,
-		true,
-	);
+		queueId: selectedQueue ? Number(selectedQueue) : undefined,
+	});
 	const itemQuery = useItems();
 	const queuesQuery = useQueues();
 	const summonerSpellsQuery = useSummonerSpells();

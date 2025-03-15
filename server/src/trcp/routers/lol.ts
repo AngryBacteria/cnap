@@ -88,17 +88,26 @@ export const lolRouter = router({
 	getMatchesParticipant: loggedProcedure
 		.input(
 			z.object({
+				page: z.number().default(1),
 				championId: z.number().optional(),
 				queueId: z.number().optional(),
+				summonerPuuid: z.string().optional(),
 				onlySummonersInDb: z.boolean().default(true),
-				page: z.number().default(1),
 			}),
 		)
 		.query(async (opts) => {
-			const { championId, queueId, onlySummonersInDb, page } = opts.input;
+			const { page, championId, queueId, summonerPuuid, onlySummonersInDb } =
+				opts.input;
 
 			// Init the pipeline
 			const pipeline: Record<string, unknown>[] = [];
+
+			//Optionally filter by puuid
+			if (summonerPuuid) {
+				pipeline.push({
+					$match: { "info.participants.puuid": summonerPuuid },
+				});
+			}
 
 			// Optionally filter by champion id
 			if (championId) {
@@ -151,7 +160,14 @@ export const lolRouter = router({
 				},
 			});
 
-			// Optionally filter unwinder document again by champion id
+			// Optionally filter unwinded document again by puuid
+			if (summonerPuuid) {
+				pipeline.push({
+					$match: { "info.participants.puuid": summonerPuuid },
+				});
+			}
+
+			// Optionally filter unwinded document again by champion id
 			if (championId) {
 				pipeline.push({
 					$match: { "info.participants.championId": championId },
