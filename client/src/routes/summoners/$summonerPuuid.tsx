@@ -1,8 +1,13 @@
 import { Alert, Flex, Loader } from "@mantine/core";
 import { IconAlertSquareRounded } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { MatchBannerSummaryLoader } from "../../components/Match/MatchBannerSummaryLoader.tsx";
+import { useItems } from "../../hooks/api/useItems.ts";
 import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts";
+import { useQueues } from "../../hooks/api/useQueues.ts";
 import { useSummoner } from "../../hooks/api/useSummoner.ts";
+import { useSummonerSpells } from "../../hooks/api/useSummonerSpells.ts";
 import { useSummonerSummary } from "../../hooks/api/useSummonerSummary.ts";
 
 export const Route = createFileRoute("/summoners/$summonerPuuid")({
@@ -11,18 +16,26 @@ export const Route = createFileRoute("/summoners/$summonerPuuid")({
 
 export function SummonerPage() {
 	const { summonerPuuid } = Route.useParams();
+	const [page, setPage] = useState<number>(1);
 
 	const summonerQuery = useSummoner(summonerPuuid);
 	const summonerSummaryQuery = useSummonerSummary(summonerPuuid);
-	const summonerMatchesQuery = useMatchesParticipant({
-		page: 1,
-		summonerPuuid,
-	});
+
+	// Preloading
+	useMatchesParticipant(
+		{
+			page,
+			summonerPuuid,
+		},
+		true,
+	);
+	useItems(true);
+	useQueues(true);
+	useSummonerSpells(true);
 
 	if (
 		summonerQuery.status === "pending" ||
-		summonerSummaryQuery.status === "pending" ||
-		summonerMatchesQuery.status === "pending"
+		summonerSummaryQuery.status === "pending"
 	) {
 		return (
 			<Flex
@@ -38,8 +51,7 @@ export function SummonerPage() {
 
 	if (
 		summonerQuery.status === "error" ||
-		summonerSummaryQuery.status === "error" ||
-		summonerMatchesQuery.status === "error"
+		summonerSummaryQuery.status === "error"
 	) {
 		return (
 			<Alert
@@ -54,5 +66,17 @@ export function SummonerPage() {
 		);
 	}
 
-	return <h1>Hello {summonerPuuid}</h1>;
+	return (
+		<>
+			<h1>Hello {summonerPuuid}</h1>
+			<p>Summoner Name: {summonerQuery.data.gameName}</p>
+			<p>Summary entries: {summonerSummaryQuery.data.length}</p>
+
+			<MatchBannerSummaryLoader
+				summonerPuuid={summonerPuuid}
+				page={page}
+				setPage={setPage}
+			/>
+		</>
+	);
 }

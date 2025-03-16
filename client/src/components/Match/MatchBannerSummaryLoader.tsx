@@ -1,6 +1,5 @@
 import { Alert, Loader, Pagination, Select, Title } from "@mantine/core";
 import { IconAlertSquareRounded } from "@tabler/icons-react";
-import { useNavigate, useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useItems } from "../../hooks/api/useItems";
 import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts";
@@ -9,25 +8,27 @@ import { useSummonerSpells } from "../../hooks/api/useSummonerSpells";
 import { MatchBannerSummary } from "./MatchBannerSummary/MatchBannerSummary";
 
 export interface Props {
-	championId: number;
+	page: number;
+	setPage: (page: number) => void;
+	championId?: number;
+	summonerPuuid?: string;
 }
 
-export function MatchBannerSummaryLoader({ championId }: Props) {
+export function MatchBannerSummaryLoader({
+	championId,
+	summonerPuuid,
+	page,
+	setPage,
+}: Props) {
 	//TODO: replace with router search param
 	//TODO: put in own component
 	//TODO scroll to title
 	const [selectedQueue, setSelectedQueue] = useState<string | null>(null);
-	const { page } = useSearch({ from: "/champions/$championId" });
-	const navigate = useNavigate({ from: "/champions/$championId" });
-	const handlePageChange = (newPage: number) => {
-		navigate({
-			search: { page: newPage },
-		});
-	};
 
 	const matchesParticipantQuery = useMatchesParticipant({
 		page,
 		championId,
+		summonerPuuid,
 		queueId: selectedQueue ? Number(selectedQueue) : undefined,
 	});
 	const itemQuery = useItems();
@@ -107,7 +108,7 @@ export function MatchBannerSummaryLoader({ championId }: Props) {
 			<Pagination
 				total={matchesParticipantQuery.data.maxPage}
 				value={page}
-				onChange={handlePageChange}
+				onChange={setPage}
 			/>
 		</>
 	);

@@ -1,6 +1,7 @@
 import { Alert, Flex, Loader } from "@mantine/core";
 import { IconAlertSquareRounded } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 import { ChampionAbilitiesTabs } from "../../components/Champion/ChampionAbilities/ChampionAbilitiesTabs.tsx";
 import { ChampionHeader } from "../../components/Champion/ChampionHeader.tsx";
 import { ChampionSkins } from "../../components/Champion/ChampionSkins/ChampionSkins.tsx";
@@ -11,27 +12,18 @@ import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts"
 import { useQueues } from "../../hooks/api/useQueues.ts";
 import { useSummonerSpells } from "../../hooks/api/useSummonerSpells.ts";
 
-type ChampionSearch = {
-	page: number;
-};
-
 export const Route = createFileRoute("/champions/$championId")({
 	component: ChampionPage,
-	validateSearch: (search: Record<string, unknown>): ChampionSearch => {
-		return {
-			page: Number(search?.page ?? 1),
-		};
-	},
 });
 
 export function ChampionPage() {
 	const { championId } = Route.useParams();
-	const { page } = Route.useSearch();
+	const [page, setPage] = useState<number>(1);
 
 	// Fetch champion
 	const query = useChampion(Number(championId));
 
-	// Prefetch data for the next page
+	// Prefetch data for the MatchBannerSummaryLoader
 	useMatchesParticipant({ page, championId: Number(championId) }, true);
 	useItems(true);
 	useQueues(true);
@@ -71,7 +63,11 @@ export function ChampionPage() {
 				<ChampionAbilitiesTabs champion={query.data} />
 				<ChampionSkins champion={query.data} />
 
-				<MatchBannerSummaryLoader championId={query.data.id} />
+				<MatchBannerSummaryLoader
+					championId={query.data.id}
+					page={page}
+					setPage={setPage}
+				/>
 			</Flex>
 		</>
 	);
