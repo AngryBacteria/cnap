@@ -2,6 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import dbh from "../../helpers/DBHelper.js";
 import logger from "../../helpers/Logger.js";
+import rh from "../../helpers/RiotHelper.js";
 import simpleCache from "../../helpers/SimpleCache.js";
 import { ChampionReducedSchema, ChampionSchema } from "../../model/Champion.js";
 import { CollectionName } from "../../model/Database.js";
@@ -16,6 +17,9 @@ import {
 import { SummonerSpellSchema } from "../../model/SummonerSpell.js";
 import { loggedProcedure } from "../middlewares/executionTime.js";
 import { router } from "../trcp.js";
+
+// Test riot api connection
+await rh.testConnection();
 
 export const lolRouter = router({
 	getChampionsReduced: loggedProcedure.query(async () => {

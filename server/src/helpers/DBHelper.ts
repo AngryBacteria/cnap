@@ -54,10 +54,10 @@ export class DBHelper {
 		try {
 			// Ping the database
 			await this.database.command({ ping: 1 });
-			logger.debug({ connectec: true }, "DBHelper:testConnection");
+			logger.debug({ connected: true }, "DBHelper:testConnection");
 			return true;
 		} catch (e) {
-			logger.error({ connectec: false, error: e }, "DBHelper:testConnection");
+			logger.error({ connected: false, error: e }, "DBHelper:testConnection");
 			return false;
 		}
 	}

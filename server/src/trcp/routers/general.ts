@@ -7,6 +7,9 @@ import { MemberSchema } from "../../model/Member.js";
 import { loggedProcedure } from "../middlewares/executionTime.js";
 import { router } from "../trcp.js";
 
+// Test database connection
+await dbh.testConnection();
+
 export const generalRouter = router({
 	getServerTime: loggedProcedure.query(async () => {
 		return new Date();
