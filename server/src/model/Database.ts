@@ -47,6 +47,7 @@ export enum CollectionName {
 	SUMMONER_SPELL = "summoner_spell",
 	TIMELINE = "timeline_v5",
 	SESSION = "session",
+	SUMMONER = "summoner",
 }
 
 /**
@@ -68,7 +69,7 @@ export const BasicFilterSchema = z.object({
 		.describe("Maximum number of items to return"),
 	project: z
 		.record(z.string(), z.number())
-		.default({ _id: 0 })
+		.default({})
 		.describe("Fields to return"),
 	filter: z.record(z.string(), z.any()).default({}).describe("Filter to apply"),
 });
