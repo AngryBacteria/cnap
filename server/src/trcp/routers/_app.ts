@@ -9,6 +9,7 @@ import { intervalUpdate } from "../../tasks/MainTask.js";
 import { router } from "../trcp.js";
 import { generalRouter } from "./general.js";
 import { lolRouter } from "./lol.js";
+import { penAndPaperRouter } from "./penAndPaper.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -27,6 +28,7 @@ if (!fs.existsSync(spaFilesPath)) {
 const appRouter = router({
 	lol: lolRouter,
 	general: generalRouter,
+	penAndPaper: penAndPaperRouter,
 });
 
 const app = express();

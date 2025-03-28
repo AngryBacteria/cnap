@@ -2,18 +2,18 @@ import dbh from "../helpers/DBHelper.js";
 import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
 import { CollectionName } from "../model/Database.js";
-import { type Member, MemberSchema } from "../model/Member.js";
+import { SummonerDbSchema } from "../model/Summoner.js";
 
 export class MatchTask {
 	async updateMatchData(count = 69, offset = 0, puuid = ""): Promise<void> {
 		// Optionally filter by puuid
-		const memberResponse = await dbh.genericGet<Member>(
-			CollectionName.MEMBER,
+		const summonerResponse = await dbh.genericGet(
+			CollectionName.SUMMONER,
 			{ limit: 100000, filter: puuid ? { puuid } : undefined },
-			MemberSchema,
+			SummonerDbSchema,
 		);
 
-		if (!memberResponse.success || memberResponse.data.length === 0) {
+		if (!summonerResponse.success || summonerResponse.data.length === 0) {
 			logger.warn(
 				{ count, offset, puuid },
 				"Task:updateMatchData No Summoner data available to update match history. Stopping the task",
@@ -21,10 +21,7 @@ export class MatchTask {
 			return;
 		}
 
-		const summoners = memberResponse.data.flatMap(
-			(member) => member.leagueSummoners,
-		);
-		for (const summoner of summoners) {
+		for (const summoner of summonerResponse.data) {
 			const riotMatchIds = await rh.getMatchList(summoner.puuid, count, offset);
 
 			const filteredMatchIds = (
@@ -84,7 +81,7 @@ export class MatchTask {
 		}
 
 		logger.debug(
-			{ count, offset, puuid, amountUpdated: summoners.length },
+			{ count, offset, puuid, amountUpdated: summonerResponse.data.length },
 			"Task:updateMatchData Updated match data summoners",
 		);
 	}

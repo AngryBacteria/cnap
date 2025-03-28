@@ -8,7 +8,6 @@ import { ChampionReducedSchema, ChampionSchema } from "../../model/Champion.js";
 import { CollectionName } from "../../model/Database.js";
 import { ItemSchema } from "../../model/Item.js";
 import type { MatchV5Participant } from "../../model/MatchV5.js";
-import { MemberSchema } from "../../model/Member.js";
 import { QueueSchema } from "../../model/Queue.js";
 import {
 	SummonerDbSchema,
@@ -123,28 +122,28 @@ export const lolRouter = router({
 			// Optionally Filter by summoner puuids
 			let summonerPuuids: string[] = [];
 			if (onlySummonersInDb) {
-				const existingMembersResponse = await dbh.genericGet(
-					CollectionName.MEMBER,
+				const existingPuuidsResponse = await dbh.genericGet(
+					CollectionName.SUMMONER,
 					{
 						limit: 100000,
-						project: { "leagueSummoners.puuid": 1 },
+						project: { puuid: 1 },
 					},
 					z.object({
-						leagueSummoners: z.object({ puuid: z.string() }).array(),
+						puuid: z.string(),
 					}),
 				);
-				if (!existingMembersResponse.success) {
+				if (!existingPuuidsResponse.success) {
 					logger.error(
-						{ error: existingMembersResponse.error },
+						{ error: existingPuuidsResponse.error },
 						"API:getMatchesParticipant",
 					);
 					throw new TRPCError({
-						message: `Members couldn't be fetched`,
+						message: `Summoners couldn't be fetched`,
 						code: "INTERNAL_SERVER_ERROR",
 					});
 				}
-				summonerPuuids = existingMembersResponse.data.flatMap((member) =>
-					member.leagueSummoners.map((summoner) => summoner.puuid),
+				summonerPuuids = existingPuuidsResponse.data.map(
+					(responseObject) => responseObject.puuid,
 				);
 				pipeline.push({
 					$match: { "info.participants.puuid": { $in: summonerPuuids } },
@@ -294,37 +293,36 @@ export const lolRouter = router({
 			return cachedResult.data;
 		}
 
-		const resultRaw = await dbh.genericGet(
-			CollectionName.MEMBER,
+		const summonerResponse = await dbh.genericGet(
+			CollectionName.SUMMONER,
 			{ limit: 1000 },
-			MemberSchema,
+			SummonerDbSchema,
 		);
-		if (!resultRaw.success) {
-			logger.error({ error: resultRaw.error }, "API:getSummoners");
+		if (!summonerResponse.success) {
+			logger.error({ error: summonerResponse.error }, "API:getSummoners");
 			throw new TRPCError({
 				message: `Summoners couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
 			});
 		}
-		const result = resultRaw.data.flatMap((member) => member.leagueSummoners);
 
-		simpleCache.set("getSummoners", result);
+		simpleCache.set("getSummoners", summonerResponse.data);
 		logger.info({ cached: false }, "API:getSummoners");
-		return result;
+		return summonerResponse.data;
 	}),
 	getSummonerByPuuid: loggedProcedure.input(z.string()).query(async (opts) => {
-		const dbResult = await dbh.genericGet(
-			CollectionName.MEMBER,
+		const summonerResponse = await dbh.genericGet(
+			CollectionName.SUMMONER,
 			{
-				filter: { "leagueSummoners.puuid": opts.input },
+				filter: { puuid: opts.input },
 			},
-			MemberSchema,
+			SummonerDbSchema,
 		);
 
-		if (!dbResult.success) {
+		if (!summonerResponse.success) {
 			logger.error(
 				{
-					error: dbResult.error,
+					error: summonerResponse.error,
 					puuid: opts.input,
 					code: "INTERNAL_SERVER_ERROR",
 				},
@@ -336,7 +334,7 @@ export const lolRouter = router({
 			});
 		}
 
-		if (!dbResult.data[0]) {
+		if (!summonerResponse.data[0]) {
 			logger.warn(
 				{
 					puuid: opts.input,
@@ -351,29 +349,11 @@ export const lolRouter = router({
 			});
 		}
 
-		const summoner = dbResult.data[0].leagueSummoners.find(
-			(summoner) => summoner.puuid === opts.input,
-		);
-		if (!summoner) {
-			logger.error(
-				{
-					puuid: opts.input,
-					code: "INTERNAL_SERVER_ERROR",
-					message: `Returned Member has no matching Summoner: ${opts.input}`,
-				},
-				"API:getSummonerByPuuid",
-			);
-			throw new TRPCError({
-				message: `Returned Member has no matching Summoner: ${opts.input}`,
-				code: "INTERNAL_SERVER_ERROR",
-			});
-		}
-
 		logger.info(
 			{ operationInputs: opts.input, cached: false },
 			"API:getSummonerByPuuid",
 		);
-		return summoner;
+		return summonerResponse.data[0];
 	}),
 	getSummonerSummaryByPuuid: loggedProcedure
 		.input(z.string())

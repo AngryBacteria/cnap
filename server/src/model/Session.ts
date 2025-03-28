@@ -1,11 +1,11 @@
 import { z } from "zod";
-import { MemberOnlySchema } from "./Member.js";
+import { MemberSchema } from "./Member.js";
 
 export const SessionSchema = z.object({
 	timestamp: z.number(),
 	sessionName: z.string(),
-	dm: MemberOnlySchema,
-	players: MemberOnlySchema.array(),
+	dm: MemberSchema,
+	players: MemberSchema.array(),
 	campaign: z.string(),
 	transcriptions: z.string().array(),
 	summaries: z.string().array(),

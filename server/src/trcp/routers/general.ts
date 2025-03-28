@@ -3,7 +3,7 @@ import dbh from "../../helpers/DBHelper.js";
 import logger from "../../helpers/Logger.js";
 import simpleCache from "../../helpers/SimpleCache.js";
 import { CollectionName } from "../../model/Database.js";
-import { MemberSchema } from "../../model/Member.js";
+import { MemberWithSummonerSchema } from "../../model/Member.js";
 import { loggedProcedure } from "../middlewares/executionTime.js";
 import { router } from "../trcp.js";
 
@@ -22,7 +22,7 @@ export const generalRouter = router({
 		)
 		.query(async (opts) => {
 			// Try cache
-			const cachedResult = MemberSchema.array().safeParse(
+			const cachedResult = MemberWithSummonerSchema.array().safeParse(
 				simpleCache.get(`getMembers[${opts.input.onlyCore}]`),
 			);
 			if (cachedResult.success) {
@@ -31,21 +31,32 @@ export const generalRouter = router({
 			}
 
 			// Try DB
-			const filter: Record<string, unknown> = {};
+			const pipeline: Record<string, unknown>[] = [];
 			if (opts.input.onlyCore) {
-				filter.core = true;
+				pipeline.push({ $match: { core: true } });
 			}
-			const result = await dbh.genericGet(
+			pipeline.push({
+				$lookup: {
+					from: "summoner",
+					localField: "_id",
+					foreignField: "memberId",
+					as: "leagueSummoners",
+				},
+			});
+			const memberResponse = await dbh.genericPipeline(
+				pipeline,
 				CollectionName.MEMBER,
-				{ limit: 10000, filter },
-				MemberSchema,
+				MemberWithSummonerSchema,
 			);
-			if (!result.success) {
+			if (!memberResponse.success) {
 				throw new Error("Members couldn't be fetched");
 			}
 
-			simpleCache.set(`getMembers[${opts.input.onlyCore}]`, result.data);
+			simpleCache.set(
+				`getMembers[${opts.input.onlyCore}]`,
+				memberResponse.data,
+			);
 			logger.info({ cached: false }, "API:getMembers");
-			return result.data;
+			return memberResponse.data;
 		}),
 });
