@@ -1,13 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import { trpc } from "../../utils/trcp.ts";
+import { type Inputs, trpc } from "../../utils/trcp.ts";
 
-export const useSummonerSummary = (puuid: string, prefetchOnly?: boolean) => {
+export const useSummonerSummary = (
+	queryParams: Inputs["lol"]["getSummonerSummaryByName"],
+	prefetchOnly?: boolean,
+) => {
 	if (prefetchOnly) {
 		return useQuery(
-			trpc.lol.getSummonerSummaryByPuuid.queryOptions(puuid, {
+			trpc.lol.getSummonerSummaryByName.queryOptions(queryParams, {
 				notifyOnChangeProps: [],
 			}),
 		);
 	}
-	return useQuery(trpc.lol.getSummonerSummaryByPuuid.queryOptions(puuid));
+	return useQuery(trpc.lol.getSummonerSummaryByName.queryOptions(queryParams));
 };

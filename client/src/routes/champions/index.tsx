@@ -14,17 +14,17 @@ export const Route = createFileRoute("/champions/")({
 export function ChampionsPage() {
 	const [nameSearch, setNameSearch] = useState<string>("");
 
-	const query = useChampions();
+	const championsQuery = useChampions();
 
 	/**
 	 * Filter the champions based on the name search
 	 */
 	const filteredChampions = useMemo(() => {
-		if (!query.data) {
+		if (!championsQuery.data) {
 			return [];
 		}
 
-		return query.data
+		return championsQuery.data
 			.filter((champion) => {
 				// Check if name or title matches
 				if (champion.id === -1) {
@@ -36,9 +36,9 @@ export function ChampionsPage() {
 				);
 			})
 			.sort((a, b) => a.name.localeCompare(b.name));
-	}, [query.data, nameSearch]);
+	}, [championsQuery.data, nameSearch]);
 
-	if (query.status === "pending") {
+	if (championsQuery.status === "pending") {
 		return (
 			<Flex
 				justify={"center"}
@@ -51,7 +51,7 @@ export function ChampionsPage() {
 		);
 	}
 
-	if (query.status === "error") {
+	if (championsQuery.status === "error") {
 		return (
 			<Alert
 				title={"Fehler beim Laden der Champions"}

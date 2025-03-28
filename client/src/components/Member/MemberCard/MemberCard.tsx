@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function MemberCard({ member }: Props) {
-	const memberPuuid = member.leagueSummoners[0]?.puuid;
+	const summonerNameTag = `${member.leagueSummoners[0]?.gameName}-${member.leagueSummoners[0]?.tagLine}`;
 
 	return (
 		<motion.div
@@ -59,10 +59,10 @@ export function MemberCard({ member }: Props) {
 						align={"center"}
 						justify={{ base: "center", md: "flex-end" }}
 					>
-						{memberPuuid && (
+						{summonerNameTag && (
 							<Link
-								to={"/summoners/$summonerPuuid"}
-								params={{ summonerPuuid: memberPuuid }}
+								to={"/summoners/$summonerNameTag"}
+								params={{ summonerNameTag: summonerNameTag }}
 							>
 								<Image src={"./lol_logo.svg"} h={50} w={50} />
 							</Link>

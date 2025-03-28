@@ -1,34 +1,36 @@
-import { Alert, Flex, Loader } from "@mantine/core";
+import { Alert, Flex, Loader, Title } from "@mantine/core";
 import { IconAlertSquareRounded } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { ChampionIdSelector } from "../../components/Match/ChampionIdSelector.tsx";
 import { MatchBannerSummaryLoader } from "../../components/Match/MatchBannerSummaryLoader.tsx";
+import { QueueIdSelector } from "../../components/Match/QueueIdSelector.tsx";
 import { useItems } from "../../hooks/api/useItems.ts";
-import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts";
 import { useQueues } from "../../hooks/api/useQueues.ts";
 import { useSummoner } from "../../hooks/api/useSummoner.ts";
 import { useSummonerSpells } from "../../hooks/api/useSummonerSpells.ts";
 import { useSummonerSummary } from "../../hooks/api/useSummonerSummary.ts";
 
-export const Route = createFileRoute("/summoners/$summonerPuuid")({
+export const Route = createFileRoute("/summoners/$summonerNameTag")({
 	component: SummonerPage,
 });
 
 export function SummonerPage() {
-	const { summonerPuuid } = Route.useParams();
+	const { summonerNameTag } = Route.useParams();
 	const [page, setPage] = useState<number>(1);
 
-	const summonerQuery = useSummoner(summonerPuuid);
-	const summonerSummaryQuery = useSummonerSummary(summonerPuuid);
+	const [selectedQueueId, setSelectedQueueId] = useState<string | null>(null);
+	const [selectedChampionId, setSelectedChampionId] = useState<string | null>(
+		null,
+	);
+
+	const gameName = summonerNameTag.split("-")[0];
+	const tagLine = summonerNameTag.split("-")[1];
+
+	const summonerQuery = useSummoner({ gameName, tagLine });
+	const summonerSummaryQuery = useSummonerSummary({ gameName, tagLine });
 
 	// Preloading
-	useMatchesParticipant(
-		{
-			page,
-			summonerPuuid,
-		},
-		true,
-	);
 	useItems(true);
 	useQueues(true);
 	useSummonerSpells(true);
@@ -68,15 +70,28 @@ export function SummonerPage() {
 
 	return (
 		<>
-			<h1>Hello {summonerPuuid}</h1>
-			<p>Summoner Name: {summonerQuery.data.gameName}</p>
-			<p>Summary entries: {summonerSummaryQuery.data.length}</p>
+			<Flex direction={"column"} gap={"md"}>
+				<Title order={2}>Matches from {summonerQuery.data.gameName}</Title>
 
-			<MatchBannerSummaryLoader
-				summonerPuuid={summonerPuuid}
-				page={page}
-				setPage={setPage}
-			/>
+				<Flex direction={"row"} gap={"md"} wrap={"wrap"}>
+					<QueueIdSelector
+						selectedQueueId={selectedQueueId}
+						setSelectedQueueId={setSelectedQueueId}
+					/>
+					<ChampionIdSelector
+						selectedChampionId={selectedChampionId}
+						setSelectedChampionId={setSelectedChampionId}
+					/>
+				</Flex>
+
+				<MatchBannerSummaryLoader
+					summonerPuuid={summonerQuery.data.puuid}
+					page={page}
+					setPage={setPage}
+					queueId={Number(selectedQueueId)}
+					championId={Number(selectedChampionId)}
+				/>
+			</Flex>
 		</>
 	);
 }

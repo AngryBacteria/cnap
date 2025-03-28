@@ -14,8 +14,8 @@ export function SummonerCard({ summoner }: Props) {
 	return (
 		<Card shadow={"md"} withBorder className={"fillSpacePointer"}>
 			<Link
-				to="/summoners/$summonerPuuid"
-				params={{ summonerPuuid: summoner.puuid }}
+				to="/summoners/$summonerNameTag"
+				params={{ summonerNameTag: `${summoner.gameName}-${summoner.tagLine}` }}
 				className={styles.navigationItem}
 			>
 				<Card.Section>

@@ -88,6 +88,7 @@ export const lolRouter = router({
 		);
 		return dbResult.data[0];
 	}),
+	// TODO: dont use puuid, use gameName and tagLine
 	getMatchesParticipant: loggedProcedure
 		.input(
 			z.object({
@@ -310,58 +311,115 @@ export const lolRouter = router({
 		logger.info({ cached: false }, "API:getSummoners");
 		return summonerResponse.data;
 	}),
-	getSummonerByPuuid: loggedProcedure.input(z.string()).query(async (opts) => {
-		const summonerResponse = await dbh.genericGet(
-			CollectionName.SUMMONER,
-			{
-				filter: { puuid: opts.input },
-			},
-			SummonerDbSchema,
-		);
-
-		if (!summonerResponse.success) {
-			logger.error(
-				{
-					error: summonerResponse.error,
-					puuid: opts.input,
-					code: "INTERNAL_SERVER_ERROR",
-				},
-				"API:getSummonerByPuuid",
-			);
-			throw new TRPCError({
-				message: `Summoner couldn't be fetched`,
-				code: "INTERNAL_SERVER_ERROR",
-			});
-		}
-
-		if (!summonerResponse.data[0]) {
-			logger.warn(
-				{
-					puuid: opts.input,
-					code: "NOT_FOUND",
-					message: `Database returned no members for PUUID: ${opts.input}`,
-				},
-				"API:getSummonerByPuuid",
-			);
-			throw new TRPCError({
-				message: `Database returned no members for PUUID: ${opts.input}`,
-				code: "NOT_FOUND",
-			});
-		}
-
-		logger.info(
-			{ operationInputs: opts.input, cached: false },
-			"API:getSummonerByPuuid",
-		);
-		return summonerResponse.data[0];
-	}),
-	getSummonerSummaryByPuuid: loggedProcedure
-		.input(z.string())
+	getSummonerByName: loggedProcedure
+		.input(
+			z.object({
+				gameName: z.string(),
+				tagLine: z.string(),
+			}),
+		)
 		.query(async (opts) => {
+			const summonerResponse = await dbh.genericGet(
+				CollectionName.SUMMONER,
+				{
+					filter: {
+						gameName: opts.input.gameName,
+						tagLine: opts.input.tagLine,
+					},
+				},
+				SummonerDbSchema,
+			);
+
+			if (!summonerResponse.success) {
+				logger.error(
+					{
+						error: summonerResponse.error,
+						puuid: opts.input,
+						code: "INTERNAL_SERVER_ERROR",
+					},
+					"API:getSummonerByName",
+				);
+				throw new TRPCError({
+					message: `Summoner couldn't be fetched`,
+					code: "INTERNAL_SERVER_ERROR",
+				});
+			}
+
+			if (!summonerResponse.data[0]) {
+				logger.warn(
+					{
+						puuid: opts.input,
+						code: "NOT_FOUND",
+						message: `Database returned no members for PUUID: ${opts.input}`,
+					},
+					"API:getSummonerByName",
+				);
+				throw new TRPCError({
+					message: `Database returned no members for PUUID: ${opts.input}`,
+					code: "NOT_FOUND",
+				});
+			}
+
+			logger.info(
+				{ operationInputs: opts.input, cached: false },
+				"API:getSummonerByName",
+			);
+			return summonerResponse.data[0];
+		}),
+	getSummonerSummaryByName: loggedProcedure
+		.input(
+			z.object({
+				gameName: z.string(),
+				tagLine: z.string(),
+			}),
+		)
+		.query(async (opts) => {
+			const summonerResponse = await dbh.genericGet(
+				CollectionName.SUMMONER,
+				{
+					filter: {
+						gameName: opts.input.gameName,
+						tagLine: opts.input.tagLine,
+					},
+				},
+				SummonerDbSchema,
+			);
+			if (!summonerResponse.success) {
+				logger.error(
+					{
+						error: summonerResponse.error,
+						gameName: opts.input.gameName,
+						tagLine: opts.input.tagLine,
+						code: "INTERNAL_SERVER_ERROR",
+					},
+					"API:getSummonerSummaryByName",
+				);
+				throw new TRPCError({
+					message: `Summoner couldn't be fetched`,
+					code: "INTERNAL_SERVER_ERROR",
+				});
+			}
+
+			if (!summonerResponse.data[0]) {
+				logger.warn(
+					{
+						gameName: opts.input.gameName,
+						tagLine: opts.input.tagLine,
+						code: "NOT_FOUND",
+						message: `Database returned no summoner: ${opts.input}`,
+					},
+					"API:getSummonerSummaryByName",
+				);
+				throw new TRPCError({
+					message: `Database returned no summoners: ${opts.input}`,
+					code: "NOT_FOUND",
+				});
+			}
+
 			const pipeline = [
 				{
 					$match: {
-						"info.participants.puuid": opts.input,
+						"info.participants.puuid": summonerResponse.data[0].puuid,
 					},
 				},
 				{
@@ -371,7 +429,7 @@ export const lolRouter = router({
 				},
 				{
 					$match: {
-						"info.participants.puuid": opts.input,
+						"info.participants.puuid": summonerResponse.data[0].puuid,
 					},
 				},
 				{
@@ -437,14 +495,14 @@ export const lolRouter = router({
 				SummonerSummarySchema,
 			);
 			if (!result.success) {
-				logger.error({ error: result.error }, "API:getSummonerSummaryByPuuid");
+				logger.error({ error: result.error }, "API:getSummonerSummaryByName");
 				throw new TRPCError({
 					message: `Summoner summary couldn't be fetched`,
 					code: "INTERNAL_SERVER_ERROR",
 				});
 			}
 
-			logger.info({ cached: false }, "API:getSummonerSummaryByPuuid");
+			logger.info({ cached: false }, "API:getSummonerSummaryByName");
 			return result.data;
 		}),
 });

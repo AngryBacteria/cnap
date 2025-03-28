@@ -1,6 +1,5 @@
-import { Alert, Flex, Loader, Pagination, Select, Title } from "@mantine/core";
+import { Alert, Flex, Loader, Pagination } from "@mantine/core";
 import { IconAlertSquareRounded } from "@tabler/icons-react";
-import { useMemo, useState } from "react";
 import { useItems } from "../../hooks/api/useItems";
 import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts";
 import { useQueues } from "../../hooks/api/useQueues";
@@ -12,6 +11,7 @@ export interface Props {
 	setPage: (page: number) => void;
 	championId?: number;
 	summonerPuuid?: string;
+	queueId?: number;
 }
 
 export function MatchBannerSummaryLoader({
@@ -19,40 +19,21 @@ export function MatchBannerSummaryLoader({
 	summonerPuuid,
 	page,
 	setPage,
+	queueId,
 }: Props) {
 	//TODO: replace with router search param
 	//TODO: put in own component
 	//TODO scroll to title
-	const [selectedQueue, setSelectedQueue] = useState<string | null>(null);
 
 	const matchesParticipantQuery = useMatchesParticipant({
 		page,
 		championId,
 		summonerPuuid,
-		queueId: selectedQueue ? Number(selectedQueue) : undefined,
+		queueId,
 	});
 	const itemQuery = useItems();
 	const queuesQuery = useQueues();
 	const summonerSpellsQuery = useSummonerSpells();
-
-	const formattedQueues = useMemo(() => {
-		const output = [];
-		if (queuesQuery.data) {
-			for (const queue of queuesQuery.data) {
-				if (queue.notes?.includes("Deprecated")) {
-					continue;
-				}
-
-				if (queue.queueId && queue.description) {
-					output.push({
-						value: `${queue.queueId}`,
-						label: queue.description,
-					});
-				}
-			}
-		}
-		return output;
-	}, [queuesQuery.data]);
 
 	if (
 		matchesParticipantQuery.status === "pending" ||
@@ -84,18 +65,6 @@ export function MatchBannerSummaryLoader({
 
 	return (
 		<Flex direction={"column"} gap={"md"}>
-			<Title order={2}>Matches from CnAP Players on this champion</Title>
-
-			<Select
-				maw={400}
-				clearable
-				searchable
-				data={formattedQueues}
-				value={selectedQueue}
-				onChange={setSelectedQueue}
-				label="Select a Queue (nothing means return all queues)"
-			/>
-
 			{matchesParticipantQuery.data.data.map((match) => (
 				<MatchBannerSummary
 					key={`${match.info.gameId} - ${match.info.participants.puuid}`}

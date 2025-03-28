@@ -1,4 +1,4 @@
-import { Alert, Flex, Loader } from "@mantine/core";
+import { Alert, Flex, Loader, Title } from "@mantine/core";
 import { IconAlertSquareRounded } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
@@ -6,6 +6,7 @@ import { ChampionAbilitiesTabs } from "../../components/Champion/ChampionAbiliti
 import { ChampionHeader } from "../../components/Champion/ChampionHeader.tsx";
 import { ChampionSkins } from "../../components/Champion/ChampionSkins/ChampionSkins.tsx";
 import { MatchBannerSummaryLoader } from "../../components/Match/MatchBannerSummaryLoader.tsx";
+import { QueueIdSelector } from "../../components/Match/QueueIdSelector.tsx";
 import { useChampion } from "../../hooks/api/useChampion.ts";
 import { useItems } from "../../hooks/api/useItems.ts";
 import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts";
@@ -19,12 +20,16 @@ export const Route = createFileRoute("/champions/$championId")({
 export function ChampionPage() {
 	const { championId } = Route.useParams();
 	const [page, setPage] = useState<number>(1);
+	const [selectedQueueId, setSelectedQueueId] = useState<string | null>(null);
 
 	// Fetch champion
 	const query = useChampion(Number(championId));
 
 	// Prefetch data for the MatchBannerSummaryLoader
-	useMatchesParticipant({ page, championId: Number(championId) }, true);
+	useMatchesParticipant(
+		{ page, championId: Number(championId), queueId: Number(selectedQueueId) },
+		true,
+	);
 	useItems(true);
 	useQueues(true);
 	useSummonerSpells(true);
@@ -63,10 +68,18 @@ export function ChampionPage() {
 				<ChampionAbilitiesTabs champion={query.data} />
 				<ChampionSkins champion={query.data} />
 
+				<Title order={2}>Matches from CnAP Players on this champion</Title>
+
+				<QueueIdSelector
+					selectedQueueId={selectedQueueId}
+					setSelectedQueueId={setSelectedQueueId}
+				/>
+
 				<MatchBannerSummaryLoader
 					championId={query.data.id}
 					page={page}
 					setPage={setPage}
+					queueId={Number(selectedQueueId)}
 				/>
 			</Flex>
 		</>
