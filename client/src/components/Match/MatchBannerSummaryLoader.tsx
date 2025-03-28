@@ -10,13 +10,15 @@ export interface Props {
 	page: number;
 	setPage: (page: number) => void;
 	championId?: number;
-	summonerPuuid?: string;
+	gameName?: string;
+	tagLine?: string;
 	queueId?: number;
 }
 
 export function MatchBannerSummaryLoader({
 	championId,
-	summonerPuuid,
+	gameName,
+	tagLine,
 	page,
 	setPage,
 	queueId,
@@ -28,7 +30,8 @@ export function MatchBannerSummaryLoader({
 	const matchesParticipantQuery = useMatchesParticipant({
 		page,
 		championId,
-		summonerPuuid,
+		gameName,
+		tagLine,
 		queueId,
 	});
 	const itemQuery = useItems();

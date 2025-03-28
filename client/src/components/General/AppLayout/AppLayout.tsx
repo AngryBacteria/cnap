@@ -110,8 +110,12 @@ export function AppLayout() {
 					<Outlet />
 				</AppShell.Main>
 			</AppShell>
-			<TanStackRouterDevtools />
-			<ReactQueryDevtools initialIsOpen={false} />
+			{import.meta.env.MODE !== "production" && (
+				<>
+					<TanStackRouterDevtools initialIsOpen={false} />
+					<ReactQueryDevtools initialIsOpen={false} />
+				</>
+			)}
 		</>
 	);
 }

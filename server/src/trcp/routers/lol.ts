@@ -5,7 +5,7 @@ import logger from "../../helpers/Logger.js";
 import rh from "../../helpers/RiotHelper.js";
 import simpleCache from "../../helpers/SimpleCache.js";
 import { ChampionReducedSchema, ChampionSchema } from "../../model/Champion.js";
-import { CollectionName, type MongoPipeline } from "../../model/Database.js";
+import {CollectionName, type MongoFilter, type MongoPipeline} from "../../model/Database.js";
 import { ItemSchema } from "../../model/Item.js";
 import type { MatchV5Participant } from "../../model/MatchV5.js";
 import { QueueSchema } from "../../model/Queue.js";
@@ -95,23 +95,17 @@ export const lolRouter = router({
 				page: z.number().default(1),
 				championId: z.number().optional(),
 				queueId: z.number().optional(),
-				summonerPuuid: z.string().optional(),
+				gameName: z.string().optional(),
+				tagLine: z.string().optional(),
 				onlySummonersInDb: z.boolean().default(true),
 			}),
 		)
 		.query(async (opts) => {
-			const { page, championId, queueId, summonerPuuid, onlySummonersInDb } =
+			const { page, championId, queueId, gameName, tagLine, onlySummonersInDb } =
 				opts.input;
 
 			// Init the pipeline
 			const pipeline: MongoPipeline = [];
-
-			//Optionally filter by puuid
-			if (summonerPuuid) {
-				pipeline.push({
-					$match: { "info.participants.puuid": summonerPuuid },
-				});
-			}
 
 			// Optionally filter by champion id
 			if (championId) {
@@ -122,12 +116,20 @@ export const lolRouter = router({
 
 			// Optionally Filter by summoner puuids
 			let summonerPuuids: string[] = [];
-			if (onlySummonersInDb) {
+			if (onlySummonersInDb || gameName || tagLine) {
+				const summonerFilter: MongoFilter = {}
+				if (gameName) {
+					summonerFilter.gameName = gameName;
+				}
+				if (tagLine) {
+					summonerFilter.tagLine = tagLine;
+				}
 				const existingPuuidsResponse = await dbh.genericGet(
 					CollectionName.SUMMONER,
 					{
 						limit: 100000,
 						project: { puuid: 1 },
+						filter: summonerFilter
 					},
 					z.object({
 						puuid: z.string(),
@@ -164,13 +166,6 @@ export const lolRouter = router({
 				},
 			});
 
-			// Optionally filter unwinded document again by puuid
-			if (summonerPuuid) {
-				pipeline.push({
-					$match: { "info.participants.puuid": summonerPuuid },
-				});
-			}
-
 			// Optionally filter unwinded document again by champion id
 			if (championId) {
 				pipeline.push({
@@ -179,7 +174,7 @@ export const lolRouter = router({
 			}
 
 			// Optionally filter unwinded documents again by summoner puuids
-			if (onlySummonersInDb) {
+			if (onlySummonersInDb || gameName || tagLine) {
 				pipeline.push({
 					$match: { "info.participants.puuid": { $in: summonerPuuids } },
 				});

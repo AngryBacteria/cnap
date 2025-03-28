@@ -10,6 +10,7 @@ import { useQueues } from "../../hooks/api/useQueues.ts";
 import { useSummoner } from "../../hooks/api/useSummoner.ts";
 import { useSummonerSpells } from "../../hooks/api/useSummonerSpells.ts";
 import { useSummonerSummary } from "../../hooks/api/useSummonerSummary.ts";
+import {useMatchesParticipant} from "../../hooks/api/useMatchesParticipant.ts";
 
 export const Route = createFileRoute("/summoners/$summonerNameTag")({
 	component: SummonerPage,
@@ -31,6 +32,10 @@ export function SummonerPage() {
 	const summonerSummaryQuery = useSummonerSummary({ gameName, tagLine });
 
 	// Preloading
+	useMatchesParticipant(
+		{ page, championId: Number(selectedChampionId), queueId: Number(selectedQueueId), gameName, tagLine },
+		true,
+	);
 	useItems(true);
 	useQueues(true);
 	useSummonerSpells(true);
@@ -85,7 +90,8 @@ export function SummonerPage() {
 				</Flex>
 
 				<MatchBannerSummaryLoader
-					summonerPuuid={summonerQuery.data.puuid}
+					gameName={gameName}
+					tagLine={tagLine}
 					page={page}
 					setPage={setPage}
 					queueId={Number(selectedQueueId)}

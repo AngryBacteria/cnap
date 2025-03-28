@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+export type MongoPipeline = Record<string, unknown>[];
+export type MongoFilter = Record<string, unknown>;
+
 export type DBResponse<T> = {
 	data: T[];
 	success: boolean;
@@ -80,5 +83,3 @@ export type BasicFilter = z.infer<typeof BasicFilterSchema>;
  */
 export const PartialBasicFilter = BasicFilterSchema.partial();
 export type PartialBasicFilter = z.infer<typeof PartialBasicFilter>;
-
-export type MongoPipeline = Record<string, unknown>[];
