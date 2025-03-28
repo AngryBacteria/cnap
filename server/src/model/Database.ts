@@ -46,6 +46,7 @@ export enum CollectionName {
 	SUMMONER_ICON = "summoner_icon",
 	SUMMONER_SPELL = "summoner_spell",
 	TIMELINE = "timeline_v5",
+	SESSION = "session",
 }
 
 /**
