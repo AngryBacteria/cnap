@@ -1,7 +1,7 @@
 import { z } from "zod";
 import dbh from "../../helpers/DBHelper.js";
 import { CollectionName } from "../../model/Database.js";
-import { SessionSchema } from "../../model/Session.js";
+import { PenAndPaperSessionSchema } from "../../model/PenAndPaper.js";
 import { loggedProcedure } from "../middlewares/executionTime.js";
 import { router } from "../trcp.js";
 
@@ -10,11 +10,14 @@ export const penAndPaperRouter = router({
 		.input(
 			z.object({
 				campaign: z.string().nullish(),
+				dmGameName: z.string().nullish(),
+				playerGameName: z.string().nullish(),
 			}),
 		)
 		.query(async (opts) => {
 			const pipeline: Record<string, unknown>[] = [];
-			// Filter
+
+			// Initial filters
 			if (opts.input.campaign) {
 				pipeline.push({
 					$match: {
@@ -22,7 +25,6 @@ export const penAndPaperRouter = router({
 					},
 				});
 			}
-
 			// Lookup relationships
 			pipeline.push({
 				$lookup: {
@@ -43,11 +45,29 @@ export const penAndPaperRouter = router({
 			});
 			// Project into right format
 			pipeline.push({ $project: { playerIds: 0, dmId: 0 } });
+			// Filters after lookup
+			if (opts.input.dmGameName) {
+				pipeline.push({
+					$match: {
+						"dm.gameName": { $regex: opts.input.dmGameName, $options: "i" },
+					},
+				});
+			}
+			if (opts.input.playerGameName) {
+				pipeline.push({
+					$match: {
+						"players.gameName": {
+							$regex: opts.input.playerGameName,
+							$options: "i",
+						},
+					},
+				});
+			}
 
 			const sessionResponse = await dbh.genericPipeline(
 				pipeline,
 				CollectionName.SESSION,
-				SessionSchema,
+				PenAndPaperSessionSchema,
 			);
 			return sessionResponse.data;
 		}),

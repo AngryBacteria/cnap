@@ -1,4 +1,4 @@
-import { Alert, Loader, Pagination, Select, Title } from "@mantine/core";
+import { Alert, Flex, Loader, Pagination, Select, Title } from "@mantine/core";
 import { IconAlertSquareRounded } from "@tabler/icons-react";
 import { useMemo, useState } from "react";
 import { useItems } from "../../hooks/api/useItems";
@@ -83,7 +83,7 @@ export function MatchBannerSummaryLoader({
 	}
 
 	return (
-		<>
+		<Flex direction={"column"} gap={"md"}>
 			<Title order={2}>Matches from CnAP Players on this champion</Title>
 
 			<Select
@@ -110,6 +110,6 @@ export function MatchBannerSummaryLoader({
 				value={page}
 				onChange={setPage}
 			/>
-		</>
+		</Flex>
 	);
 }
