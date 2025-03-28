@@ -80,3 +80,5 @@ export type BasicFilter = z.infer<typeof BasicFilterSchema>;
  */
 export const PartialBasicFilter = BasicFilterSchema.partial();
 export type PartialBasicFilter = z.infer<typeof PartialBasicFilter>;
+
+export type MongoPipeline = Record<string, unknown>[];

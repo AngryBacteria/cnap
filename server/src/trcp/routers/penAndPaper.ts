@@ -1,6 +1,6 @@
 import { z } from "zod";
 import dbh from "../../helpers/DBHelper.js";
-import { CollectionName } from "../../model/Database.js";
+import { CollectionName, type MongoPipeline } from "../../model/Database.js";
 import { PenAndPaperSessionSchema } from "../../model/PenAndPaper.js";
 import { loggedProcedure } from "../middlewares/executionTime.js";
 import { router } from "../trcp.js";
@@ -15,7 +15,7 @@ export const penAndPaperRouter = router({
 			}),
 		)
 		.query(async (opts) => {
-			const pipeline: Record<string, unknown>[] = [];
+			const pipeline: MongoPipeline = [];
 
 			// Initial filters
 			if (opts.input.campaign) {

@@ -5,7 +5,7 @@ import logger from "../../helpers/Logger.js";
 import rh from "../../helpers/RiotHelper.js";
 import simpleCache from "../../helpers/SimpleCache.js";
 import { ChampionReducedSchema, ChampionSchema } from "../../model/Champion.js";
-import { CollectionName } from "../../model/Database.js";
+import { CollectionName, type MongoPipeline } from "../../model/Database.js";
 import { ItemSchema } from "../../model/Item.js";
 import type { MatchV5Participant } from "../../model/MatchV5.js";
 import { QueueSchema } from "../../model/Queue.js";
@@ -104,7 +104,7 @@ export const lolRouter = router({
 				opts.input;
 
 			// Init the pipeline
-			const pipeline: Record<string, unknown>[] = [];
+			const pipeline: MongoPipeline = [];
 
 			//Optionally filter by puuid
 			if (summonerPuuid) {

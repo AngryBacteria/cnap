@@ -2,7 +2,7 @@ import { z } from "zod";
 import dbh from "../../helpers/DBHelper.js";
 import logger from "../../helpers/Logger.js";
 import simpleCache from "../../helpers/SimpleCache.js";
-import { CollectionName } from "../../model/Database.js";
+import { CollectionName, type MongoPipeline } from "../../model/Database.js";
 import { MemberWithSummonerSchema } from "../../model/Member.js";
 import { loggedProcedure } from "../middlewares/executionTime.js";
 import { router } from "../trcp.js";
@@ -31,7 +31,7 @@ export const generalRouter = router({
 			}
 
 			// Try DB
-			const pipeline: Record<string, unknown>[] = [];
+			const pipeline: MongoPipeline = [];
 			if (opts.input.onlyCore) {
 				pipeline.push({ $match: { core: true } });
 			}

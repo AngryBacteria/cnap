@@ -13,6 +13,7 @@ import {
 	type DBResponse,
 	type DBResponsePaginated,
 	MongoDBPaginationSchema,
+	type MongoPipeline,
 	type PartialBasicFilter,
 } from "../model/Database.js";
 import logger from "./Logger.js";
@@ -341,7 +342,7 @@ export class DBHelper {
 	}
 
 	async genericPipeline<T extends object>(
-		pipeline: Record<string, unknown>[],
+		pipeline: MongoPipeline,
 		collectionName: CollectionName,
 		validator?: z.ZodType<T>,
 	): Promise<DBResponse<T>> {
@@ -380,7 +381,7 @@ export class DBHelper {
 	}
 
 	async genericPaginatedPipeline<T extends object>(
-		pipeline: Record<string, unknown>[],
+		pipeline: MongoPipeline,
 		collectionName: CollectionName,
 		page: number,
 		pageSize = 10,
