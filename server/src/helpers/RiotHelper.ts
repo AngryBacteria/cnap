@@ -1,29 +1,29 @@
 import { RateLimiter } from "limiter";
 import "dotenv/config";
 import { z } from "zod";
-import { type Account, AccountSchema } from "../model/Account.js";
+import { type AccountDB, AccountDBSchema } from "../model/Account.js";
 import {
-	type Champion,
-	ChampionSchema,
-	ChampionSummarySchema,
+	type ChampionDB,
+	ChampionDBSchema,
+	ChampionRiotReducedSchema,
 } from "../model/Champion.js";
-import { type GameMode, GameModeSchema } from "../model/GameMode.js";
-import { type GameType, GameTypeSchema } from "../model/GameType.js";
-import { type Item, ItemSchema } from "../model/Item.js";
-import { type LeagueMap, LeagueMapSchema } from "../model/Map.js";
-import { type Queue, QueueSchema } from "../model/Queue.js";
+import { type GameModeDB, GameModeDBSchema } from "../model/GameMode.js";
+import { type GameTypeDB, GameTypeDBSchema } from "../model/GameType.js";
+import { type ItemDB, ItemDBSchema } from "../model/Item.js";
+import { type LeagueMapDB, LeagueMapDBSchema } from "../model/LeagueMap.js";
+import { type QueueDB, QueueDBSchema } from "../model/Queue.js";
 import {
 	type SummonerDb,
 	SummonerDbSchema,
-	SummonerSchema,
+	SummonerRiotSchema,
 } from "../model/Summoner.js";
 import {
-	type SummonerIcon,
-	SummonerIconSchema,
+	type SummonerIconDB,
+	SummonerIconDBSchema,
 } from "../model/SummonerIcon.js";
 import {
-	type SummonerSpell,
-	SummonerSpellSchema,
+	type SummonerSpellDB,
+	SummonerSpellDBSchema,
 } from "../model/SummonerSpell.js";
 import logger from "./Logger.js";
 
@@ -195,11 +195,11 @@ export class RiotHelper {
 	async getRiotAccountByTag(
 		name: string,
 		tag: string,
-	): Promise<Account | undefined> {
+	): Promise<AccountDB | undefined> {
 		try {
 			const properTag = tag.replace("#", "");
 			const url = `https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${name}/${properTag}`;
-			const account = await this.makeRequest(url, AccountSchema);
+			const account = await this.makeRequest(url, AccountDBSchema);
 			logger.debug({ name, tag }, "RiotHelper:getRiotAccountByTag");
 			return account;
 		} catch (e) {
@@ -213,10 +213,10 @@ export class RiotHelper {
 	 * @param puuid The puuid of the account
 	 * @returns AccountDTO object
 	 */
-	async getRiotAccountByPuuid(puuid: string): Promise<Account | undefined> {
+	async getRiotAccountByPuuid(puuid: string): Promise<AccountDB | undefined> {
 		try {
 			const url = `https://europe.api.riotgames.com/riot/account/v1/accounts/by-puuid/${puuid}`;
-			const account = await this.makeRequest(url, AccountSchema);
+			const account = await this.makeRequest(url, AccountDBSchema);
 			logger.debug({ puuid }, "RiotHelper:getRiotAccountByPuuid");
 			return account;
 		} catch (e) {
@@ -234,15 +234,15 @@ export class RiotHelper {
 	 */
 	async getSummonerByPuuidRiot(
 		puuid: string,
-		account?: Account | undefined,
+		account?: AccountDB | undefined,
 	): Promise<SummonerDb | undefined> {
 		try {
 			const url = `https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`;
-			const summonerRiot = await this.makeRequest(url, SummonerSchema);
+			const summonerRiot = await this.makeRequest(url, SummonerRiotSchema);
 			logger.debug({ puuid }, "RiotHelper:getSummonerByPuuidRiot");
 
 			// check if account provided
-			let properAccount: Account | undefined = account;
+			let properAccount: AccountDB | undefined = account;
 			if (!account) {
 				properAccount = await this.getRiotAccountByPuuid(summonerRiot.puuid);
 			}
@@ -294,11 +294,11 @@ export class RiotHelper {
 	 * Fetch items from Community Dragon CDN
 	 * @returns Array of ItemDTO objects
 	 */
-	async getItems(): Promise<Item[]> {
+	async getItems(): Promise<ItemDB[]> {
 		try {
 			const output = await this.makeRequest(
 				"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/items.json",
-				ItemSchema.array(),
+				ItemDBSchema.array(),
 				false,
 			);
 			for (const item of output) {
@@ -317,19 +317,19 @@ export class RiotHelper {
 	 * Fetch champions from Community Dragon CDN
 	 * @returns Array of ChampionDTO objects
 	 */
-	async getChampions(): Promise<Champion[]> {
+	async getChampions(): Promise<ChampionDB[]> {
 		try {
-			const outputData: Champion[] = [];
+			const outputData: ChampionDB[] = [];
 			const championsSummary = await this.makeRequest(
 				"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-summary.json",
-				ChampionSummarySchema.array(),
+				ChampionRiotReducedSchema.array(),
 				false,
 			);
 
 			for (const championSummary of championsSummary) {
 				const champion = await this.makeRequest(
 					`https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champions/${championSummary.id}.json`,
-					ChampionSchema,
+					ChampionDBSchema,
 					false,
 				);
 
@@ -388,11 +388,11 @@ export class RiotHelper {
 	 * Fetch game modes from Riot API
 	 * @returns Array of GameModeDTO objects
 	 */
-	async getGameModes(): Promise<GameMode[]> {
+	async getGameModes(): Promise<GameModeDB[]> {
 		try {
 			const gameModes = await this.makeRequest(
 				"https://static.developer.riotgames.com/docs/lol/gameModes.json",
-				GameModeSchema.array(),
+				GameModeDBSchema.array(),
 			);
 
 			logger.debug({ amount: gameModes.length }, "RiotHelper:getGameModes");
@@ -407,11 +407,11 @@ export class RiotHelper {
 	 * Fetch game types from Riot API
 	 * @returns Array of GameTypeDTO objects
 	 */
-	async getGameTypes(): Promise<GameType[]> {
+	async getGameTypes(): Promise<GameTypeDB[]> {
 		try {
 			const gameTypes = await this.makeRequest(
 				"https://static.developer.riotgames.com/docs/lol/gameTypes.json",
-				GameTypeSchema.array(),
+				GameTypeDBSchema.array(),
 			);
 
 			logger.debug({ amount: gameTypes.length }, "RiotHelper:getGameTypes");
@@ -426,11 +426,11 @@ export class RiotHelper {
 	 * Fetch maps from Riot API
 	 * @returns Array of MapDTO objects
 	 */
-	async getMaps(): Promise<LeagueMap[]> {
+	async getMaps(): Promise<LeagueMapDB[]> {
 		try {
 			const maps = await this.makeRequest(
 				"https://static.developer.riotgames.com/docs/lol/maps.json",
-				LeagueMapSchema.array(),
+				LeagueMapDBSchema.array(),
 			);
 
 			logger.debug({ amount: maps.length }, "RiotHelper:getMaps");
@@ -445,11 +445,11 @@ export class RiotHelper {
 	 * Fetch queues from Riot API
 	 * @returns Array of QueueDTO objects
 	 */
-	async getQueues(): Promise<Queue[]> {
+	async getQueues(): Promise<QueueDB[]> {
 		try {
 			const queues = await this.makeRequest(
 				"https://static.developer.riotgames.com/docs/lol/queues.json",
-				QueueSchema.array(),
+				QueueDBSchema.array(),
 			);
 
 			logger.debug({ amount: queues.length }, "RiotHelper:getQueues");
@@ -464,11 +464,11 @@ export class RiotHelper {
 	 * Fetch summoner icons from Community Dragon CDN
 	 * @returns Array of SummonerIconDTO objects
 	 */
-	async getSummonerIcons(): Promise<SummonerIcon[]> {
+	async getSummonerIcons(): Promise<SummonerIconDB[]> {
 		try {
 			const icons = await this.makeRequest(
 				"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/summoner-icons.json",
-				SummonerIconSchema.array(),
+				SummonerIconDBSchema.array(),
 				false,
 			);
 
@@ -490,11 +490,11 @@ export class RiotHelper {
 	 * Fetch summoner spells from Community Dragon CDN
 	 * @returns Array of SummonerSpellDTO objects
 	 */
-	async getSummonerSpells(): Promise<SummonerSpell[]> {
+	async getSummonerSpells(): Promise<SummonerSpellDB[]> {
 		try {
 			const spells = await this.makeRequest(
 				"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/summoner-spells.json",
-				SummonerSpellSchema.array(),
+				SummonerSpellDBSchema.array(),
 				false,
 			);
 

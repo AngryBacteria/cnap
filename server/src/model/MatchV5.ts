@@ -1,10 +1,16 @@
 //TODO: find better solution for this mess. This is now only weak typing in app
 
+/**
+ * Version of the MatchV5s Info with only one participant
+ */
 export interface MatchV5Participant {
 	metadata: Metadata;
 	info: InfoParticipant;
 }
 
+/**
+ * Version of the MatchV5s Info with only one participant
+ */
 export interface InfoParticipant {
 	gameCreation: number;
 	gameDuration: number;
@@ -24,7 +30,7 @@ export interface InfoParticipant {
 	endOfGameResult?: string;
 }
 
-export interface MatchV5 {
+export interface MatchV5DB {
 	metadata: Metadata;
 	info: Info;
 }

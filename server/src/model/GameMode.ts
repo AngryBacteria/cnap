@@ -1,8 +1,8 @@
 import { z } from "zod";
 
-export const GameModeSchema = z.object({
+export const GameModeDBSchema = z.object({
 	gameMode: z.string(),
 	description: z.string(),
 });
 
-export type GameMode = z.infer<typeof GameModeSchema>;
+export type GameModeDB = z.infer<typeof GameModeDBSchema>;

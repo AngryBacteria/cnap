@@ -220,7 +220,10 @@ export const SkinSchema = z.object({
 
 export type Skin = z.infer<typeof SkinSchema>;
 
-export const ChampionSchema = z.object({
+/**
+ * Full Version of the Champion from the Riot CDN
+ */
+export const ChampionDBSchema = z.object({
 	id: z.number(),
 	alias: z.string(),
 	banVoPath: z.string(),
@@ -241,12 +244,12 @@ export const ChampionSchema = z.object({
 	spellbookOverride: z.array(z.array(SpellSchema)).nullish(),
 });
 
-export type Champion = z.infer<typeof ChampionSchema>;
+export type ChampionDB = z.infer<typeof ChampionDBSchema>;
 
-//
-// ChampionSummary from Riot CDN
-//
-export const ChampionSummarySchema = z.object({
+/**
+ * Reduced Version of Champion from the Riot CDN
+ */
+export const ChampionRiotReducedSchema = z.object({
 	id: z.number(),
 	name: z.string(),
 	alias: z.string(),
@@ -254,11 +257,11 @@ export const ChampionSummarySchema = z.object({
 	roles: z.array(z.string()),
 });
 
-export type ChampionSummary = z.infer<typeof ChampionSummarySchema>;
+export type ChampionRiotSummary = z.infer<typeof ChampionRiotReducedSchema>;
 
-//
-// Reduced Champion from DB (after project)
-//
+/**
+ * Reduced Version of Champion for the Client
+ */
 export const ChampionReducedSchema = z.object({
 	id: z.number(),
 	name: z.string(),

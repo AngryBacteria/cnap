@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const SummonerSchema = z.object({
+export const SummonerRiotSchema = z.object({
 	accountId: z.string(),
 	profileIconId: z.number(),
 	revisionDate: z.number(),
@@ -9,7 +9,7 @@ export const SummonerSchema = z.object({
 	summonerLevel: z.number(),
 });
 
-export type Summoner = z.infer<typeof SummonerSchema>;
+export type SummonerRiot = z.infer<typeof SummonerRiotSchema>;
 
 export const SummonerDbSchema = z.object({
 	puuid: z.string(),
@@ -23,6 +23,9 @@ export const SummonerDbSchema = z.object({
 });
 export type SummonerDb = z.infer<typeof SummonerDbSchema>;
 
+/**
+ * The id of a summoner summary
+ */
 export const SummonerSummaryIdSchema = z.object({
 	champion: z.string(),
 	queueId: z.number(),
@@ -30,6 +33,9 @@ export const SummonerSummaryIdSchema = z.object({
 });
 export type SummonerSummaryId = z.infer<typeof SummonerSummaryIdSchema>;
 
+/**
+ * Summoner summary for a specific champion. Comes from a mongodb aggregation pipeline.
+ */
 export const SummonerSummarySchema = z.object({
 	_id: SummonerSummaryIdSchema,
 	totalMatches: z.number(),

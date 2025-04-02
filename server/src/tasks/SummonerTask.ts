@@ -6,7 +6,6 @@ import rh from "../helpers/RiotHelper.js";
 import {
 	type SummonerDb,
 	SummonerDbSchema,
-	SummonerSchema,
 } from "../model/Summoner.js";
 
 export class SummonerTask {
@@ -43,7 +42,7 @@ export class SummonerTask {
 			newSummoners,
 			"gameName",
 			CollectionName.SUMMONER,
-			SummonerSchema,
+			SummonerDbSchema,
 		);
 		logger.debug("Task:updateSummonerData - Summoner data updated");
 	}

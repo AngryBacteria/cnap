@@ -27,7 +27,10 @@ export function ChampionPage() {
 
 	// Prefetch data for the MatchBannerSummaryLoader
 	useItems(true);
-	useMatchesParticipant({ page, championId: Number(championId), queueId: Number(selectedQueueId) }, true,);
+	useMatchesParticipant(
+		{ page, championId: Number(championId), queueId: Number(selectedQueueId) },
+		true,
+	);
 	useQueues(true);
 	useSummonerSpells(true);
 

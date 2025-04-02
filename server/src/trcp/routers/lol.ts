@@ -4,16 +4,20 @@ import dbh from "../../helpers/DBHelper.js";
 import logger from "../../helpers/Logger.js";
 import rh from "../../helpers/RiotHelper.js";
 import simpleCache from "../../helpers/SimpleCache.js";
-import { ChampionReducedSchema, ChampionSchema } from "../../model/Champion.js";
-import {CollectionName, type MongoFilter, type MongoPipeline} from "../../model/Database.js";
-import { ItemSchema } from "../../model/Item.js";
+import { ChampionReducedSchema, ChampionDBSchema } from "../../model/Champion.js";
+import {
+	CollectionName,
+	type MongoFilter,
+	type MongoPipeline,
+} from "../../model/Database.js";
+import { ItemDBSchema } from "../../model/Item.js";
 import type { MatchV5Participant } from "../../model/MatchV5.js";
-import { QueueSchema } from "../../model/Queue.js";
+import { QueueDBSchema } from "../../model/Queue.js";
 import {
 	SummonerDbSchema,
 	SummonerSummarySchema,
 } from "../../model/Summoner.js";
-import { SummonerSpellSchema } from "../../model/SummonerSpell.js";
+import { SummonerSpellDBSchema } from "../../model/SummonerSpell.js";
 import { loggedProcedure } from "../middlewares/executionTime.js";
 import { router } from "../trcp.js";
 
@@ -64,7 +68,7 @@ export const lolRouter = router({
 			{
 				filter: { id: opts.input },
 			},
-			ChampionSchema,
+			ChampionDBSchema,
 		);
 
 		if (!dbResult.success) {
@@ -101,8 +105,14 @@ export const lolRouter = router({
 			}),
 		)
 		.query(async (opts) => {
-			const { page, championId, queueId, gameName, tagLine, onlySummonersInDb } =
-				opts.input;
+			const {
+				page,
+				championId,
+				queueId,
+				gameName,
+				tagLine,
+				onlySummonersInDb,
+			} = opts.input;
 
 			// Init the pipeline
 			const pipeline: MongoPipeline = [];
@@ -117,7 +127,7 @@ export const lolRouter = router({
 			// Optionally Filter by summoner puuids
 			let summonerPuuids: string[] = [];
 			if (onlySummonersInDb || gameName || tagLine) {
-				const summonerFilter: MongoFilter = {}
+				const summonerFilter: MongoFilter = {};
 				if (gameName) {
 					summonerFilter.gameName = gameName;
 				}
@@ -129,7 +139,7 @@ export const lolRouter = router({
 					{
 						limit: 100000,
 						project: { puuid: 1 },
-						filter: summonerFilter
+						filter: summonerFilter,
 					},
 					z.object({
 						puuid: z.string(),
@@ -203,7 +213,7 @@ export const lolRouter = router({
 			return dbResult.data;
 		}),
 	getQueues: loggedProcedure.query(async () => {
-		const cachedResult = QueueSchema.array().safeParse(
+		const cachedResult = QueueDBSchema.array().safeParse(
 			simpleCache.get("getQueues"),
 		);
 		if (cachedResult.success) {
@@ -214,7 +224,7 @@ export const lolRouter = router({
 		const result = await dbh.genericGet(
 			CollectionName.QUEUE,
 			{ limit: 1000 },
-			QueueSchema,
+			QueueDBSchema,
 		);
 		if (!result.success) {
 			logger.error({ error: result.error }, "API:getQueues");
@@ -229,7 +239,7 @@ export const lolRouter = router({
 		return result.data;
 	}),
 	getItems: loggedProcedure.query(async () => {
-		const cachedResult = ItemSchema.array().safeParse(
+		const cachedResult = ItemDBSchema.array().safeParse(
 			simpleCache.get("getItems"),
 		);
 		if (cachedResult.success) {
@@ -240,7 +250,7 @@ export const lolRouter = router({
 		const results = await dbh.genericGet(
 			CollectionName.ITEM,
 			{ limit: 1000 },
-			ItemSchema,
+			ItemDBSchema,
 		);
 		if (!results.success) {
 			logger.error({ error: results.error }, "API:getItems");
@@ -255,7 +265,7 @@ export const lolRouter = router({
 		return results.data;
 	}),
 	getSummonerSpells: loggedProcedure.query(async () => {
-		const cachedResult = SummonerSpellSchema.array().safeParse(
+		const cachedResult = SummonerSpellDBSchema.array().safeParse(
 			simpleCache.get("getSummonerSpells"),
 		);
 		if (cachedResult.success) {
@@ -266,7 +276,7 @@ export const lolRouter = router({
 		const result = await dbh.genericGet(
 			CollectionName.SUMMONER_SPELL,
 			{ limit: 1000 },
-			SummonerSpellSchema,
+			SummonerSpellDBSchema,
 		);
 		if (!result.success) {
 			logger.error({ error: result.error }, "API:getSummonerSpells");

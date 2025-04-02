@@ -17,7 +17,7 @@ export const generalRouter = router({
 	getMembers: loggedProcedure
 		.input(
 			z.object({
-				onlyCore: z.boolean(),
+				onlyCore: z.boolean().optional().default(true),
 			}),
 		)
 		.query(async (opts) => {

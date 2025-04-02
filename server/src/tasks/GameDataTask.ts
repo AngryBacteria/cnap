@@ -1,15 +1,15 @@
 import dbh from "../helpers/DBHelper.js";
 import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
-import { ChampionSchema } from "../model/Champion.js";
+import { ChampionDBSchema } from "../model/Champion.js";
 import { CollectionName } from "../model/Database.js";
-import { GameModeSchema } from "../model/GameMode.js";
-import { GameTypeSchema } from "../model/GameType.js";
-import { ItemSchema } from "../model/Item.js";
-import { LeagueMapSchema } from "../model/Map.js";
-import { QueueSchema } from "../model/Queue.js";
-import { SummonerIconSchema } from "../model/SummonerIcon.js";
-import { SummonerSpellSchema } from "../model/SummonerSpell.js";
+import { GameModeDBSchema } from "../model/GameMode.js";
+import { GameTypeDBSchema } from "../model/GameType.js";
+import { ItemDBSchema } from "../model/Item.js";
+import { LeagueMapDBSchema } from "../model/LeagueMap.js";
+import { QueueDBSchema } from "../model/Queue.js";
+import { SummonerIconDBSchema } from "../model/SummonerIcon.js";
+import { SummonerSpellDBSchema } from "../model/SummonerSpell.js";
 
 export class GameDataTask {
 	async updateChampions(): Promise<void> {
@@ -21,7 +21,7 @@ export class GameDataTask {
 				champions,
 				"id",
 				CollectionName.CHAMPION,
-				ChampionSchema,
+				ChampionDBSchema,
 			);
 			logger.debug("Task:updateChampions - Champions updated");
 		}
@@ -38,7 +38,7 @@ export class GameDataTask {
 				gameModes,
 				"gameMode",
 				CollectionName.GAME_MODE,
-				GameModeSchema,
+				GameModeDBSchema,
 			);
 			logger.debug("Task:updateGameModes - Game modes updated");
 		}
@@ -55,7 +55,7 @@ export class GameDataTask {
 				gameTypes,
 				"gametype",
 				CollectionName.GAME_TYPE,
-				GameTypeSchema,
+				GameTypeDBSchema,
 			);
 			logger.debug("Task:updateGameTypes - Game types updated");
 		}
@@ -66,7 +66,7 @@ export class GameDataTask {
 		if (items.length <= 0) {
 			logger.error("Task:updateItems - No items found in CDN response");
 		} else {
-			await dbh.genericUpsert(items, "id", CollectionName.ITEM, ItemSchema);
+			await dbh.genericUpsert(items, "id", CollectionName.ITEM, ItemDBSchema);
 			logger.debug("Task:updateItems - Items updated");
 		}
 	}
@@ -80,7 +80,7 @@ export class GameDataTask {
 				maps,
 				"mapId",
 				CollectionName.MAP,
-				LeagueMapSchema,
+				LeagueMapDBSchema,
 			);
 			logger.debug("Task:updateMaps - Maps updated");
 		}
@@ -95,7 +95,7 @@ export class GameDataTask {
 				queues,
 				"queueId",
 				CollectionName.QUEUE,
-				QueueSchema,
+				QueueDBSchema,
 			);
 			logger.debug("Task:updateQueues - Queues updated");
 		}
@@ -112,7 +112,7 @@ export class GameDataTask {
 				summonerIcons,
 				"id",
 				CollectionName.SUMMONER_ICON,
-				SummonerIconSchema,
+				SummonerIconDBSchema,
 			);
 			logger.debug("Task:updateSummonerIcons - Summoner icons updated");
 		}
@@ -129,7 +129,7 @@ export class GameDataTask {
 				summonerSpells,
 				"id",
 				CollectionName.SUMMONER_SPELL,
-				SummonerSpellSchema,
+				SummonerSpellDBSchema,
 			);
 			logger.debug("Task:updateSummonerSpells - Summoner spells updated");
 		}

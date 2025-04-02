@@ -8,13 +8,13 @@ import "dotenv/config";
 import { type Collection, type Db, MongoClient } from "mongodb";
 import type { z } from "zod";
 import {
+	type BasicFilter,
 	BasicFilterSchema,
 	CollectionName,
 	type DBResponse,
-	type DBResponsePaginated,
+	type DBResponsePaginated, DEFAULT_FILTER,
 	MongoDBPaginationSchema,
 	type MongoPipeline,
-	type PartialBasicFilter,
 } from "../model/Database.js";
 import logger from "./Logger.js";
 
@@ -221,7 +221,7 @@ export class DBHelper {
 	 */
 	async genericGet<T>(
 		collectionName: CollectionName,
-		partialFilter: PartialBasicFilter = {},
+		partialFilter: BasicFilter = DEFAULT_FILTER,
 		validator?: z.ZodType<T>,
 	): Promise<DBResponse<T>> {
 		try {

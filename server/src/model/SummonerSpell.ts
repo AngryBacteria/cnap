@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const SummonerSpellSchema = z.object({
+export const SummonerSpellDBSchema = z.object({
 	id: z.number(),
 	cooldown: z.number(),
 	description: z.string(),
@@ -10,4 +10,4 @@ export const SummonerSpellSchema = z.object({
 	summonerLevel: z.number(),
 });
 
-export type SummonerSpell = z.infer<typeof SummonerSpellSchema>;
+export type SummonerSpellDB = z.infer<typeof SummonerSpellDBSchema>;

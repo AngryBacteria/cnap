@@ -14,7 +14,7 @@ export const RaritySchema = z.object({
 
 export type Rarity = z.infer<typeof RaritySchema>;
 
-export const SummonerIconSchema = z.object({
+export const SummonerIconDBSchema = z.object({
 	id: z.number(),
 	contentId: z.string(),
 	descriptions: z.array(DescriptionSchema),
@@ -29,4 +29,4 @@ export const SummonerIconSchema = z.object({
 	yearReleased: z.number(),
 });
 
-export type SummonerIcon = z.infer<typeof SummonerIconSchema>;
+export type SummonerIconDB = z.infer<typeof SummonerIconDBSchema>;

@@ -6,7 +6,7 @@
     "server"
   ],
   "scripts": {
-    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev": "concurrently -c \"blue.bold,green.bold\" -n \"CLIENT,SERVER\" \"npm run dev:client\" \"npm run dev:server\"",
     "dev:client": "npm run dev --workspace=client",
     "dev:server": "npm run dev --workspace=server",
     "build": "npm run build --workspaces",

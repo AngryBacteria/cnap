@@ -6,11 +6,11 @@ import { ChampionIdSelector } from "../../components/Match/ChampionIdSelector.ts
 import { MatchBannerSummaryLoader } from "../../components/Match/MatchBannerSummaryLoader.tsx";
 import { QueueIdSelector } from "../../components/Match/QueueIdSelector.tsx";
 import { useItems } from "../../hooks/api/useItems.ts";
+import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts";
 import { useQueues } from "../../hooks/api/useQueues.ts";
 import { useSummoner } from "../../hooks/api/useSummoner.ts";
 import { useSummonerSpells } from "../../hooks/api/useSummonerSpells.ts";
 import { useSummonerSummary } from "../../hooks/api/useSummonerSummary.ts";
-import {useMatchesParticipant} from "../../hooks/api/useMatchesParticipant.ts";
 
 export const Route = createFileRoute("/summoners/$summonerNameTag")({
 	component: SummonerPage,
@@ -33,7 +33,13 @@ export function SummonerPage() {
 
 	// Preloading
 	useMatchesParticipant(
-		{ page, championId: Number(selectedChampionId), queueId: Number(selectedQueueId), gameName, tagLine },
+		{
+			page,
+			championId: Number(selectedChampionId),
+			queueId: Number(selectedQueueId),
+			gameName,
+			tagLine,
+		},
 		true,
 	);
 	useItems(true);

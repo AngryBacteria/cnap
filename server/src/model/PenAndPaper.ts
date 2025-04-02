@@ -1,25 +1,15 @@
 import { z } from "zod";
-import { MemberSchema } from "./Member.js";
-
-export const PenAndPaperCharacterSchema = z.object({
-	name: z.string(),
-	characterClass: z.string().nullish(),
-	player: MemberSchema,
-	punchline: z.string(),
-	backstory: z.string(),
-	imageUrls: z.string().array(),
-});
-export type PenAndPaperCharacter = z.infer<typeof PenAndPaperCharacterSchema>;
+import { MemberDBSchema } from "./Member.js";
 
 export const PenAndPaperSessionSchema = z.object({
 	timestamp: z.number(),
 	sessionName: z.string(),
-	dm: MemberSchema,
-	players: MemberSchema.array(),
-	characters: PenAndPaperCharacterSchema.array(),
+	dm: MemberDBSchema,
+	players: MemberDBSchema.array(),
 	campaign: z.string(),
+	summaryLong: z.string(),
+	summaryShort: z.string(),
 	transcriptions: z.string().array(),
-	summaries: z.string().array(),
 	audioFiles: z.string().array(),
 });
 export type PenAndPaperSession = z.infer<typeof PenAndPaperSessionSchema>;

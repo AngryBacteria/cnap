@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const ItemSchema = z.object({
+export const ItemDBSchema = z.object({
 	id: z.number(),
 	active: z.boolean(),
 	categories: z.array(z.string()),
@@ -22,4 +22,4 @@ export const ItemSchema = z.object({
 	to: z.array(z.number()),
 });
 
-export type Item = z.infer<typeof ItemSchema>;
+export type ItemDB = z.infer<typeof ItemDBSchema>;
