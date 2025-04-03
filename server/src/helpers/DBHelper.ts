@@ -8,13 +8,13 @@ import "dotenv/config";
 import { type Collection, type Db, MongoClient } from "mongodb";
 import type { z } from "zod";
 import {
-	type BasicFilter,
-	BasicFilterSchema,
 	CollectionName,
 	type DBResponse,
-	type DBResponsePaginated, DEFAULT_FILTER,
+	type DBResponsePaginated,
 	MongoDBPaginationSchema,
+	type MongoFilter,
 	type MongoPipeline,
+	type MongoProjection,
 } from "../model/Database.js";
 import logger from "./Logger.js";
 
@@ -215,22 +215,32 @@ export class DBHelper {
 	 * Generic method for retrieving data from a specified collection.
 	 * Can optionally validate the returned data using a Zod validator.
 	 * @param collectionName - The name of the collection.
-	 * @param partialFilter - Optional filter for querying data.
 	 * @param validator - Optional Zod schema for data validation.
+	 * @param options
 	 * @returns The queried data cast as type T[]. Only if schema is provided it is strong typed.
 	 */
 	async genericGet<T>(
 		collectionName: CollectionName,
-		partialFilter: BasicFilter = DEFAULT_FILTER,
+		options?: {
+			filter?: MongoFilter;
+			projection?: MongoProjection;
+			offset?: number;
+			limit?: number;
+		},
 		validator?: z.ZodType<T>,
 	): Promise<DBResponse<T>> {
+		const {
+			filter = {},
+			projection = {},
+			offset = 0,
+			limit = 5,
+		} = options || {};
 		try {
 			const startTime = performance.now();
-			const baseFilter = BasicFilterSchema.parse(partialFilter);
 			const cursor = this.getCollection(collectionName)
-				.find(baseFilter.filter, { projection: baseFilter.project })
-				.skip(baseFilter.offset)
-				.limit(baseFilter.limit);
+				.find(filter, { projection })
+				.skip(offset)
+				.limit(limit);
 
 			const dbResultRaw = await cursor.toArray();
 

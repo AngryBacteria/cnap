@@ -3,10 +3,7 @@ import "dotenv/config";
 import dbh from "../helpers/DBHelper.js";
 import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
-import {
-	type SummonerDb,
-	SummonerDbSchema,
-} from "../model/Summoner.js";
+import { type SummonerDb, SummonerDbSchema } from "../model/Summoner.js";
 
 export class SummonerTask {
 	/**

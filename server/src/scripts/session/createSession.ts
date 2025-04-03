@@ -5,17 +5,17 @@ import "dotenv/config";
 import { z } from "zod";
 import dbh from "../../helpers/DBHelper.js";
 import { CollectionName } from "../../model/Database.js";
+import type { PenAndPaperSessionDB } from "../../model/PenAndPaper.js";
 
 const ORIGINAL_AUDIO_FILE = ["SWN_Robin_06-02-2025_1.m4a"];
 const SPLIT_AUDIO_FILES = ["out000.m4a", "out001.m4a", "out002.m4a"];
+const DATE = Date.parse("2025-02-06"); // YYYY-MM-DD (USA) format
 const LANGUAGE = "de";
 const TEMPERATURE = 0.0;
-// YYYY-MM-DD (USA) format
-const DATE = Date.parse("2025-02-06");
 
 const groq = new Groq();
 
-const sessionTemplate = {
+const sessionTemplate: PenAndPaperSessionDB = {
 	timestamp: DATE.valueOf(),
 	sessionName: "SWN_Robin_06-02-2025_1",
 	dmId: new ObjectId("67ceddb5f102f50d7e216048"),
@@ -26,7 +26,8 @@ const sessionTemplate = {
 	],
 	campaign: "A star without names",
 	transcriptions: [] as string[],
-	summaries: [] as string[],
+	summaryLong: "",
+	summaryShort: "",
 	audioFiles: ORIGINAL_AUDIO_FILE,
 };
 
@@ -35,7 +36,7 @@ for (const audioFile of SPLIT_AUDIO_FILES) {
 	const transcription = await groq.audio.transcriptions.create({
 		file: fs.createReadStream(audioFile),
 		model: "whisper-large-v3-turbo",
-		prompt: "Specify context or spelling",
+		//prompt: "Specify context or spelling",
 		response_format: "text",
 		language: LANGUAGE,
 		temperature: TEMPERATURE,

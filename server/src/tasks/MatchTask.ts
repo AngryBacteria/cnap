@@ -9,7 +9,7 @@ export class MatchTask {
 		// Optionally filter by puuid
 		const summonerResponse = await dbh.genericGet(
 			CollectionName.SUMMONER,
-			{ limit: 100000, filter: puuid ? { puuid } : undefined },
+			{ limit: 100000, filter: puuid ? { puuid } : {} },
 			SummonerDbSchema,
 		);
 

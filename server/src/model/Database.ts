@@ -1,12 +1,8 @@
 import { z } from "zod";
-import {ObjectId} from "mongodb";
-
-export const MongoDBIDSchema = z
-	.instanceof(ObjectId, { message: "Input must be a BSON ObjectId" })
-	.transform((objectId) => objectId.toHexString());
 
 export type MongoPipeline = Record<string, unknown>[];
 export type MongoFilter = Record<string, unknown>;
+export type MongoProjection = Record<string, number>;
 
 export type DBResponse<T> = {
 	data: T[];
@@ -60,38 +56,3 @@ export enum CollectionName {
 	SESSION = "session",
 	SUMMONER = "summoner",
 }
-
-/**
- * Zod schema for basic filtering options.
- * Validates filtering input for database queries.
- */
-export const BasicFilterSchema = z.object({
-	offset: z
-		.number()
-		.int()
-		.nonnegative()
-		.optional()
-		.default(0)
-		.describe("Number of items to skip"),
-	limit: z
-		.number()
-		.int()
-		.positive()
-		.optional()
-		.default(5)
-		.describe("Maximum number of items to return"),
-	project: z
-		.record(z.string(), z.number())
-		.optional()
-		.default({})
-		.describe("Fields to return"),
-	filter: z.record(z.string(), z.any()).default({}).describe("Filter to apply"),
-});
-export type BasicFilter = z.infer<typeof BasicFilterSchema>;
-
-export const DEFAULT_FILTER: BasicFilter = {
-	offset: 0,
-	limit: 5,
-	project: {},
-	filter: {}
-};

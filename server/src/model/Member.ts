@@ -1,6 +1,5 @@
-import {z} from "zod";
-import {SummonerDbSchema} from "./Summoner.js";
-
+import { z } from "zod";
+import { SummonerDbSchema } from "./Summoner.js";
 
 export const MemberDBSchema = z.object({
 	gameName: z.string(),

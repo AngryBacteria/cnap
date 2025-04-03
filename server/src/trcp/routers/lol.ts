@@ -4,7 +4,10 @@ import dbh from "../../helpers/DBHelper.js";
 import logger from "../../helpers/Logger.js";
 import rh from "../../helpers/RiotHelper.js";
 import simpleCache from "../../helpers/SimpleCache.js";
-import { ChampionReducedSchema, ChampionDBSchema } from "../../model/Champion.js";
+import {
+	ChampionDBSchema,
+	ChampionReducedSchema,
+} from "../../model/Champion.js";
 import {
 	CollectionName,
 	type MongoFilter,
@@ -38,7 +41,7 @@ export const lolRouter = router({
 			CollectionName.CHAMPION,
 			{
 				limit: 1000,
-				project: {
+				projection: {
 					_id: 0,
 					id: 1,
 					name: 1,
@@ -138,7 +141,7 @@ export const lolRouter = router({
 					CollectionName.SUMMONER,
 					{
 						limit: 100000,
-						project: { puuid: 1 },
+						projection: { puuid: 1 },
 						filter: summonerFilter,
 					},
 					z.object({
