@@ -2,8 +2,7 @@
   "name": "cnap",
   "private": true,
   "workspaces": [
-    "client",
-    "server"
+    "packages/*"
   ],
   "scripts": {
     "dev": "concurrently -c \"blue.bold,green.bold\" -n \"CLIENT,SERVER\" \"npm run dev:client\" \"npm run dev:server\"",
@@ -17,9 +16,10 @@
     "start": "concurrently \"npm run start:client\" \"npm run start:server\"",
     "start:client": "npm run start --workspace=client",
     "start:server": "npm run start --workspace=server",
-    "cleanup": "npx rimraf ./node_modules client/node_modules  client/dist server/node_modules server/dist"
+    "cleanup": "rimraf ./node_modules packages/client/node_modules  packages/client/dist packages/server/node_modules packages/server/dist"
   },
-  "devDependencies": {
-    "concurrently": "9.1.2"
+  "dependencies": {
+    "concurrently": "9.1.2",
+    "rimraf": "6.0.1"
   }
 }

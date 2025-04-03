@@ -1,8 +1,8 @@
 {
-  "name": "cnap-frontend",
-  "private": true,
-  "version": "0.0.0",
+  "name": "client",
+  "version": "1.0.0",
   "type": "module",
+  "description": "The client code for the cnap.ch website",
   "scripts": {
     "dev": "vite",
     "biome": "biome check --write ./src/",

@@ -1,9 +1,9 @@
 {
-  "name": "typescript-node-project",
+  "name": "server",
   "version": "1.0.0",
-  "description": "A modern Node.js TypeScript project with ES modules",
+  "description": "The server code for the cnap.ch website",
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/trcp/routers/_app.js",
   "scripts": {
     "dev": "tsx watch src/trcp/routers/_app.ts | pino-pretty",
     "biome": "biome check --write ./src/",
@@ -11,15 +11,13 @@
     "build": "tsc",
     "start": "node dist/trcp/routers/_app.js"
   },
-  "author": "",
-  "license": "MIT",
   "dependencies": {
     "@trpc/client": "11.0.0-rc.824",
     "@trpc/server": "11.0.0-rc.824",
     "cors": "2.8.5",
     "dotenv": "16.4.7",
     "express": "4.21.2",
-    "groq-sdk": "^0.17.0",
+    "groq-sdk": "0.19.0",
     "limiter": "3.0.0",
     "mongodb": "6.14.2",
     "pino": "9.6.0",
