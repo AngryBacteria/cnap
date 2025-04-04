@@ -12,20 +12,21 @@
     "start": "node dist/trcp/routers/_app.js"
   },
   "dependencies": {
-    "@trpc/client": "11.0.0-rc.824",
-    "@trpc/server": "11.0.0-rc.824",
+    "@trpc/client": "11.0.1",
+    "@trpc/server": "11.0.1",
     "cors": "2.8.5",
     "dotenv": "16.4.7",
     "express": "4.21.2",
     "groq-sdk": "0.19.0",
     "limiter": "3.0.0",
     "mongodb": "6.14.2",
+    "openai": "4.91.1",
     "pino": "9.6.0",
     "zod": "3.24.2"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "@types/cors": "^2.8.17",
+    "@types/cors": "2.8.17",
     "@types/express": "5.0.0",
     "@types/node": "22.13.5",
     "nodemon": "3.1.9",

@@ -1,7 +1,6 @@
 import { z } from "zod";
 import dbh from "../../helpers/DBHelper.js";
 import logger from "../../helpers/Logger.js";
-import simpleCache from "../../helpers/SimpleCache.js";
 import { CollectionName, type MongoPipeline } from "../../model/Database.js";
 import { MemberWithSummonerSchema } from "../../model/Member.js";
 import { loggedProcedure } from "../middlewares/executionTime.js";
@@ -21,16 +20,6 @@ export const generalRouter = router({
 			}),
 		)
 		.query(async (opts) => {
-			// Try cache
-			const cachedResult = MemberWithSummonerSchema.array().safeParse(
-				simpleCache.get(`getMembers[${opts.input.onlyCore}]`),
-			);
-			if (cachedResult.success) {
-				logger.info({ cached: true }, "API:getMembers");
-				return cachedResult.data;
-			}
-
-			// Try DB
 			const pipeline: MongoPipeline = [];
 			if (opts.input.onlyCore) {
 				pipeline.push({ $match: { core: true } });
@@ -51,12 +40,7 @@ export const generalRouter = router({
 			if (!memberResponse.success) {
 				throw new Error("Members couldn't be fetched");
 			}
-
-			simpleCache.set(
-				`getMembers[${opts.input.onlyCore}]`,
-				memberResponse.data,
-			);
-			logger.info({ cached: false }, "API:getMembers");
+			logger.info("API:getMembers");
 			return memberResponse.data;
 		}),
 });

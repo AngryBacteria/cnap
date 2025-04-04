@@ -3,7 +3,6 @@ import { z } from "zod";
 import dbh from "../../helpers/DBHelper.js";
 import logger from "../../helpers/Logger.js";
 import rh from "../../helpers/RiotHelper.js";
-import simpleCache from "../../helpers/SimpleCache.js";
 import {
 	ChampionDBSchema,
 	ChampionReducedSchema,
@@ -29,14 +28,6 @@ await rh.testConnection();
 
 export const lolRouter = router({
 	getChampionsReduced: loggedProcedure.query(async () => {
-		const cachedResult = ChampionReducedSchema.array().safeParse(
-			simpleCache.get("championReduced"),
-		);
-		if (cachedResult.success) {
-			logger.info({ cached: true }, "API:getChampionsReduced");
-			return cachedResult.data;
-		}
-
 		const result = await dbh.genericGet(
 			CollectionName.CHAMPION,
 			{
@@ -60,9 +51,7 @@ export const lolRouter = router({
 				code: "INTERNAL_SERVER_ERROR",
 			});
 		}
-
-		simpleCache.set("championReduced", result.data);
-		logger.info({ cached: false }, "API:getChampionsReduced");
+		logger.info("API:getChampionsReduced");
 		return result.data;
 	}),
 	getChampionById: loggedProcedure.input(z.number()).query(async (opts) => {
@@ -216,14 +205,6 @@ export const lolRouter = router({
 			return dbResult.data;
 		}),
 	getQueues: loggedProcedure.query(async () => {
-		const cachedResult = QueueDBSchema.array().safeParse(
-			simpleCache.get("getQueues"),
-		);
-		if (cachedResult.success) {
-			logger.info({ cached: true }, "API:getQueues");
-			return cachedResult.data;
-		}
-
 		const result = await dbh.genericGet(
 			CollectionName.QUEUE,
 			{ limit: 1000 },
@@ -237,19 +218,10 @@ export const lolRouter = router({
 			});
 		}
 
-		simpleCache.set("getQueues", result.data);
-		logger.info({ cached: false }, "API:getQueues");
+		logger.info("API:getQueues");
 		return result.data;
 	}),
 	getItems: loggedProcedure.query(async () => {
-		const cachedResult = ItemDBSchema.array().safeParse(
-			simpleCache.get("getItems"),
-		);
-		if (cachedResult.success) {
-			logger.info({ cached: true }, "API:getItems");
-			return cachedResult.data;
-		}
-
 		const results = await dbh.genericGet(
 			CollectionName.ITEM,
 			{ limit: 1000 },
@@ -263,19 +235,10 @@ export const lolRouter = router({
 			});
 		}
 
-		simpleCache.set("getItems", results.data);
-		logger.info({ cached: false }, "API:getItems");
+		logger.info("API:getItems");
 		return results.data;
 	}),
 	getSummonerSpells: loggedProcedure.query(async () => {
-		const cachedResult = SummonerSpellDBSchema.array().safeParse(
-			simpleCache.get("getSummonerSpells"),
-		);
-		if (cachedResult.success) {
-			logger.info({ cached: true }, "API:getSummonerSpells");
-			return cachedResult.data;
-		}
-
 		const result = await dbh.genericGet(
 			CollectionName.SUMMONER_SPELL,
 			{ limit: 1000 },
@@ -289,19 +252,10 @@ export const lolRouter = router({
 			});
 		}
 
-		simpleCache.set("getSummonerSpells", result.data);
-		logger.info({ cached: false }, "API:getSummonerSpells");
+		logger.info("API:getSummonerSpells");
 		return result.data;
 	}),
 	getSummoners: loggedProcedure.query(async () => {
-		const cachedResult = SummonerDbSchema.array().safeParse(
-			simpleCache.get("getSummoners"),
-		);
-		if (cachedResult.success) {
-			logger.info({ cached: true }, "API:getSummoners");
-			return cachedResult.data;
-		}
-
 		const summonerResponse = await dbh.genericGet(
 			CollectionName.SUMMONER,
 			{ limit: 1000 },
@@ -315,8 +269,7 @@ export const lolRouter = router({
 			});
 		}
 
-		simpleCache.set("getSummoners", summonerResponse.data);
-		logger.info({ cached: false }, "API:getSummoners");
+		logger.info("API:getSummoners");
 		return summonerResponse.data;
 	}),
 	getSummonerByName: loggedProcedure

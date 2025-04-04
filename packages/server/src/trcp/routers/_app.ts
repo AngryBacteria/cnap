@@ -14,7 +14,17 @@ import { penAndPaperRouter } from "./penAndPaper.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const staticFilesPath = join(__dirname, "..", "..", "..", "..", "..", "static");
-const spaFilesPath = join(__dirname, "..", "..", "..", "..", "..", "packages", "client", "dist");
+const spaFilesPath = join(
+	__dirname,
+	"..",
+	"..",
+	"..",
+	"..",
+	"..",
+	"packages",
+	"client",
+	"dist",
+);
 
 // Validate paths exist
 if (!fs.existsSync(staticFilesPath)) {
