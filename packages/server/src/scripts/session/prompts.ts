@@ -1,3 +1,5 @@
+import logger from "../../helpers/Logger.js";
+
 enum FRAMEWORK {
 	DND = "Dungeons and Dragons (DND)",
 	SWN = "Stars Without Number (SWN)",
