@@ -9,7 +9,6 @@ interface Props {
 
 export function SummonerCard({ summoner }: Props) {
 	const summonerIconPath = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${summoner.profileIconId}.jpg`;
-	//TODO use something else than puuid for nav
 
 	return (
 		<Card shadow={"md"} withBorder className={"fillSpacePointer"}>

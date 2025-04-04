@@ -16,10 +16,14 @@
     "start": "concurrently \"npm run start:client\" \"npm run start:server\"",
     "start:client": "npm run start --workspace=client",
     "start:server": "npm run start --workspace=server",
-    "cleanup": "rimraf ./node_modules packages/client/node_modules  packages/client/dist packages/server/node_modules packages/server/dist"
+    "cleanup": "rimraf ./node_modules packages/client/node_modules  packages/client/dist packages/server/node_modules packages/server/dist",
+    "prepare": "husky"
   },
   "dependencies": {
     "concurrently": "9.1.2",
     "rimraf": "6.0.1"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
   }
 }

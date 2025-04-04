@@ -84,7 +84,6 @@ export const lolRouter = router({
 		);
 		return dbResult.data[0];
 	}),
-	// TODO: dont use puuid, use gameName and tagLine
 	getMatchesParticipant: loggedProcedure
 		.input(
 			z.object({

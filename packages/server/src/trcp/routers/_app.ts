@@ -28,11 +28,15 @@ const spaFilesPath = join(
 
 // Validate paths exist
 if (!fs.existsSync(staticFilesPath)) {
-	logger.warn(`The folder at ${staticFilesPath} does not exist. Static files will not be served`);
+	logger.warn(
+		`The folder at ${staticFilesPath} does not exist. Static files will not be served`,
+	);
 }
 
 if (!fs.existsSync(spaFilesPath)) {
-	logger.warn(`The client/dist folder at ${spaFilesPath} does not exist. Frontend will not work`)
+	logger.warn(
+		`The client/dist folder at ${spaFilesPath} does not exist. Frontend will not work`,
+	);
 }
 
 const appRouter = router({

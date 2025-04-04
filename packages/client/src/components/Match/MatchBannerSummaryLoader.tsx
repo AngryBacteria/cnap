@@ -23,8 +23,6 @@ export function MatchBannerSummaryLoader({
 	setPage,
 	queueId,
 }: Props) {
-	//TODO: replace with router search param
-	//TODO: put in own component
 	//TODO scroll to title
 
 	const matchesParticipantQuery = useMatchesParticipant({
