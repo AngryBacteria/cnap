@@ -136,13 +136,14 @@ export class DBHelper {
 			});
 			logger.debug("DBHelper:initIndexes - Created static data indexes");
 
-			await this.getCollection(CollectionName.SESSION).dropIndexes();
-			await this.getCollection(CollectionName.SESSION).createIndex(
-				"sessionName",
-				{
-					unique: true,
-				},
-			);
+			await this.getCollection(
+				CollectionName.PEN_AND_PAPER_SESSION,
+			).dropIndexes();
+			await this.getCollection(
+				CollectionName.PEN_AND_PAPER_SESSION,
+			).createIndex("sessionName", {
+				unique: true,
+			});
 			logger.debug("DBHelper:initIndexes - Created P&P data indexes");
 
 			logger.debug("DBHelper:initIndexes - All indexes created successfully");
