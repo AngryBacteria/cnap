@@ -54,5 +54,6 @@ export enum CollectionName {
 	SUMMONER_SPELL = "summoner_spell",
 	TIMELINE = "timeline_v5",
 	PEN_AND_PAPER_SESSION = "pen_and_paper_session",
+	PEN_AND_PAPER_CHARACTER = "pen_and_paper_character",
 	SUMMONER = "summoner",
 }

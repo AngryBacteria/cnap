@@ -144,6 +144,14 @@ export class DBHelper {
 			).createIndex("sessionName", {
 				unique: true,
 			});
+			await this.getCollection(
+				CollectionName.PEN_AND_PAPER_CHARACTER,
+			).dropIndexes();
+			await this.getCollection(
+				CollectionName.PEN_AND_PAPER_CHARACTER,
+			).createIndex("name", {
+				unique: true,
+			});
 			logger.debug("DBHelper:initIndexes - Created P&P data indexes");
 
 			logger.debug("DBHelper:initIndexes - All indexes created successfully");

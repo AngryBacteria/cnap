@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { SummonerDbSchema } from "./Summoner.js";
 
+//TODO what to use for ID?
 export const MemberDBSchema = z.object({
 	gameName: z.string(),
 	punchline: z.string().nullish(),
