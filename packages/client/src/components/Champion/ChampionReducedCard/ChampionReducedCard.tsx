@@ -17,7 +17,6 @@ export function ChampionReducedCard({ champion }: ChampionCardProps) {
 			<Link
 				to="/champions/$championId"
 				params={{ championId: `${champion.id}` }}
-				search={(prev) => ({ ...prev, page: 1 })}
 				className={styles.navigationItem}
 			>
 				<Card.Section>

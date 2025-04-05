@@ -1,5 +1,3 @@
-//TODO: find better solution for this mess. This is now only weak typing in app
-
 /**
  * Version of the MatchV5s Info with only one participant
  */
