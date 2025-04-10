@@ -1,8 +1,11 @@
+import { ObjectId } from "mongodb";
 import { z } from "zod";
 
 export type MongoPipeline = Record<string, unknown>[];
 export type MongoFilter = Record<string, unknown>;
 export type MongoProjection = Record<string, number>;
+
+export const MongoDBIDSchema = z.instanceof(ObjectId).nullish();
 
 export type DBResponse<T> = {
 	data: T[];

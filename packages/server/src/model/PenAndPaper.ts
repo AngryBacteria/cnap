@@ -1,9 +1,11 @@
 import { ObjectId } from "mongodb";
 import { z } from "zod";
+import { MongoDBIDSchema } from "./Database.js";
 import { MemberDBSchema } from "./Member.js";
 
 //TODO what to use for ID?
 export const PenAndPaperCharacterDBSchema = z.object({
+	_id: MongoDBIDSchema,
 	name: z.string(),
 	memberId: z.instanceof(ObjectId),
 	imageUrls: z.string().array(),
@@ -21,6 +23,7 @@ export type PenAndPaperCharacter = z.infer<typeof PenAndPaperCharacterSchema>;
 
 //TODO what to use for ID?
 export const PenAndPaperSessionDBSchema = z.object({
+	_id: MongoDBIDSchema,
 	framework: z.string(),
 	dmMemberId: z.instanceof(ObjectId),
 	characterMemberIds: z.instanceof(ObjectId).array(),

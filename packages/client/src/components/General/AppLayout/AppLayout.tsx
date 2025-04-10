@@ -1,6 +1,11 @@
 import { AppShell, Burger, Divider, Flex, Image, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconHelmet, IconHome, IconUser } from "@tabler/icons-react";
+import {
+	IconHelmet,
+	IconHome,
+	IconSwords,
+	IconUser,
+} from "@tabler/icons-react";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Link, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
@@ -80,6 +85,11 @@ export function AppLayout() {
 									label={"Summoners"}
 									icon={<IconUser />}
 								/>
+								<NavigationButton
+									to={"/sessions"}
+									label={"Sessions"}
+									icon={<IconSwords />}
+								/>
 								<ColorModeButton />
 							</Flex>
 						</Flex>
@@ -98,6 +108,11 @@ export function AppLayout() {
 							to={"/summoners"}
 							label={"Summoners"}
 							icon={<IconUser />}
+						/>
+						<NavigationButton
+							to={"/sessions"}
+							label={"Sessions"}
+							icon={<IconSwords />}
 						/>
 
 						<Divider />

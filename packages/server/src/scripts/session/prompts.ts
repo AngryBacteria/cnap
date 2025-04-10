@@ -23,13 +23,17 @@ Kiryu Arasaka: Nicht-Spieler-Charakter. 14-jähriger Sohn des ehemaligen Arasaka
 };
 
 const BASE_PROMPT_TEMPLATE = `## Ziel
-Bitte erstelle aus dem folgenden Transkript unserer <%FRAMEWORK%> Runde zwei separate Zusammenfassungen:
+Bitte erstelle aus dem folgenden Transkript unserer <%FRAMEWORK%> Runde die folgenden Elemente:
+1.  Einen passenden Titel für die Runde.
 1.  Eine detaillierte Zusammenfassung: Ein ausführlicher Fliesstext, der die Ereignisse der Runde nacherzählt.
 2.  Eine kurze Zusammenfassung: Eine prägnante Übersicht über die wichtigsten Geschehnisse und Ergebnisse der Runde.
 3.  Eine Liste der Ziele der Gruppe: Eine Auflistung der aktuellen Ziele oder Aufgaben, welche die Gruppe verfolgt.
 Nutze für beide Zusammenfassungen die bereitgestellten Kontextinformationen zu Spielercharakteren (PCs), wichtigen Nicht-Spieler-Charakteren (NPCs) und Orten (Planeten, Städte usw.) zusammen mit dem Transkript. Gestalte die Zusammenfassungen spannend, aber stelle sicher, dass sie inhaltlich korrekt sind.
 
 ## Format
+Für den Titel:
+*   Erfinde einen kurzen, prägnanten und thematisch passenden Titel.
+
 Für die detaillierte Zusammenfassung:
 *   Schreibe einen zusammenhängenden Fliesstext mit sinnvollen Absätzen.
 *   Benutze keine Stichpunkte oder expliziten Überschriften innerhalb des Textes.

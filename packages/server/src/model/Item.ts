@@ -1,6 +1,8 @@
+import { ObjectId } from "mongodb";
 import { z } from "zod";
 
 export const ItemDBSchema = z.object({
+	_id: z.instanceof(ObjectId),
 	id: z.number(),
 	active: z.boolean(),
 	categories: z.array(z.string()),

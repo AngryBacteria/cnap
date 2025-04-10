@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { z } from "zod";
+import { MongoDBIDSchema } from "./Database.js";
 
 export const SummonerRiotSchema = z.object({
 	accountId: z.string(),
@@ -13,6 +14,7 @@ export const SummonerRiotSchema = z.object({
 export type SummonerRiot = z.infer<typeof SummonerRiotSchema>;
 
 export const SummonerDbSchema = z.object({
+	_id: MongoDBIDSchema,
 	puuid: z.string(),
 	accountId: z.string(),
 	gameName: z.string(),

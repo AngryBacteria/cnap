@@ -1,6 +1,6 @@
 import { Card, Flex, Image, Text, Tooltip } from "@mantine/core";
-import { useMemo } from "react";
 import type { Outputs } from "../../../utils/trcp.ts";
+import { FormattedDateText } from "../../General/FormattedDateText.tsx";
 import { LeagueItemGrid } from "../LeagueItemGrid/LeagueItemGrid";
 import styles from "./MatchBannerSummary.module.css";
 
@@ -20,27 +20,6 @@ export function MatchBannerSummary({
 	const participant = match.info.participants;
 
 	const championImage = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${participant.championId}.png`;
-
-	const formattedDate = new Intl.DateTimeFormat("en-US", {
-		hour: "numeric",
-		minute: "numeric",
-		day: "numeric",
-		month: "numeric",
-		year: "numeric",
-		hour12: false,
-	}).format(new Date(match.info.gameCreation));
-
-	const formattedTimeAgo = useMemo(() => {
-		const rtf = new Intl.RelativeTimeFormat("en", {
-			numeric: "auto",
-			style: "long",
-		});
-
-		const diffTime = Math.abs(match.info.gameCreation - new Date().getTime());
-		const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
-		return rtf.format(-diffDays, "days");
-	}, [match.info.gameCreation]);
 
 	const formattedGameDuration = `${Math.round(match.info.gameDuration / 60)} minutes`;
 
@@ -80,13 +59,7 @@ export function MatchBannerSummary({
 								"Unknown Queue"}
 						</Text>
 
-						<Tooltip
-							label={formattedDate}
-							color="teal"
-							transitionProps={{ transition: "fade-down", duration: 300 }}
-						>
-							<Text c="dimmed">{formattedTimeAgo}</Text>
-						</Tooltip>
+						<FormattedDateText unixTimestamp={match.info.gameCreation} />
 
 						<Text c="dimmed">{formattedGameDuration}</Text>
 					</Flex>
