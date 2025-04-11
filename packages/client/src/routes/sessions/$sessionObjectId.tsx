@@ -20,7 +20,7 @@ import {
 import { createFileRoute } from "@tanstack/react-router";
 import { FormattedDateText } from "../../components/General/FormattedDateText.tsx";
 import { usePenAndPaperSession } from "../../hooks/api/usePenAndPaperSession.ts";
-import {PRIMARY_COLOR} from "../../main.tsx";
+import { PRIMARY_COLOR } from "../../main.tsx";
 
 export const Route = createFileRoute("/sessions/$sessionObjectId")({
 	component: RouteComponent,

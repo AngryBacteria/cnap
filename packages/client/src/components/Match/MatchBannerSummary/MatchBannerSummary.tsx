@@ -1,9 +1,9 @@
 import { Card, Flex, Image, Text, Tooltip } from "@mantine/core";
+import { PRIMARY_COLOR } from "../../../main.tsx";
 import type { Outputs } from "../../../utils/trcp.ts";
 import { FormattedDateText } from "../../General/FormattedDateText.tsx";
 import { LeagueItemGrid } from "../LeagueItemGrid/LeagueItemGrid";
 import styles from "./MatchBannerSummary.module.css";
-import {PRIMARY_COLOR} from "../../../main.tsx";
 
 interface Props {
 	match: Outputs["lol"]["getMatchesParticipant"]["data"][number];

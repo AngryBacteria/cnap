@@ -1,7 +1,7 @@
 import { Badge, Card, Flex, Grid, Image, Text, Title } from "@mantine/core";
+import { PRIMARY_COLOR } from "../../main.tsx";
 import type { Outputs } from "../../utils/trcp.ts";
 import { ChampionAttributeRadar } from "./ChampionAttributeRadar.tsx";
-import {PRIMARY_COLOR} from "../../main.tsx";
 
 interface Props {
 	champion: Outputs["lol"]["getChampionById"];

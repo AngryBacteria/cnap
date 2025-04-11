@@ -4,9 +4,9 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { FormattedDateText } from "../../components/General/FormattedDateText.tsx";
 import { usePenAndPaperSessions } from "../../hooks/api/usePenAndPaperSessions.ts";
+import { PRIMARY_COLOR } from "../../main.tsx";
 import { truncateText } from "../../utils/GeneralUtil.ts";
 import styles from "./index.module.css";
-import {PRIMARY_COLOR} from "../../main.tsx";
 
 export const Route = createFileRoute("/sessions/")({
 	component: RouteComponent,

@@ -1,6 +1,6 @@
 import { Text, Tooltip } from "@mantine/core";
 import { useMemo } from "react";
-import {PRIMARY_COLOR} from "../../main.tsx";
+import { PRIMARY_COLOR } from "../../main.tsx";
 
 interface Props {
 	unixTimestamp: number;

@@ -9,6 +9,7 @@ interface Props {
 }
 
 interface PreparedItem {
+	id: number;
 	name: string;
 	iconPath: string;
 	stats: { name: string; value: string }[];
@@ -29,6 +30,7 @@ export function LeagueItemGrid({ participant, items }: Props) {
 			.map((itemId) => items.find((item) => item.id === itemId))
 			.map((item) => {
 				const defaultItem: PreparedItem = {
+					id: item?.id || -1,
 					name: item?.name || "",
 					iconPath: item?.iconPath || "",
 					stats: [],
@@ -36,7 +38,7 @@ export function LeagueItemGrid({ participant, items }: Props) {
 				};
 
 				if (!item) {
-					return defaultItem;
+					return undefined;
 				}
 
 				// If main text available, parse it, else return empty string
@@ -44,13 +46,13 @@ export function LeagueItemGrid({ participant, items }: Props) {
 				const doc = parser.parseFromString(item.description, "text/html");
 				const mainText = doc.querySelector("mainText");
 				if (!mainText) {
-					return defaultItem;
+					return undefined;
 				}
 
 				// If stats element available, parse it, else return empty string
 				const statsElement = mainText.querySelector("stats");
 				if (!statsElement) {
-					return defaultItem;
+					return undefined;
 				}
 
 				// Add stats to description
@@ -114,7 +116,7 @@ export function LeagueItemGrid({ participant, items }: Props) {
 						shadow="md"
 						width={300}
 						// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
-						key={index}
+						key={index + item.id}
 					>
 						<HoverCard.Target>
 							<Image src={item.iconPath} h={30} w={30} radius="5px" />

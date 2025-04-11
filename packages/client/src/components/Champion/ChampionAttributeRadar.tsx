@@ -1,7 +1,7 @@
 import { RadarChart } from "@mantine/charts";
 import { useMemo } from "react";
+import { PRIMARY_COLOR } from "../../main.tsx";
 import type { Outputs } from "../../utils/trcp.ts";
-import {PRIMARY_COLOR} from "../../main.tsx";
 
 interface Props {
 	champion: Outputs["lol"]["getChampionById"];
