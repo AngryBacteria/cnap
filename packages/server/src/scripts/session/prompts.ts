@@ -65,3 +65,5 @@ export function buildPenAndPaperPrompt(
 		.replace(/<%CONTEXT%>/g, context.trim())
 		.trim();
 }
+
+//console.log(buildPenAndPaperPrompt(FRAMEWORK.SWN, CONTEXTS.SWN_ROBIN, "hier"));

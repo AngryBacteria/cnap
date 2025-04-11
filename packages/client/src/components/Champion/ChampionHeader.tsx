@@ -1,6 +1,7 @@
 import { Badge, Card, Flex, Grid, Image, Text, Title } from "@mantine/core";
 import type { Outputs } from "../../utils/trcp.ts";
 import { ChampionAttributeRadar } from "./ChampionAttributeRadar.tsx";
+import {PRIMARY_COLOR} from "../../main.tsx";
 
 interface Props {
 	champion: Outputs["lol"]["getChampionById"];
@@ -29,7 +30,7 @@ export function ChampionHeader({ champion }: Props) {
 								<Title order={1}>{champion.name}</Title>
 								{champion.roles.map((role) => {
 									return (
-										<Badge color="teal" key={role}>
+										<Badge color={PRIMARY_COLOR} key={role}>
 											{role}
 										</Badge>
 									);

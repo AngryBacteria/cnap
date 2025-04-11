@@ -1,5 +1,6 @@
 import { Text, Tooltip } from "@mantine/core";
 import { useMemo } from "react";
+import {PRIMARY_COLOR} from "../../main.tsx";
 
 interface Props {
 	unixTimestamp: number;
@@ -30,7 +31,7 @@ export function FormattedDateText({ unixTimestamp }: Props) {
 	return (
 		<Tooltip
 			label={formattedDate}
-			color="teal"
+			color={PRIMARY_COLOR}
 			transitionProps={{ transition: "fade-down", duration: 300 }}
 		>
 			<Text c="dimmed">{formattedTimeAgo}</Text>

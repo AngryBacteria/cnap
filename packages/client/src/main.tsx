@@ -12,9 +12,14 @@ import ReactDOM from "react-dom/client";
 // Global styles
 import "./assets/main.css";
 
+export const PRIMARY_COLOR = localStorage.getItem("CNAP_PRIMARY_COLOR") || "red";
+if(!localStorage.getItem("CNAP_PRIMARY_COLOR")) {
+	localStorage.setItem("CNAP_PRIMARY_COLOR", PRIMARY_COLOR);
+}
+
 // Mantine theme
 const theme = createTheme({
-	primaryColor: "teal",
+	primaryColor: PRIMARY_COLOR,
 });
 
 // Import the generated route tree

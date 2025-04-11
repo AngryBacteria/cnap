@@ -3,6 +3,7 @@ import type { Outputs } from "../../../utils/trcp.ts";
 import { FormattedDateText } from "../../General/FormattedDateText.tsx";
 import { LeagueItemGrid } from "../LeagueItemGrid/LeagueItemGrid";
 import styles from "./MatchBannerSummary.module.css";
+import {PRIMARY_COLOR} from "../../../main.tsx";
 
 interface Props {
 	match: Outputs["lol"]["getMatchesParticipant"]["data"][number];
@@ -81,7 +82,7 @@ export function MatchBannerSummary({
 						>
 							<Tooltip
 								label={participant.championName}
-								color="teal"
+								color={PRIMARY_COLOR}
 								position="bottom"
 								transitionProps={{ transition: "fade-up", duration: 300 }}
 							>
@@ -115,7 +116,7 @@ export function MatchBannerSummary({
 							</Text>
 							<Tooltip
 								label="A KDA of above 2 is considered good"
-								color="teal"
+								color={PRIMARY_COLOR}
 								position="bottom"
 								transitionProps={{ transition: "fade-up", duration: 300 }}
 							>
@@ -131,7 +132,7 @@ export function MatchBannerSummary({
 							</Text>
 							<Tooltip
 								label="A CS per minute of 5 or above is considered good"
-								color="teal"
+								color={PRIMARY_COLOR}
 								position="bottom"
 								transitionProps={{ transition: "fade-up", duration: 300 }}
 							>

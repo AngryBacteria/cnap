@@ -6,11 +6,12 @@ interface Props {
 	to: string;
 	label: string;
 	icon?: ReactNode;
+	onClick?: () => void;
 }
 
-export function NavigationButton({ to, label, icon }: Props) {
+export function NavigationButton({ to, label, icon, onClick }: Props) {
 	return (
-		<Link to={to} className={styles.navigationItem}>
+		<Link to={to} className={styles.navigationItem} onClick={onClick}>
 			{icon && icon}
 			<span>{label}</span>
 		</Link>

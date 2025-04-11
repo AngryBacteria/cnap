@@ -6,6 +6,7 @@ import { FormattedDateText } from "../../components/General/FormattedDateText.ts
 import { usePenAndPaperSessions } from "../../hooks/api/usePenAndPaperSessions.ts";
 import { truncateText } from "../../utils/GeneralUtil.ts";
 import styles from "./index.module.css";
+import {PRIMARY_COLOR} from "../../main.tsx";
 
 export const Route = createFileRoute("/sessions/")({
 	component: RouteComponent,
@@ -70,7 +71,7 @@ function RouteComponent() {
 								>
 									<Title order={2}>{session.sessionName}</Title>
 									<FormattedDateText unixTimestamp={session.timestamp} />
-									<Badge color={"teal"}>{session.framework}</Badge>
+									<Badge color={PRIMARY_COLOR}>{session.framework}</Badge>
 								</Flex>
 								<Text hiddenFrom={"sm"}>
 									{truncateText(session.summaryShort, 500)}

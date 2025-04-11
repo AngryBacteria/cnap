@@ -14,7 +14,7 @@ import { NavigationButton } from "../NavigationButton/NavigationButton.tsx";
 import styles from "./AppLayout.module.css";
 
 export function AppLayout() {
-	const [opened, { toggle }] = useDisclosure();
+	const [opened, { close, toggle }] = useDisclosure();
 
 	return (
 		<>
@@ -98,21 +98,29 @@ export function AppLayout() {
 
 				<AppShell.Navbar>
 					<Flex gap={"md"} p={"md"} direction={"column"}>
-						<NavigationButton to={"/"} label={"Home"} icon={<IconHome />} />
+						<NavigationButton
+							to={"/"}
+							label={"Home"}
+							icon={<IconHome />}
+							onClick={close}
+						/>
 						<NavigationButton
 							to={"/champions"}
 							label={"Champions"}
 							icon={<IconHelmet />}
+							onClick={close}
 						/>
 						<NavigationButton
 							to={"/summoners"}
 							label={"Summoners"}
 							icon={<IconUser />}
+							onClick={close}
 						/>
 						<NavigationButton
 							to={"/sessions"}
 							label={"Sessions"}
 							icon={<IconSwords />}
+							onClick={close}
 						/>
 
 						<Divider />

@@ -20,6 +20,7 @@ import {
 import { createFileRoute } from "@tanstack/react-router";
 import { FormattedDateText } from "../../components/General/FormattedDateText.tsx";
 import { usePenAndPaperSession } from "../../hooks/api/usePenAndPaperSession.ts";
+import {PRIMARY_COLOR} from "../../main.tsx";
 
 export const Route = createFileRoute("/sessions/$sessionObjectId")({
 	component: RouteComponent,
@@ -90,7 +91,7 @@ function RouteComponent() {
 				<Flex direction={"row"} gap={"md"} align={"center"} wrap={"wrap"}>
 					<Title order={2}>{session.sessionName}</Title>
 					<FormattedDateText unixTimestamp={session.timestamp} />
-					<Badge color={"teal"}>{session.framework}</Badge>
+					<Badge color={PRIMARY_COLOR}>{session.framework}</Badge>
 				</Flex>
 
 				<Card withBorder shadow="sm">
@@ -173,7 +174,7 @@ function RouteComponent() {
 									wrap={"wrap"}
 								>
 									<Title order={4}>{participant.characterName}</Title>
-									<Badge color={"teal"}>{participant.role}</Badge>
+									<Badge color={PRIMARY_COLOR}>{participant.role}</Badge>
 								</Flex>
 								<Text c={"dimmed"}>{participant.memberName}</Text>
 								<Image

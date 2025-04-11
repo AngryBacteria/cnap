@@ -5,6 +5,7 @@ import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts"
 import { useQueues } from "../../hooks/api/useQueues";
 import { useSummonerSpells } from "../../hooks/api/useSummonerSpells";
 import { MatchBannerSummary } from "./MatchBannerSummary/MatchBannerSummary";
+import {PRIMARY_COLOR} from "../../main.tsx";
 
 export interface Props {
 	page: number;
@@ -42,7 +43,7 @@ export function MatchBannerSummaryLoader({
 		queuesQuery.status === "pending" ||
 		summonerSpellsQuery.status === "pending"
 	) {
-		return <Loader color={"teal"} />;
+		return <Loader color={PRIMARY_COLOR} />;
 	}
 
 	if (

@@ -18,9 +18,13 @@ import {
 //  ffmpeg -i input.m4a -f segment -segment_time 4000 -c:a copy -reset_timestamps 1 output_%03d.m4a
 
 // Replace with your own values
-const ORIGINAL_AUDIO_FILES = ["SWN_Robin_22-03-2025_1.m4a"];
-const SPLIT_AUDIO_FILES = ["out000.m4a", "out001.m4a", "out002.m4a"];
-const DATE = Date.parse("2025-03-22"); // YYYY-MM-DD (USA) format
+const ORIGINAL_AUDIO_FILES = ["SWN_Robin_06-04-2025_1.m4a"];
+const SPLIT_AUDIO_FILES = [
+	"output_000.m4a",
+	"output_001.m4a",
+	"output_002.m4a",
+];
+const DATE = Date.parse("2025-04-06"); // YYYY-MM-DD (USA) format
 const CAMPAIGN = "A Star Without Names";
 const FRAMEWORK = "SWN";
 
@@ -120,5 +124,5 @@ async function uploadCharacters() {
 	);
 }
 
-// await uploadSession();
+await uploadSession();
 // await uploadCharacters();
