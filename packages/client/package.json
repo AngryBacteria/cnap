@@ -8,7 +8,7 @@
     "biome": "biome check --write ./src/",
     "type-check": "tsc --noEmit",
     "preview": "vite preview",
-    "build": "tsc -b && vite build",
+    "build": "tsc --noEmit && vite build",
     "start": "serve -p 4173 -s dist"
   },
   "dependencies": {

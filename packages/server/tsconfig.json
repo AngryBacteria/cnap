@@ -20,7 +20,7 @@
       "strict": true,
 
       // Fix for type character exceeding limit
-      "declaration": false
+      "declaration": false,
     },
     "include": ["src/**/*.ts"],
     "exclude": ["node_modules", "dist"]
