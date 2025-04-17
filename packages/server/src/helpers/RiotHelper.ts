@@ -11,6 +11,7 @@ import { type GameModeDB, GameModeDBSchema } from "../model/GameMode.js";
 import { type GameTypeDB, GameTypeDBSchema } from "../model/GameType.js";
 import { type ItemDB, ItemDBSchema } from "../model/Item.js";
 import { type LeagueMapDB, LeagueMapDBSchema } from "../model/LeagueMap.js";
+import type { MatchV5DB } from "../model/MatchV5.js";
 import { type QueueDB, QueueDBSchema } from "../model/Queue.js";
 import {
 	type SummonerDb,
@@ -138,12 +139,12 @@ export class RiotHelper {
 	 * @param matchId The match id of the match to fetch
 	 * @returns Dict representation of the match
 	 */
-	async getMatch(matchId: string): Promise<unknown | undefined> {
+	async getMatch(matchId: string): Promise<MatchV5DB | undefined> {
 		try {
 			const url = `https://europe.api.riotgames.com/lol/match/v5/matches/${matchId}`;
 			const match = await this.makeRequest(url);
 			logger.debug({ matchId }, "RiotHelper:getMatch");
-			return match;
+			return match as MatchV5DB;
 		} catch (e) {
 			logger.error({ matchId, error: e }, "RiotHelper:getMatch");
 			return undefined;

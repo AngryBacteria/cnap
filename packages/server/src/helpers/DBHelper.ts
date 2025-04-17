@@ -41,9 +41,15 @@ export class DBHelper {
 		return this.database.collection(name);
 	}
 
-	async disconnect(): Promise<void> {
-		await this.mongoClient.close();
-		logger.debug("DBHelper:disconnect");
+	async disconnect(): Promise<boolean> {
+		try {
+			await this.mongoClient.close();
+			logger.debug("DBHelper:disconnect");
+			return true;
+		} catch (error) {
+			logger.error({ error }, "DBHelper:disconnect");
+			return false;
+		}
 	}
 
 	/**

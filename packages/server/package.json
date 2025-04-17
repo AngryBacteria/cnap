@@ -8,6 +8,8 @@
     "dev": "tsx watch src/trcp/routers/_app.ts | pino-pretty",
     "biome": "biome check --write ./src/",
     "type-check": "tsc --noEmit",
+    "test": "vitest --test-timeout=15000 --run",
+    "test:coverage": "vitest run --coverage --test-timeout=15000 --run",
     "build": "tsc",
     "start": "node dist/trcp/routers/_app.js"
   },
@@ -29,9 +31,11 @@
     "@types/cors": "2.8.17",
     "@types/express": "5.0.0",
     "@types/node": "22.13.5",
+    "@vitest/coverage-v8": "^3.1.1",
     "nodemon": "3.1.9",
     "pino-pretty": "13.0.0",
     "tsx": "4.19.3",
-    "typescript": "5.8.2"
+    "typescript": "5.8.2",
+    "vitest": "^3.1.1"
   }
 }
