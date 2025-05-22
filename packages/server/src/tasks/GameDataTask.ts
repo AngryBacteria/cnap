@@ -1,15 +1,21 @@
-import dbh from "../helpers/DBHelper.js";
+import { db } from "../db/index.js";
+import {
+	LEAGUE_CHAMPIONS_TABLE,
+	LEAGUE_CHAMPION_PASSIVES_TABLE,
+	LEAGUE_CHAMPION_PLAYSTYLES_TABLE,
+	LEAGUE_CHAMPION_SKINS_TABLE,
+	LEAGUE_CHAMPION_SPELLS_TABLE,
+	LEAGUE_CHAMPION_TACTICAL_INFO_TABLE,
+} from "../db/schemas/Champion.js";
+import { LEAGUE_GAME_MODES_TABLE } from "../db/schemas/GameMode.js";
+import { LEAGUE_GAME_TYPES_TABLE } from "../db/schemas/GameType.js";
+import { LEAGUE_ITEMS_TABLE } from "../db/schemas/Item.js";
+import { LEAGUE_MAPS_TABLE } from "../db/schemas/LeagueMap.js";
+import { LEAGUE_QUEUES_TABLE } from "../db/schemas/Queue.js";
+import { LEAGUE_SUMMONER_ICONS_TABLE } from "../db/schemas/SummonerIcon.js";
+import { LEAGUE_SUMMONER_SPELLS_TABLE } from "../db/schemas/SummonerSpell.js";
 import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
-import { ChampionDBSchema } from "../model/Champion.js";
-import { CollectionName } from "../model/Database.js";
-import { GameModeDBSchema } from "../model/GameMode.js";
-import { GameTypeDBSchema } from "../model/GameType.js";
-import { ItemDBSchema } from "../model/Item.js";
-import { LeagueMapDBSchema } from "../model/LeagueMap.js";
-import { QueueDBSchema } from "../model/Queue.js";
-import { SummonerIconDBSchema } from "../model/SummonerIcon.js";
-import { SummonerSpellDBSchema } from "../model/SummonerSpell.js";
 
 export class GameDataTask {
 	async updateChampions(): Promise<void> {
@@ -17,12 +23,64 @@ export class GameDataTask {
 		if (champions.length <= 0) {
 			logger.error("Task:updateChampions - No champions found in CDN response");
 		} else {
-			await dbh.genericUpsert(
-				champions,
-				"id",
-				CollectionName.CHAMPION,
-				ChampionDBSchema,
+			//TODO
+			await db.delete(LEAGUE_CHAMPION_PLAYSTYLES_TABLE);
+			await db.delete(LEAGUE_CHAMPION_TACTICAL_INFO_TABLE);
+			await db.delete(LEAGUE_CHAMPION_SKINS_TABLE);
+			await db.delete(LEAGUE_CHAMPION_PASSIVES_TABLE);
+			await db.delete(LEAGUE_CHAMPION_SPELLS_TABLE);
+			await db.delete(LEAGUE_CHAMPIONS_TABLE);
+
+			await db.insert(LEAGUE_CHAMPIONS_TABLE).values(champions);
+			await db.insert(LEAGUE_CHAMPION_PLAYSTYLES_TABLE).values(
+				champions.map((champion) => {
+					return {
+						championId: champion.id,
+						...champion.playstyleInfo,
+					};
+				}),
 			);
+
+			await db.insert(LEAGUE_CHAMPION_TACTICAL_INFO_TABLE).values(
+				champions.map((champion) => {
+					return {
+						championId: champion.id,
+						...champion.tacticalInfo,
+					};
+				}),
+			);
+
+			await db.insert(LEAGUE_CHAMPION_SKINS_TABLE).values(
+				champions.flatMap((champion) => {
+					return champion.skins.map((skin) => {
+						return {
+							championId: champion.id,
+							...skin,
+						};
+					});
+				}),
+			);
+
+			await db.insert(LEAGUE_CHAMPION_PASSIVES_TABLE).values(
+				champions.map((champion) => {
+					return {
+						championId: champion.id,
+						...champion.passive,
+					};
+				}),
+			);
+
+			await db.insert(LEAGUE_CHAMPION_SPELLS_TABLE).values(
+				champions.flatMap((champion) => {
+					return champion.spells.map((spell) => {
+						return {
+							championId: champion.id,
+							...spell,
+						};
+					});
+				}),
+			);
+
 			logger.debug("Task:updateChampions - Champions updated");
 		}
 	}
@@ -34,12 +92,8 @@ export class GameDataTask {
 				"Task:updateGameModes - No game modes found in CDN response",
 			);
 		} else {
-			await dbh.genericUpsert(
-				gameModes,
-				"gameMode",
-				CollectionName.GAME_MODE,
-				GameModeDBSchema,
-			);
+			await db.delete(LEAGUE_GAME_MODES_TABLE);
+			await db.insert(LEAGUE_GAME_MODES_TABLE).values(gameModes);
 			logger.debug("Task:updateGameModes - Game modes updated");
 		}
 	}
@@ -51,12 +105,8 @@ export class GameDataTask {
 				"Task:updateGameTypes - No game types found in CDN response",
 			);
 		} else {
-			await dbh.genericUpsert(
-				gameTypes,
-				"gametype",
-				CollectionName.GAME_TYPE,
-				GameTypeDBSchema,
-			);
+			await db.delete(LEAGUE_GAME_TYPES_TABLE);
+			await db.insert(LEAGUE_GAME_TYPES_TABLE).values(gameTypes);
 			logger.debug("Task:updateGameTypes - Game types updated");
 		}
 	}
@@ -66,7 +116,8 @@ export class GameDataTask {
 		if (items.length <= 0) {
 			logger.error("Task:updateItems - No items found in CDN response");
 		} else {
-			await dbh.genericUpsert(items, "id", CollectionName.ITEM, ItemDBSchema);
+			await db.delete(LEAGUE_ITEMS_TABLE);
+			await db.insert(LEAGUE_ITEMS_TABLE).values(items);
 			logger.debug("Task:updateItems - Items updated");
 		}
 	}
@@ -76,12 +127,8 @@ export class GameDataTask {
 		if (maps.length <= 0) {
 			logger.error("Task:updateMaps - No maps found in CDN response");
 		} else {
-			await dbh.genericUpsert(
-				maps,
-				"mapId",
-				CollectionName.MAP,
-				LeagueMapDBSchema,
-			);
+			await db.delete(LEAGUE_MAPS_TABLE);
+			await db.insert(LEAGUE_MAPS_TABLE).values(maps);
 			logger.debug("Task:updateMaps - Maps updated");
 		}
 	}
@@ -91,12 +138,8 @@ export class GameDataTask {
 		if (queues.length <= 0) {
 			logger.error("Task:updateQueues - No queues found in CDN response");
 		} else {
-			await dbh.genericUpsert(
-				queues,
-				"queueId",
-				CollectionName.QUEUE,
-				QueueDBSchema,
-			);
+			await db.delete(LEAGUE_QUEUES_TABLE);
+			await db.insert(LEAGUE_QUEUES_TABLE).values(queues);
 			logger.debug("Task:updateQueues - Queues updated");
 		}
 	}
@@ -108,12 +151,8 @@ export class GameDataTask {
 				"Task:updateSummonerIcons - No summoner icons found in CDN response",
 			);
 		} else {
-			await dbh.genericUpsert(
-				summonerIcons,
-				"id",
-				CollectionName.SUMMONER_ICON,
-				SummonerIconDBSchema,
-			);
+			await db.delete(LEAGUE_SUMMONER_ICONS_TABLE);
+			await db.insert(LEAGUE_SUMMONER_ICONS_TABLE).values(summonerIcons);
 			logger.debug("Task:updateSummonerIcons - Summoner icons updated");
 		}
 	}
@@ -125,12 +164,12 @@ export class GameDataTask {
 				"Task:updateSummonerSpells - No summoner spells found in CDN response",
 			);
 		} else {
-			await dbh.genericUpsert(
-				summonerSpells,
-				"id",
-				CollectionName.SUMMONER_SPELL,
-				SummonerSpellDBSchema,
-			);
+			// remove all summoner spells from array if id 4294967295
+			const filtered = summonerSpells.filter((spell) => {
+				return spell.id !== 4294967295;
+			});
+			await db.delete(LEAGUE_SUMMONER_SPELLS_TABLE);
+			await db.insert(LEAGUE_SUMMONER_SPELLS_TABLE).values(filtered);
 			logger.debug("Task:updateSummonerSpells - Summoner spells updated");
 		}
 	}

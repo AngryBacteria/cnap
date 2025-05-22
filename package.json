@@ -19,10 +19,16 @@
   },
   "dependencies": {
     "concurrently": "9.1.2",
+    "dotenv": "16.4.7",
+    "drizzle-orm": "^0.43.1",
+    "pg": "^8.16.0",
     "rimraf": "6.0.1"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "husky": "^9.1.7"
+    "@types/pg": "^8.15.2",
+    "drizzle-kit": "^0.31.1",
+    "husky": "^9.1.7",
+    "tsx": "4.19.3"
   }
 }

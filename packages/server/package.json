@@ -11,7 +11,8 @@
     "test": "vitest --test-timeout=15000 --run",
     "test:coverage": "vitest run --coverage --test-timeout=15000 --run",
     "build": "tsc",
-    "start": "node dist/trcp/routers/_app.js"
+    "start": "node dist/trcp/routers/_app.js",
+    "db:push": "set NODE_OPTIONS=--import tsx && drizzle-kit push"
   },
   "dependencies": {
     "@trpc/client": "11.0.1",
