@@ -1,4 +1,3 @@
-import { relations } from "drizzle-orm";
 import {
 	boolean,
 	integer,
@@ -64,16 +63,6 @@ export const LEAGUE_CHAMPION_SKINS_TABLE = pgTable("league_champion_skins", {
 	splashVideoPath: varchar(),
 	featuresText: varchar(),
 });
-
-export const championSkinsRelations = relations(
-	LEAGUE_CHAMPION_SKINS_TABLE,
-	({ one }) => ({
-		champion: one(LEAGUE_CHAMPIONS_TABLE, {
-			fields: [LEAGUE_CHAMPION_SKINS_TABLE.championId],
-			references: [LEAGUE_CHAMPIONS_TABLE.id],
-		}),
-	}),
-);
 
 export const LEAGUE_CHAMPION_PASSIVES_TABLE = pgTable(
 	"league_champion_passives",

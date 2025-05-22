@@ -11,4 +11,4 @@ export const db = drizzle({
 });
 
 const task = new GameDataTask();
-await task.updateEverything();
+//await task.updateEverything();
