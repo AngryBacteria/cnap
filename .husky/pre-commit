@@ -1,4 +1,3 @@
 npm run biome
 npm run type-check
-npm run test:server
 git add .

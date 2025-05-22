@@ -34,7 +34,6 @@
     "serve": "14.2.4"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
     "@tanstack/react-query-devtools": "5.67.3",
     "@tanstack/router-devtools": "1.114.17",
     "@tanstack/router-plugin": "1.114.17",
