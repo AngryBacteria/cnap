@@ -6,6 +6,7 @@ export default defineConfig({
     schema: './src/db/schemas/*',
     dialect: 'postgresql',
     casing: 'snake_case',
+    schemaFilter: ["public", "league", "pnp", "core"],
     dbCredentials: {
         url: process.env.DATABASE_URL,
     },

@@ -24,14 +24,15 @@ export class GameDataTask {
 			logger.error("Task:updateChampions - No champions found in CDN response");
 		} else {
 			//TODO
+			await db.delete(LEAGUE_CHAMPIONS_TABLE);
 			await db.delete(LEAGUE_CHAMPION_PLAYSTYLES_TABLE);
 			await db.delete(LEAGUE_CHAMPION_TACTICAL_INFO_TABLE);
 			await db.delete(LEAGUE_CHAMPION_SKINS_TABLE);
 			await db.delete(LEAGUE_CHAMPION_PASSIVES_TABLE);
 			await db.delete(LEAGUE_CHAMPION_SPELLS_TABLE);
-			await db.delete(LEAGUE_CHAMPIONS_TABLE);
 
 			await db.insert(LEAGUE_CHAMPIONS_TABLE).values(champions);
+
 			await db.insert(LEAGUE_CHAMPION_PLAYSTYLES_TABLE).values(
 				champions.map((champion) => {
 					return {

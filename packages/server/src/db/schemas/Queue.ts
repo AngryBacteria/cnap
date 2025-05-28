@@ -1,6 +1,7 @@
-import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
+import { integer, varchar } from "drizzle-orm/pg-core";
+import { LEAGUE_SCHEMA } from "./PGSchemas.js";
 
-export const LEAGUE_QUEUES_TABLE = pgTable("league_queues", {
+export const LEAGUE_QUEUES_TABLE = LEAGUE_SCHEMA.table("queues", {
 	queueId: integer().primaryKey(),
 	description: varchar(),
 	map: varchar().notNull(),

@@ -1,12 +1,7 @@
-import {
-	boolean,
-	integer,
-	pgTable,
-	serial,
-	varchar,
-} from "drizzle-orm/pg-core";
+import { boolean, integer, serial, varchar } from "drizzle-orm/pg-core";
+import { LEAGUE_SCHEMA } from "./PGSchemas.js";
 
-export const LEAGUE_CHAMPIONS_TABLE = pgTable("league_champions", {
+export const LEAGUE_CHAMPIONS_TABLE = LEAGUE_SCHEMA.table("champions", {
 	id: integer().notNull().primaryKey(),
 	alias: varchar().notNull(),
 	name: varchar().notNull(),
@@ -17,12 +12,12 @@ export const LEAGUE_CHAMPIONS_TABLE = pgTable("league_champions", {
 	uncenteredSplashPath: varchar(),
 });
 
-export const LEAGUE_CHAMPION_PLAYSTYLES_TABLE = pgTable(
-	"league_champion_playstyles",
+export const LEAGUE_CHAMPION_PLAYSTYLES_TABLE = LEAGUE_SCHEMA.table(
+	"champion_playstyles",
 	{
 		id: serial().primaryKey(),
 		championId: integer()
-			.references(() => LEAGUE_CHAMPIONS_TABLE.id)
+			.references(() => LEAGUE_CHAMPIONS_TABLE.id, { onDelete: "cascade" })
 			.notNull(),
 		damage: integer().notNull(),
 		durability: integer().notNull(),
@@ -32,12 +27,12 @@ export const LEAGUE_CHAMPION_PLAYSTYLES_TABLE = pgTable(
 	},
 );
 
-export const LEAGUE_CHAMPION_TACTICAL_INFO_TABLE = pgTable(
-	"league_champion_tactical_info",
+export const LEAGUE_CHAMPION_TACTICAL_INFO_TABLE = LEAGUE_SCHEMA.table(
+	"champion_tactical_info",
 	{
 		id: serial().primaryKey(),
 		championId: integer()
-			.references(() => LEAGUE_CHAMPIONS_TABLE.id)
+			.references(() => LEAGUE_CHAMPIONS_TABLE.id, { onDelete: "cascade" })
 			.notNull(),
 		style: integer().notNull(),
 		difficulty: integer().notNull(),
@@ -45,31 +40,34 @@ export const LEAGUE_CHAMPION_TACTICAL_INFO_TABLE = pgTable(
 	},
 );
 
-export const LEAGUE_CHAMPION_SKINS_TABLE = pgTable("league_champion_skins", {
-	id: serial().primaryKey(),
-	championId: integer()
-		.references(() => LEAGUE_CHAMPIONS_TABLE.id)
-		.notNull(),
-	isBase: boolean().notNull(),
-	name: varchar().notNull(),
-	splashPath: varchar().notNull(),
-	uncenteredSplashPath: varchar().notNull(),
-	tilePath: varchar().notNull(),
-	loadScreenPath: varchar().notNull(),
-	loadScreenVintagePath: varchar(),
-	skinType: varchar().notNull(),
-	rarity: varchar().notNull(),
-	isLegacy: boolean().notNull(),
-	splashVideoPath: varchar(),
-	featuresText: varchar(),
-});
-
-export const LEAGUE_CHAMPION_PASSIVES_TABLE = pgTable(
-	"league_champion_passives",
+export const LEAGUE_CHAMPION_SKINS_TABLE = LEAGUE_SCHEMA.table(
+	"champion_skins",
 	{
 		id: serial().primaryKey(),
 		championId: integer()
-			.references(() => LEAGUE_CHAMPIONS_TABLE.id)
+			.references(() => LEAGUE_CHAMPIONS_TABLE.id, { onDelete: "cascade" })
+			.notNull(),
+		isBase: boolean().notNull(),
+		name: varchar().notNull(),
+		splashPath: varchar().notNull(),
+		uncenteredSplashPath: varchar().notNull(),
+		tilePath: varchar().notNull(),
+		loadScreenPath: varchar().notNull(),
+		loadScreenVintagePath: varchar(),
+		skinType: varchar().notNull(),
+		rarity: varchar().notNull(),
+		isLegacy: boolean().notNull(),
+		splashVideoPath: varchar(),
+		featuresText: varchar(),
+	},
+);
+
+export const LEAGUE_CHAMPION_PASSIVES_TABLE = LEAGUE_SCHEMA.table(
+	"champion_passives",
+	{
+		id: serial().primaryKey(),
+		championId: integer()
+			.references(() => LEAGUE_CHAMPIONS_TABLE.id, { onDelete: "cascade" })
 			.notNull(),
 		name: varchar().notNull(),
 		abilityIconPath: varchar().notNull(),
@@ -79,20 +77,23 @@ export const LEAGUE_CHAMPION_PASSIVES_TABLE = pgTable(
 	},
 );
 
-export const LEAGUE_CHAMPION_SPELLS_TABLE = pgTable("league_champion_spells", {
-	id: serial().primaryKey(),
-	championId: integer()
-		.references(() => LEAGUE_CHAMPIONS_TABLE.id)
-		.notNull(),
-	name: varchar().notNull(),
-	abilityIconPath: varchar().notNull(),
-	abilityVideoPath: varchar().notNull(),
-	abilityVideoImagePath: varchar().notNull(),
-	cost: varchar().notNull(),
-	cooldown: varchar().notNull(),
-	description: varchar().notNull(),
-	dynamicDescription: varchar().notNull(),
-	range: integer().array().notNull(),
-	costCoefficients: integer().array().notNull(),
-	cooldownCoefficients: integer().array().notNull(),
-});
+export const LEAGUE_CHAMPION_SPELLS_TABLE = LEAGUE_SCHEMA.table(
+	"champion_spells",
+	{
+		id: serial().primaryKey(),
+		championId: integer()
+			.references(() => LEAGUE_CHAMPIONS_TABLE.id, { onDelete: "cascade" })
+			.notNull(),
+		name: varchar().notNull(),
+		abilityIconPath: varchar().notNull(),
+		abilityVideoPath: varchar().notNull(),
+		abilityVideoImagePath: varchar().notNull(),
+		cost: varchar().notNull(),
+		cooldown: varchar().notNull(),
+		description: varchar().notNull(),
+		dynamicDescription: varchar().notNull(),
+		range: integer().array().notNull(),
+		costCoefficients: integer().array().notNull(),
+		cooldownCoefficients: integer().array().notNull(),
+	},
+);

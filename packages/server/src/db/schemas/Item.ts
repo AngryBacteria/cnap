@@ -1,6 +1,7 @@
-import { boolean, integer, pgTable, varchar } from "drizzle-orm/pg-core";
+import { boolean, integer, varchar } from "drizzle-orm/pg-core";
+import { LEAGUE_SCHEMA } from "./PGSchemas.js";
 
-export const LEAGUE_ITEMS_TABLE = pgTable("league_items", {
+export const LEAGUE_ITEMS_TABLE = LEAGUE_SCHEMA.table("items", {
 	id: integer().primaryKey(),
 	active: boolean().notNull(),
 	categories: varchar().array().notNull(),

@@ -1,7 +1,8 @@
-import { boolean, integer, pgTable, varchar } from "drizzle-orm/pg-core";
+import { boolean, integer, varchar } from "drizzle-orm/pg-core";
+import { LEAGUE_SCHEMA } from "./PGSchemas.js";
 
-export const LEAGUE_SUMMONER_ICONS_TABLE = pgTable(
-	"league_summoner_icons_table",
+export const LEAGUE_SUMMONER_ICONS_TABLE = LEAGUE_SCHEMA.table(
+	"summoner_icons_table",
 	{
 		id: integer().primaryKey(),
 		imagePath: varchar(),
