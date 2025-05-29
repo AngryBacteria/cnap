@@ -1,4 +1,4 @@
-import { boolean, integer, serial, varchar } from "drizzle-orm/pg-core";
+import { boolean, integer, real, serial, varchar } from "drizzle-orm/pg-core";
 import { LEAGUE_SCHEMA } from "./PGSchemas.js";
 
 export const LEAGUE_CHAMPIONS_TABLE = LEAGUE_SCHEMA.table("champions", {
@@ -92,8 +92,8 @@ export const LEAGUE_CHAMPION_SPELLS_TABLE = LEAGUE_SCHEMA.table(
 		cooldown: varchar().notNull(),
 		description: varchar().notNull(),
 		dynamicDescription: varchar().notNull(),
-		range: integer().array().notNull(),
-		costCoefficients: integer().array().notNull(),
-		cooldownCoefficients: integer().array().notNull(),
+		range: real().array().notNull(),
+		costCoefficients: real().array().notNull(),
+		cooldownCoefficients: real().array().notNull(),
 	},
 );

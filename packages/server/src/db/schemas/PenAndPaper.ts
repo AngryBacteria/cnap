@@ -14,14 +14,16 @@ export const PEN_AND_PAPER_CHARACTER_TABLE = PNP_SCHEMA.table("characters", {
 export const PEN_AND_PAPER_SESSION_TABLE = PNP_SCHEMA.table("sessions", {
 	id: serial().primaryKey(),
 	framework: varchar().notNull(),
-	dmMemberGameName: varchar().references(() => MEMBERS_TABLE.gameName, {
-		onDelete: "set null",
-	}),
+	dmMemberGameName: varchar()
+		.references(() => MEMBERS_TABLE.gameName, {
+			onDelete: "set null",
+		})
+		.notNull(),
 	timestamp: bigint({ mode: "number" }).notNull(),
 	sessionName: varchar().notNull(),
-	campaign: varchar("campaign"),
-	summaryLong: varchar("summary_long"),
-	summaryShort: varchar("summary_short"),
+	campaign: varchar("campaign").notNull(),
+	summaryLong: varchar("summary_long").notNull(),
+	summaryShort: varchar("summary_short").notNull(),
 	goals: varchar().array().notNull().notNull(),
 	transcriptions: varchar().array().notNull().notNull(),
 	audioFileUrls: varchar().array().notNull().notNull(),

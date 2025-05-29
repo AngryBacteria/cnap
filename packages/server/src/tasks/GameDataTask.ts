@@ -10,10 +10,10 @@ import {
 import { LEAGUE_GAME_MODES_TABLE } from "../db/schemas/GameMode.js";
 import { LEAGUE_GAME_TYPES_TABLE } from "../db/schemas/GameType.js";
 import { LEAGUE_ITEMS_TABLE } from "../db/schemas/Item.js";
-import { LEAGUE_MAPS_TABLE } from "../db/schemas/LeagueMap.js";
 import { LEAGUE_QUEUES_TABLE } from "../db/schemas/Queue.js";
-import { LEAGUE_SUMMONER_ICONS_TABLE } from "../db/schemas/SummonerIcon.js";
-import { LEAGUE_SUMMONER_SPELLS_TABLE } from "../db/schemas/SummonerSpell.js";
+import { LEAGUE_MAPS_TABLE } from "../db/schemas/index.js";
+import { LEAGUE_SUMMONER_ICONS_TABLE } from "../db/schemas/index.js";
+import { LEAGUE_SUMMONER_SPELLS_TABLE } from "../db/schemas/index.js";
 import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
 
@@ -21,9 +21,11 @@ export class GameDataTask {
 	async updateChampions(): Promise<void> {
 		const champions = await rh.getChampions();
 		if (champions.length <= 0) {
-			logger.error("Task:updateChampions - No champions found in CDN response");
-		} else {
-			//TODO
+			logger.warn("Task:updateChampions - No champions found in CDN response");
+			return;
+		}
+
+		try {
 			await db.delete(LEAGUE_CHAMPIONS_TABLE);
 			await db.delete(LEAGUE_CHAMPION_PLAYSTYLES_TABLE);
 			await db.delete(LEAGUE_CHAMPION_TACTICAL_INFO_TABLE);
@@ -82,96 +84,162 @@ export class GameDataTask {
 				}),
 			);
 
-			logger.debug("Task:updateChampions - Champions updated");
+			logger.debug(
+				{ amount: champions.length },
+				"Task:updateChampions - Champions updated",
+			);
+		} catch (e) {
+			logger.error(
+				{ err: e },
+				"Task:updateChampions - Error while updating champions",
+			);
 		}
 	}
 
 	async updateGameModes(): Promise<void> {
 		const gameModes = await rh.getGameModes();
 		if (gameModes.length <= 0) {
-			logger.error(
-				"Task:updateGameModes - No game modes found in CDN response",
-			);
-		} else {
+			logger.warn("Task:updateGameModes - No game modes found in CDN response");
+			return;
+		}
+		try {
 			await db.delete(LEAGUE_GAME_MODES_TABLE);
 			await db.insert(LEAGUE_GAME_MODES_TABLE).values(gameModes);
-			logger.debug("Task:updateGameModes - Game modes updated");
+			logger.debug(
+				{ amount: gameModes.length },
+				"Task:updateGameModes - Game modes updated",
+			);
+		} catch (e) {
+			logger.error(
+				{ err: e },
+				"Task:updateGameModes - Error while updating game modes",
+			);
 		}
 	}
 
 	async updateGameTypes(): Promise<void> {
 		const gameTypes = await rh.getGameTypes();
 		if (gameTypes.length <= 0) {
-			logger.error(
-				"Task:updateGameTypes - No game types found in CDN response",
-			);
-		} else {
+			logger.warn("Task:updateGameTypes - No game types found in CDN response");
+			return;
+		}
+		try {
 			await db.delete(LEAGUE_GAME_TYPES_TABLE);
 			await db.insert(LEAGUE_GAME_TYPES_TABLE).values(gameTypes);
-			logger.debug("Task:updateGameTypes - Game types updated");
+			logger.debug(
+				{ amount: gameTypes.length },
+				"Task:updateGameTypes - Game types updated",
+			);
+		} catch (e) {
+			logger.error(
+				{ err: e },
+				"Task:updateGameTypes - Error while updating game types",
+			);
 		}
 	}
 
 	async updateItems(): Promise<void> {
 		const items = await rh.getItems();
 		if (items.length <= 0) {
-			logger.error("Task:updateItems - No items found in CDN response");
-		} else {
+			logger.warn("Task:updateItems - No items found in CDN response");
+			return;
+		}
+		try {
 			await db.delete(LEAGUE_ITEMS_TABLE);
 			await db.insert(LEAGUE_ITEMS_TABLE).values(items);
-			logger.debug("Task:updateItems - Items updated");
+			logger.debug(
+				{ amount: items.length },
+				"Task:updateItems - Items updated",
+			);
+		} catch (e) {
+			logger.error({ err: e }, "Task:updateItems - Error while updating items");
 		}
 	}
 
 	async updateMaps(): Promise<void> {
 		const maps = await rh.getMaps();
 		if (maps.length <= 0) {
-			logger.error("Task:updateMaps - No maps found in CDN response");
-		} else {
+			logger.warn("Task:updateMaps - No maps found in CDN response");
+			return;
+		}
+		try {
 			await db.delete(LEAGUE_MAPS_TABLE);
 			await db.insert(LEAGUE_MAPS_TABLE).values(maps);
-			logger.debug("Task:updateMaps - Maps updated");
+			logger.debug({ amount: maps.length }, "Task:updateMaps - Maps updated");
+		} catch (e) {
+			logger.error({ err: e }, "Task:updateMaps - Error while updating maps");
 		}
 	}
 
 	async updateQueues(): Promise<void> {
 		const queues = await rh.getQueues();
 		if (queues.length <= 0) {
-			logger.error("Task:updateQueues - No queues found in CDN response");
-		} else {
+			logger.warn("Task:updateQueues - No queues found in CDN response");
+			return;
+		}
+		try {
 			await db.delete(LEAGUE_QUEUES_TABLE);
 			await db.insert(LEAGUE_QUEUES_TABLE).values(queues);
-			logger.debug("Task:updateQueues - Queues updated");
+			logger.debug(
+				{ amount: queues.length },
+				"Task:updateQueues - Queues updated",
+			);
+		} catch (e) {
+			logger.error(
+				{ err: e },
+				"Task:updateQueues - Error while updating queues",
+			);
 		}
 	}
 
 	async updateSummonerIcons(): Promise<void> {
 		const summonerIcons = await rh.getSummonerIcons();
 		if (summonerIcons.length <= 0) {
-			logger.error(
+			logger.warn(
 				"Task:updateSummonerIcons - No summoner icons found in CDN response",
 			);
-		} else {
+			return;
+		}
+
+		try {
 			await db.delete(LEAGUE_SUMMONER_ICONS_TABLE);
 			await db.insert(LEAGUE_SUMMONER_ICONS_TABLE).values(summonerIcons);
-			logger.debug("Task:updateSummonerIcons - Summoner icons updated");
+			logger.debug(
+				{ amount: summonerIcons.length },
+				"Task:updateSummonerIcons - Summoner icons updated",
+			);
+		} catch (e) {
+			logger.error(
+				{ err: e },
+				"Task:updateSummonerIcons - Error while updating summoner icons",
+			);
 		}
 	}
 
 	async updateSummonerSpells(): Promise<void> {
 		const summonerSpells = await rh.getSummonerSpells();
 		if (summonerSpells.length <= 0) {
-			logger.error(
+			logger.warn(
 				"Task:updateSummonerSpells - No summoner spells found in CDN response",
 			);
-		} else {
+			return;
+		}
+		try {
 			// remove all summoner spells from array if id 4294967295
 			const filtered = summonerSpells.filter((spell) => {
 				return spell.id !== 4294967295;
 			});
 			await db.delete(LEAGUE_SUMMONER_SPELLS_TABLE);
 			await db.insert(LEAGUE_SUMMONER_SPELLS_TABLE).values(filtered);
-			logger.debug("Task:updateSummonerSpells - Summoner spells updated");
+			logger.debug(
+				{ amount: summonerSpells.length },
+				"Task:updateSummonerSpells - Summoner spells updated",
+			);
+		} catch (e) {
+			logger.error(
+				{ err: e },
+				"Task:updateSummonerSpells - Error while updating summoner spells",
+			);
 		}
 	}
 
@@ -185,7 +253,7 @@ export class GameDataTask {
 		await this.updateSummonerIcons();
 		await this.updateSummonerSpells();
 
-		logger.debug("Task:updateEverything - All game data updated");
+		logger.info("Task:updateEverything - All game data updated");
 	}
 }
 

@@ -23,7 +23,7 @@ export async function intervalUpdate(
 		await gameDataTask.updateEverything();
 	}
 
-	await matchTask.updateMatchData(69, 0);
+	await matchTask.updateMatchData(95, 0);
 
 	// Sleep for the specified interval
 	await new Promise((resolve) => setTimeout(resolve, intervalTime));

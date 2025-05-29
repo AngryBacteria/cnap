@@ -156,12 +156,12 @@ export class RiotHelper {
 	 * @param timelineId The id of the timeline to fetch
 	 * @returns Dict representation of the timeline
 	 */
-	async getTimeline(timelineId: string): Promise<unknown | undefined> {
+	async getTimeline(timelineId: string): Promise<MatchV5DB | undefined> {
 		try {
 			const url = `https://europe.api.riotgames.com/lol/match/v5/matches/${timelineId}/timeline`;
 			const timeline = await this.makeRequest(url);
 			logger.debug({ timelineId }, "RiotHelper:getTimeline");
-			return timeline;
+			return timeline as MatchV5DB; //TODO make right;
 		} catch (e) {
 			logger.error({ timelineId, error: e }, "RiotHelper:getTimeline");
 			return undefined;
