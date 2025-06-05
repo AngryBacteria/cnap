@@ -11,9 +11,11 @@ import { LEAGUE_GAME_MODES_TABLE } from "../db/schemas/GameMode.js";
 import { LEAGUE_GAME_TYPES_TABLE } from "../db/schemas/GameType.js";
 import { LEAGUE_ITEMS_TABLE } from "../db/schemas/Item.js";
 import { LEAGUE_QUEUES_TABLE } from "../db/schemas/Queue.js";
-import { LEAGUE_MAPS_TABLE } from "../db/schemas/index.js";
-import { LEAGUE_SUMMONER_ICONS_TABLE } from "../db/schemas/index.js";
-import { LEAGUE_SUMMONER_SPELLS_TABLE } from "../db/schemas/index.js";
+import {
+	LEAGUE_MAPS_TABLE,
+	LEAGUE_SUMMONER_ICONS_TABLE,
+	LEAGUE_SUMMONER_SPELLS_TABLE,
+} from "../db/schemas/index.js";
 import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
 

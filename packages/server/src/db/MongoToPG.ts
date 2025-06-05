@@ -1,4 +1,5 @@
 import dbh from "../helpers/DBHelper.js";
+import { URLToBase64 } from "../helpers/General.js";
 import logger from "../helpers/Logger.js";
 import { CollectionName, type MongoPipeline } from "../model/Database.js";
 import type { MatchV5DB } from "../model/MatchV5.js";
@@ -11,6 +12,7 @@ import {
 	LEAGUE_MATCHES_TABLE,
 	LEAGUE_MATCH_PARTICIPANTS_TABLE,
 	LEAGUE_TIMELINES_TABLE,
+	PEN_AND_PAPER_SESSION_CHARACTERS_TABLE,
 } from "./schemas/index.js";
 import {
 	PEN_AND_PAPER_CHARACTER_TABLE,
@@ -33,7 +35,24 @@ async function migrateMembers() {
 
 	await db.delete(MEMBERS_TABLE);
 	const members = membersMongodb.data;
-	await db.insert(MEMBERS_TABLE).values(members);
+
+	const membersPG: (typeof MEMBERS_TABLE.$inferInsert)[] = [];
+	for (const member of members) {
+		if (!member.profilePictureURL) {
+			membersPG.push(member);
+		} else {
+			const profilePictureBase64 = await URLToBase64(
+				member.profilePictureURL,
+				true,
+			);
+			membersPG.push({
+				...member,
+				profilePictureBase64,
+			});
+		}
+	}
+
+	await db.insert(MEMBERS_TABLE).values(membersPG);
 
 	logger.debug(
 		`Members Migration completed! Total members processed: ${members.length}`,
@@ -137,6 +156,7 @@ async function migratePnP() {
 		throw new Error("PnP sessions couldn't be fetched");
 	}
 
+	await db.delete(PEN_AND_PAPER_SESSION_CHARACTERS_TABLE);
 	await db.delete(PEN_AND_PAPER_CHARACTER_TABLE);
 	await db.delete(PEN_AND_PAPER_SESSION_TABLE);
 
@@ -165,17 +185,42 @@ async function migratePnP() {
 			};
 		});
 
-	await db
+	// Insert characters and sessions
+	const insertedCharacters = await db
 		.insert(PEN_AND_PAPER_CHARACTER_TABLE)
-		.values(Array.from(charactersPG.values()));
+		.values(Array.from(charactersPG.values()))
+		.returning({ id: PEN_AND_PAPER_CHARACTER_TABLE.id });
 
-	await db.insert(PEN_AND_PAPER_SESSION_TABLE).values(sessions);
+	const insertedSessions = await db
+		.insert(PEN_AND_PAPER_SESSION_TABLE)
+		.values(sessions)
+		.returning({ id: PEN_AND_PAPER_SESSION_TABLE.id });
+
+	// Create all combinations of characters and sessions
+	const sessionCharacterRelations: (typeof PEN_AND_PAPER_SESSION_CHARACTERS_TABLE.$inferInsert)[] =
+		[];
+
+	for (const session of insertedSessions) {
+		for (const character of insertedCharacters) {
+			sessionCharacterRelations.push({
+				sessionId: session.id,
+				characterId: character.id,
+			});
+		}
+	}
+
+	await db
+		.insert(PEN_AND_PAPER_SESSION_CHARACTERS_TABLE)
+		.values(sessionCharacterRelations);
 
 	logger.debug(
 		`PnP Migration completed! Total sessions processed: ${sessions.length}`,
 	);
 	logger.debug(
 		`PnP Migration completed! Total characters processed: ${charactersPG.size}`,
+	);
+	logger.debug(
+		`PnP Migration completed! Total session-character relations processed: ${sessionCharacterRelations.length}`,
 	);
 }
 
@@ -321,9 +366,9 @@ async function migrateMatches() {
 }
 
 async function migrate() {
-	// await migrateMembers();
+	await migrateMembers();
 	// await migrateSummoners();
-	await migratePnP();
+	// await migratePnP();
 	// await migrateMatches();
 	// await migrateTimeline();
 }

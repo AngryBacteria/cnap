@@ -1,6 +1,6 @@
 import "dotenv/config";
-import { eq, sql } from "drizzle-orm";
-import { db } from "../db/index.js";
+import { eq } from "drizzle-orm";
+import { db, getAllOnConflictColumns } from "../db/index.js";
 import { LEAGUE_SUMMONERS_TABLE } from "../db/schemas/Summoner.js";
 import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
@@ -43,12 +43,7 @@ export class SummonerTask {
 				.values(newSummoners)
 				.onConflictDoUpdate({
 					target: LEAGUE_SUMMONERS_TABLE.puuid,
-					set: {
-						gameName: sql`excluded.game_name`,
-						profileIconId: sql`excluded.profile_icon_id`,
-						summonerLevel: sql`excluded.summoner_level`,
-						tagLine: sql`excluded.tag_line`,
-					},
+					set: getAllOnConflictColumns(LEAGUE_SUMMONERS_TABLE, "puuid"),
 				});
 			logger.info("Task:updateSummonerData - Summoner data updated");
 		} catch (e) {

@@ -13,6 +13,7 @@ import { LEAGUE_ITEMS_TABLE } from "./Item.js";
 import { LEAGUE_MAPS_TABLE } from "./LeagueMap.js";
 import { LEAGUE_SCHEMA } from "./PGSchemas.js";
 import { LEAGUE_QUEUES_TABLE } from "./Queue.js";
+import { LEAGUE_SUMMONERS_TABLE } from "./Summoner.js";
 import { LEAGUE_SUMMONER_SPELLS_TABLE } from "./SummonerSpell.js";
 
 export const LEAGUE_MATCHES_TABLE = LEAGUE_SCHEMA.table("matches", {
@@ -20,12 +21,24 @@ export const LEAGUE_MATCHES_TABLE = LEAGUE_SCHEMA.table("matches", {
 	dataVersion: varchar().notNull(),
 	raw: jsonb().notNull(),
 });
+export const leagueMatchRelations = relations(
+	LEAGUE_MATCHES_TABLE,
+	({ many }) => ({
+		match: many(LEAGUE_MATCHES_TABLE),
+	}),
+);
 
 export const LEAGUE_TIMELINES_TABLE = LEAGUE_SCHEMA.table("timelines", {
 	matchId: varchar().primaryKey(),
 	dataVersion: varchar().notNull(),
 	raw: jsonb().notNull(),
 });
+export const leagueTimelineRelations = relations(
+	LEAGUE_TIMELINES_TABLE,
+	({ many }) => ({
+		match: many(LEAGUE_MATCHES_TABLE),
+	}),
+);
 
 export const LEAGUE_MATCH_PARTICIPANTS_TABLE = LEAGUE_SCHEMA.table(
 	"match_participants",
@@ -34,20 +47,46 @@ export const LEAGUE_MATCH_PARTICIPANTS_TABLE = LEAGUE_SCHEMA.table(
 		matchId: varchar()
 			.references(() => LEAGUE_MATCHES_TABLE.matchId, { onDelete: "cascade" })
 			.notNull(),
-		puuid: varchar().notNull(),
+		puuid: varchar()
+			.references(() => LEAGUE_SUMMONERS_TABLE.puuid, { onDelete: "cascade" })
+			.notNull(),
 		// Referenced data
-		queueId: integer(),
-		gameMode: varchar(),
-		mapId: integer(),
-		championId: integer(),
-		item0: integer(),
-		item1: integer(),
-		item2: integer(),
-		item3: integer(),
-		item4: integer(),
-		item5: integer(),
-		summoner1Id: integer(),
-		summoner2Id: integer(),
+		queueId: integer()
+			.references(() => LEAGUE_QUEUES_TABLE.queueId)
+			.notNull(),
+		gameMode: varchar()
+			.references(() => LEAGUE_GAME_MODES_TABLE.gameMode)
+			.notNull(),
+		mapId: integer()
+			.references(() => LEAGUE_MAPS_TABLE.mapId)
+			.notNull(),
+		championId: integer()
+			.references(() => LEAGUE_CHAMPIONS_TABLE.id)
+			.notNull(),
+		item0: integer()
+			.references(() => LEAGUE_ITEMS_TABLE.id)
+			.notNull(),
+		item1: integer()
+			.references(() => LEAGUE_ITEMS_TABLE.id)
+			.notNull(),
+		item2: integer()
+			.references(() => LEAGUE_ITEMS_TABLE.id)
+			.notNull(),
+		item3: integer()
+			.references(() => LEAGUE_ITEMS_TABLE.id)
+			.notNull(),
+		item4: integer()
+			.references(() => LEAGUE_ITEMS_TABLE.id)
+			.notNull(),
+		item5: integer()
+			.references(() => LEAGUE_ITEMS_TABLE.id)
+			.notNull(),
+		summoner1Id: integer()
+			.references(() => LEAGUE_SUMMONER_SPELLS_TABLE.id)
+			.notNull(),
+		summoner2Id: integer()
+			.references(() => LEAGUE_SUMMONER_SPELLS_TABLE.id)
+			.notNull(),
 		// Game data
 		gameDuration: integer().notNull(),
 		endOfGameResult: varchar(),
@@ -83,6 +122,18 @@ export const LEAGUE_MATCH_PARTICIPANTS_TABLE = LEAGUE_SCHEMA.table(
 export const leagueMatchParticipantRelations = relations(
 	LEAGUE_MATCH_PARTICIPANTS_TABLE,
 	({ one }) => ({
+		match: one(LEAGUE_MATCHES_TABLE, {
+			fields: [LEAGUE_MATCH_PARTICIPANTS_TABLE.matchId],
+			references: [LEAGUE_MATCHES_TABLE.matchId],
+		}),
+		timeline: one(LEAGUE_TIMELINES_TABLE, {
+			fields: [LEAGUE_MATCH_PARTICIPANTS_TABLE.matchId],
+			references: [LEAGUE_TIMELINES_TABLE.matchId],
+		}),
+		summoner: one(LEAGUE_SUMMONERS_TABLE, {
+			fields: [LEAGUE_MATCH_PARTICIPANTS_TABLE.puuid],
+			references: [LEAGUE_SUMMONERS_TABLE.puuid],
+		}),
 		champion: one(LEAGUE_CHAMPIONS_TABLE, {
 			fields: [LEAGUE_MATCH_PARTICIPANTS_TABLE.championId],
 			references: [LEAGUE_CHAMPIONS_TABLE.id],

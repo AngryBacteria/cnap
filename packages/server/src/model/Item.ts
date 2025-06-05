@@ -1,4 +1,3 @@
-import { ObjectId } from "mongodb";
 import { z } from "zod";
 import { MongoDBIDSchema } from "./Database.js";
 
