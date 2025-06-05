@@ -6,9 +6,9 @@
   "scripts": {
     "dev": "vite",
     "biome": "biome check --write ./src/",
-    "type-check": "tsc --noEmit",
+    "type-check": "tsc -b",
     "preview": "vite preview",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc -b && vite build",
     "start": "serve -p 4173 -s dist"
   },
   "dependencies": {

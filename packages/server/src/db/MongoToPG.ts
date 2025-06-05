@@ -367,8 +367,8 @@ async function migrateMatches() {
 
 async function migrate() {
 	await migrateMembers();
-	// await migrateSummoners();
-	// await migratePnP();
+	await migrateSummoners();
+	await migratePnP();
 	// await migrateMatches();
 	// await migrateTimeline();
 }

@@ -104,7 +104,7 @@ export const penAndPaperRouter = router({
 		logger.info("API:getSession");
 		return sessionResponse.data[0];
 	}),
-	getSessions: loggedProcedure.query(async (opts) => {
+	getSessions: loggedProcedure.query(async () => {
 		const sessionResponse = await dbh.genericPipeline(
 			SESSION_PIPELINE,
 			CollectionName.PEN_AND_PAPER_SESSION,
