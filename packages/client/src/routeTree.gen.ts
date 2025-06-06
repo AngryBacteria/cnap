@@ -16,7 +16,7 @@ import { Route as SummonersIndexImport } from './routes/summoners/index'
 import { Route as SessionsIndexImport } from './routes/sessions/index'
 import { Route as ChampionsIndexImport } from './routes/champions/index'
 import { Route as SummonersSummonerNameTagImport } from './routes/summoners/$summonerNameTag'
-import { Route as SessionsSessionObjectIdImport } from './routes/sessions/$sessionObjectId'
+import { Route as SessionsSessionIdImport } from './routes/sessions/$sessionId'
 import { Route as ChampionsChampionIdImport } from './routes/champions/$championId'
 
 // Create/Update Routes
@@ -51,9 +51,9 @@ const SummonersSummonerNameTagRoute = SummonersSummonerNameTagImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const SessionsSessionObjectIdRoute = SessionsSessionObjectIdImport.update({
-  id: '/sessions/$sessionObjectId',
-  path: '/sessions/$sessionObjectId',
+const SessionsSessionIdRoute = SessionsSessionIdImport.update({
+  id: '/sessions/$sessionId',
+  path: '/sessions/$sessionId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -81,11 +81,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChampionsChampionIdImport
       parentRoute: typeof rootRoute
     }
-    '/sessions/$sessionObjectId': {
-      id: '/sessions/$sessionObjectId'
-      path: '/sessions/$sessionObjectId'
-      fullPath: '/sessions/$sessionObjectId'
-      preLoaderRoute: typeof SessionsSessionObjectIdImport
+    '/sessions/$sessionId': {
+      id: '/sessions/$sessionId'
+      path: '/sessions/$sessionId'
+      fullPath: '/sessions/$sessionId'
+      preLoaderRoute: typeof SessionsSessionIdImport
       parentRoute: typeof rootRoute
     }
     '/summoners/$summonerNameTag': {
@@ -124,7 +124,7 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/champions/$championId': typeof ChampionsChampionIdRoute
-  '/sessions/$sessionObjectId': typeof SessionsSessionObjectIdRoute
+  '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/summoners/$summonerNameTag': typeof SummonersSummonerNameTagRoute
   '/champions': typeof ChampionsIndexRoute
   '/sessions': typeof SessionsIndexRoute
@@ -134,7 +134,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/champions/$championId': typeof ChampionsChampionIdRoute
-  '/sessions/$sessionObjectId': typeof SessionsSessionObjectIdRoute
+  '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/summoners/$summonerNameTag': typeof SummonersSummonerNameTagRoute
   '/champions': typeof ChampionsIndexRoute
   '/sessions': typeof SessionsIndexRoute
@@ -145,7 +145,7 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/champions/$championId': typeof ChampionsChampionIdRoute
-  '/sessions/$sessionObjectId': typeof SessionsSessionObjectIdRoute
+  '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/summoners/$summonerNameTag': typeof SummonersSummonerNameTagRoute
   '/champions/': typeof ChampionsIndexRoute
   '/sessions/': typeof SessionsIndexRoute
@@ -157,7 +157,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/champions/$championId'
-    | '/sessions/$sessionObjectId'
+    | '/sessions/$sessionId'
     | '/summoners/$summonerNameTag'
     | '/champions'
     | '/sessions'
@@ -166,7 +166,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/champions/$championId'
-    | '/sessions/$sessionObjectId'
+    | '/sessions/$sessionId'
     | '/summoners/$summonerNameTag'
     | '/champions'
     | '/sessions'
@@ -175,7 +175,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/champions/$championId'
-    | '/sessions/$sessionObjectId'
+    | '/sessions/$sessionId'
     | '/summoners/$summonerNameTag'
     | '/champions/'
     | '/sessions/'
@@ -186,7 +186,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ChampionsChampionIdRoute: typeof ChampionsChampionIdRoute
-  SessionsSessionObjectIdRoute: typeof SessionsSessionObjectIdRoute
+  SessionsSessionIdRoute: typeof SessionsSessionIdRoute
   SummonersSummonerNameTagRoute: typeof SummonersSummonerNameTagRoute
   ChampionsIndexRoute: typeof ChampionsIndexRoute
   SessionsIndexRoute: typeof SessionsIndexRoute
@@ -196,7 +196,7 @@ export interface RootRouteChildren {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChampionsChampionIdRoute: ChampionsChampionIdRoute,
-  SessionsSessionObjectIdRoute: SessionsSessionObjectIdRoute,
+  SessionsSessionIdRoute: SessionsSessionIdRoute,
   SummonersSummonerNameTagRoute: SummonersSummonerNameTagRoute,
   ChampionsIndexRoute: ChampionsIndexRoute,
   SessionsIndexRoute: SessionsIndexRoute,
@@ -215,7 +215,7 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/champions/$championId",
-        "/sessions/$sessionObjectId",
+        "/sessions/$sessionId",
         "/summoners/$summonerNameTag",
         "/champions/",
         "/sessions/",
@@ -228,8 +228,8 @@ export const routeTree = rootRoute
     "/champions/$championId": {
       "filePath": "champions/$championId.tsx"
     },
-    "/sessions/$sessionObjectId": {
-      "filePath": "sessions/$sessionObjectId.tsx"
+    "/sessions/$sessionId": {
+      "filePath": "sessions/$sessionId.tsx"
     },
     "/summoners/$summonerNameTag": {
       "filePath": "summoners/$summonerNameTag.tsx"

@@ -1,4 +1,4 @@
-import { db } from "../db/index.js";
+import { db, getAllOnConflictColumns } from "../db/index.js";
 import {
 	LEAGUE_CHAMPIONS_TABLE,
 	LEAGUE_CHAMPION_PASSIVES_TABLE,
@@ -28,63 +28,95 @@ export class GameDataTask {
 		}
 
 		try {
-			await db.delete(LEAGUE_CHAMPIONS_TABLE);
-			await db.delete(LEAGUE_CHAMPION_PLAYSTYLES_TABLE);
-			await db.delete(LEAGUE_CHAMPION_TACTICAL_INFO_TABLE);
-			await db.delete(LEAGUE_CHAMPION_SKINS_TABLE);
-			await db.delete(LEAGUE_CHAMPION_PASSIVES_TABLE);
-			await db.delete(LEAGUE_CHAMPION_SPELLS_TABLE);
+			await db
+				.insert(LEAGUE_CHAMPIONS_TABLE)
+				.values(champions)
+				.onConflictDoUpdate({
+					target: LEAGUE_CHAMPIONS_TABLE.id,
+					set: getAllOnConflictColumns(LEAGUE_CHAMPIONS_TABLE, "id"),
+				});
 
-			await db.insert(LEAGUE_CHAMPIONS_TABLE).values(champions);
-
-			await db.insert(LEAGUE_CHAMPION_PLAYSTYLES_TABLE).values(
-				champions.map((champion) => {
-					return {
-						championId: champion.id,
-						...champion.playstyleInfo,
-					};
-				}),
-			);
-
-			await db.insert(LEAGUE_CHAMPION_TACTICAL_INFO_TABLE).values(
-				champions.map((champion) => {
-					return {
-						championId: champion.id,
-						...champion.tacticalInfo,
-					};
-				}),
-			);
-
-			await db.insert(LEAGUE_CHAMPION_SKINS_TABLE).values(
-				champions.flatMap((champion) => {
-					return champion.skins.map((skin) => {
+			await db
+				.insert(LEAGUE_CHAMPION_PLAYSTYLES_TABLE)
+				.values(
+					champions.map((champion) => {
 						return {
 							championId: champion.id,
-							...skin,
+							...champion.playstyleInfo,
 						};
-					});
-				}),
-			);
+					}),
+				)
+				.onConflictDoUpdate({
+					target: LEAGUE_CHAMPION_PLAYSTYLES_TABLE.id,
+					set: getAllOnConflictColumns(LEAGUE_CHAMPION_PLAYSTYLES_TABLE, "id"),
+				});
 
-			await db.insert(LEAGUE_CHAMPION_PASSIVES_TABLE).values(
-				champions.map((champion) => {
-					return {
-						championId: champion.id,
-						...champion.passive,
-					};
-				}),
-			);
-
-			await db.insert(LEAGUE_CHAMPION_SPELLS_TABLE).values(
-				champions.flatMap((champion) => {
-					return champion.spells.map((spell) => {
+			await db
+				.insert(LEAGUE_CHAMPION_TACTICAL_INFO_TABLE)
+				.values(
+					champions.map((champion) => {
 						return {
 							championId: champion.id,
-							...spell,
+							...champion.tacticalInfo,
 						};
-					});
-				}),
-			);
+					}),
+				)
+				.onConflictDoUpdate({
+					target: LEAGUE_CHAMPION_TACTICAL_INFO_TABLE.id,
+					set: getAllOnConflictColumns(
+						LEAGUE_CHAMPION_TACTICAL_INFO_TABLE,
+						"id",
+					),
+				});
+
+			await db
+				.insert(LEAGUE_CHAMPION_SKINS_TABLE)
+				.values(
+					champions.flatMap((champion) => {
+						return champion.skins.map((skin) => {
+							return {
+								championId: champion.id,
+								...skin,
+							};
+						});
+					}),
+				)
+				.onConflictDoUpdate({
+					target: LEAGUE_CHAMPION_SKINS_TABLE.id,
+					set: getAllOnConflictColumns(LEAGUE_CHAMPION_SKINS_TABLE, "id"),
+				});
+
+			await db
+				.insert(LEAGUE_CHAMPION_PASSIVES_TABLE)
+				.values(
+					champions.map((champion) => {
+						return {
+							championId: champion.id,
+							...champion.passive,
+						};
+					}),
+				)
+				.onConflictDoUpdate({
+					target: LEAGUE_CHAMPION_PASSIVES_TABLE.id,
+					set: getAllOnConflictColumns(LEAGUE_CHAMPION_PASSIVES_TABLE, "id"),
+				});
+
+			await db
+				.insert(LEAGUE_CHAMPION_SPELLS_TABLE)
+				.values(
+					champions.flatMap((champion) => {
+						return champion.spells.map((spell) => {
+							return {
+								championId: champion.id,
+								...spell,
+							};
+						});
+					}),
+				)
+				.onConflictDoUpdate({
+					target: LEAGUE_CHAMPION_SPELLS_TABLE.id,
+					set: getAllOnConflictColumns(LEAGUE_CHAMPION_SPELLS_TABLE, "id"),
+				});
 
 			logger.debug(
 				{ amount: champions.length },
@@ -105,8 +137,13 @@ export class GameDataTask {
 			return;
 		}
 		try {
-			await db.delete(LEAGUE_GAME_MODES_TABLE);
-			await db.insert(LEAGUE_GAME_MODES_TABLE).values(gameModes);
+			await db
+				.insert(LEAGUE_GAME_MODES_TABLE)
+				.values(gameModes)
+				.onConflictDoUpdate({
+					target: LEAGUE_GAME_MODES_TABLE.gameMode,
+					set: getAllOnConflictColumns(LEAGUE_GAME_MODES_TABLE, "gameMode"),
+				});
 			logger.debug(
 				{ amount: gameModes.length },
 				"Task:updateGameModes - Game modes updated",
@@ -126,8 +163,13 @@ export class GameDataTask {
 			return;
 		}
 		try {
-			await db.delete(LEAGUE_GAME_TYPES_TABLE);
-			await db.insert(LEAGUE_GAME_TYPES_TABLE).values(gameTypes);
+			await db
+				.insert(LEAGUE_GAME_TYPES_TABLE)
+				.values(gameTypes)
+				.onConflictDoUpdate({
+					target: LEAGUE_GAME_TYPES_TABLE.gametype,
+					set: getAllOnConflictColumns(LEAGUE_GAME_TYPES_TABLE, "gametype"),
+				});
 			logger.debug(
 				{ amount: gameTypes.length },
 				"Task:updateGameTypes - Game types updated",
@@ -147,8 +189,13 @@ export class GameDataTask {
 			return;
 		}
 		try {
-			await db.delete(LEAGUE_ITEMS_TABLE);
-			await db.insert(LEAGUE_ITEMS_TABLE).values(items);
+			await db
+				.insert(LEAGUE_ITEMS_TABLE)
+				.values(items)
+				.onConflictDoUpdate({
+					target: LEAGUE_ITEMS_TABLE.id,
+					set: getAllOnConflictColumns(LEAGUE_ITEMS_TABLE, "id"),
+				});
 			logger.debug(
 				{ amount: items.length },
 				"Task:updateItems - Items updated",
@@ -165,8 +212,13 @@ export class GameDataTask {
 			return;
 		}
 		try {
-			await db.delete(LEAGUE_MAPS_TABLE);
-			await db.insert(LEAGUE_MAPS_TABLE).values(maps);
+			await db
+				.insert(LEAGUE_MAPS_TABLE)
+				.values(maps)
+				.onConflictDoUpdate({
+					target: LEAGUE_MAPS_TABLE.mapId,
+					set: getAllOnConflictColumns(LEAGUE_MAPS_TABLE, "mapId"),
+				});
 			logger.debug({ amount: maps.length }, "Task:updateMaps - Maps updated");
 		} catch (e) {
 			logger.error({ err: e }, "Task:updateMaps - Error while updating maps");
@@ -180,8 +232,13 @@ export class GameDataTask {
 			return;
 		}
 		try {
-			await db.delete(LEAGUE_QUEUES_TABLE);
-			await db.insert(LEAGUE_QUEUES_TABLE).values(queues);
+			await db
+				.insert(LEAGUE_QUEUES_TABLE)
+				.values(queues)
+				.onConflictDoUpdate({
+					target: LEAGUE_QUEUES_TABLE.queueId,
+					set: getAllOnConflictColumns(LEAGUE_QUEUES_TABLE, "queueId"),
+				});
 			logger.debug(
 				{ amount: queues.length },
 				"Task:updateQueues - Queues updated",
@@ -204,8 +261,13 @@ export class GameDataTask {
 		}
 
 		try {
-			await db.delete(LEAGUE_SUMMONER_ICONS_TABLE);
-			await db.insert(LEAGUE_SUMMONER_ICONS_TABLE).values(summonerIcons);
+			await db
+				.insert(LEAGUE_SUMMONER_ICONS_TABLE)
+				.values(summonerIcons)
+				.onConflictDoUpdate({
+					target: LEAGUE_SUMMONER_ICONS_TABLE.id,
+					set: getAllOnConflictColumns(LEAGUE_SUMMONER_ICONS_TABLE, "id"),
+				});
 			logger.debug(
 				{ amount: summonerIcons.length },
 				"Task:updateSummonerIcons - Summoner icons updated",
@@ -231,8 +293,13 @@ export class GameDataTask {
 			const filtered = summonerSpells.filter((spell) => {
 				return spell.id !== 4294967295;
 			});
-			await db.delete(LEAGUE_SUMMONER_SPELLS_TABLE);
-			await db.insert(LEAGUE_SUMMONER_SPELLS_TABLE).values(filtered);
+			await db
+				.insert(LEAGUE_SUMMONER_SPELLS_TABLE)
+				.values(filtered)
+				.onConflictDoUpdate({
+					target: LEAGUE_SUMMONER_SPELLS_TABLE.id,
+					set: getAllOnConflictColumns(LEAGUE_SUMMONER_SPELLS_TABLE, "id"),
+				});
 			logger.debug(
 				{ amount: summonerSpells.length },
 				"Task:updateSummonerSpells - Summoner spells updated",

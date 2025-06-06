@@ -3,6 +3,7 @@ import { type SQL, getTableColumns, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { customType } from "drizzle-orm/pg-core";
+import logger from "../helpers/Logger.js";
 import * as schema from "./schemas/index.js";
 
 export const db = drizzle({
@@ -30,27 +31,25 @@ export const bytea = customType<{
 	},
 });
 
-export const getOnConflictPossibleColumns = <
-	T extends PgTable,
-	Q extends keyof T["_"]["columns"],
->(
-	table: T,
-	columns: Q[],
-) => {
-	const cls = getTableColumns(table);
-
-	return columns.reduce(
-		(acc, column) => {
-			if (cls[column]) {
-				const colName = cls[column].name;
-				acc[column] = sql.raw(`excluded.${colName}`);
-				return acc;
-			}
-			return acc;
-		},
-		{} as Record<Q, SQL>,
-	);
-};
+export async function testDBConnection() {
+	try {
+		const dbResult = await db.query.MEMBERS_TABLE.findFirst();
+		if (dbResult) {
+			logger.debug("testDBConnection: Connection successful");
+			return true;
+		}
+		logger.error(
+			"testDBConnection: Database connection failed, no data returned",
+		);
+		return false;
+	} catch (e) {
+		logger.error(
+			{ err: e },
+			"testDBConnection: Database connection failed, error occurred",
+		);
+		return false;
+	}
+}
 
 export const getAllOnConflictColumns = <
 	T extends PgTable,

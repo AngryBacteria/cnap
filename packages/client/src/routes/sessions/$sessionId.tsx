@@ -22,14 +22,15 @@ import { FormattedDateText } from "../../components/General/FormattedDateText.ts
 import { usePenAndPaperSession } from "../../hooks/api/usePenAndPaperSession.ts";
 import { PRIMARY_COLOR } from "../../main.tsx";
 
-export const Route = createFileRoute("/sessions/$sessionObjectId")({
+export const Route = createFileRoute("/sessions/$sessionId")({
 	component: RouteComponent,
 });
 
 function RouteComponent() {
-	const sessionObjectId = Route.useParams().sessionObjectId;
+	const sessionId = Route.useParams().sessionId;
 
-	const query = usePenAndPaperSession(sessionObjectId);
+	// TODO route level validation?
+	const query = usePenAndPaperSession(Number.parseInt(sessionId));
 
 	if (query.status === "pending") {
 		return (
@@ -47,12 +48,12 @@ function RouteComponent() {
 	if (query.status === "error") {
 		return (
 			<Alert
-				title={`Fehler beim Laden der PenAndPaper Session: ${sessionObjectId}`}
+				title={`Fehler beim Laden der PenAndPaper Session: ${sessionId}`}
 				variant={"light"}
 				color={"red"}
 				icon={<IconAlertSquareRounded />}
 			>
-				Momentan kann die Session {sessionObjectId} nicht geladen werden. Bitte
+				Momentan kann die Session {sessionId} nicht geladen werden. Bitte
 				versuche es später nochmal.
 			</Alert>
 		);
@@ -65,20 +66,20 @@ function RouteComponent() {
 		characterName?: string;
 		role: string;
 		memberName: string;
-		memberImageUrl: string | null | undefined;
+		profilePictureBase64: string | null;
 	}
 	const playerObjects: PenAndPaperParticipant[] = session.characters.map(
 		(character) => ({
-			characterName: character.name,
+			characterName: character.character.name,
 			role: "Player",
-			memberName: character.member.gameName,
-			memberImageUrl: character.member.profilePictureURL,
+			memberName: character.character.member.gameName,
+			profilePictureBase64: character.character.member.profilePictureBase64,
 		}),
 	);
 	const dmObject: PenAndPaperParticipant = {
 		memberName: session.dm.gameName,
 		role: "Dungeon Master",
-		memberImageUrl: session.dm.profilePictureURL,
+		profilePictureBase64: session.dm.profilePictureBase64,
 	};
 	const participants: PenAndPaperParticipant[] = [
 		...playerObjects,
@@ -178,7 +179,7 @@ function RouteComponent() {
 								</Flex>
 								<Text c={"dimmed"}>{participant.memberName}</Text>
 								<Image
-									src={participant.memberImageUrl}
+									src={participant.profilePictureBase64}
 									fallbackSrc={
 										"https://cnap.ch/static/profilePictures/unknown.png"
 									}

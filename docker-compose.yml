@@ -1,17 +1,15 @@
 services:
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    # user: "1000:1000"
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: <USERNAME_HERE>
-      MONGO_INITDB_ROOT_PASSWORD: <PASSWORD_HERE>
-    ports:
-      - "27017:27017"
-    volumes:
-      - <LOCAL_PATH_HERE>:/data/db
-    command: mongod --auth --bind_ip_all
+  postgres:
+    image: postgres
+    container_name: postgres
     restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: <PASSWORD_HERE>
+      POSTGRES_USER: <USERNAME_HERE>
+    volumes:
+      - <LOCAL_DATA_FOLDER_PATH>:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     logging:
       driver: "json-file"
       options:

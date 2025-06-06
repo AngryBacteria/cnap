@@ -1,14 +1,13 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
-import { db } from "../../db/index.js";
-import dbh from "../../helpers/DBHelper.js";
+import { db, testDBConnection } from "../../db/index.js";
 import logger from "../../helpers/Logger.js";
 import { to } from "../../helpers/Promises.js";
 import { loggedProcedure } from "../middlewares/executionTime.js";
 import { router } from "../trcp.js";
 
 // Test database connection
-await dbh.testConnection();
+await testDBConnection();
 
 export const generalRouter = router({
 	getServerTime: loggedProcedure.query(async () => {

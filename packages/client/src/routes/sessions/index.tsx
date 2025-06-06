@@ -54,11 +54,11 @@ function RouteComponent() {
 						duration: 0.25,
 					}}
 					className={"fillSpace"}
-					key={session._id}
+					key={session.id}
 				>
 					<Link
-						to={"/sessions/$sessionObjectId"}
-						params={{ sessionObjectId: session._id || "" }}
+						to={"/sessions/$sessionId"}
+						params={{ sessionId: `${session.id}` }}
 						className={styles.navigationItem}
 					>
 						<Card shadow={"md"} withBorder className={"fillSpacePointer"}>

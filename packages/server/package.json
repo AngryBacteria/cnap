@@ -15,27 +15,25 @@
     "db:push": "set NODE_OPTIONS=--import tsx && drizzle-kit push"
   },
   "dependencies": {
-    "@trpc/client": "11.0.1",
-    "@trpc/server": "11.0.1",
+    "@trpc/client": "11.3.1",
+    "@trpc/server": "11.3.1",
     "cors": "2.8.5",
-    "dotenv": "16.4.7",
-    "express": "4.21.2",
-    "groq-sdk": "0.19.0",
+    "dotenv": "16.5.0",
+    "express": "5.1.0",
     "limiter": "3.0.0",
-    "mongodb": "6.14.2",
-    "openai": "4.91.1",
-    "pino": "9.6.0",
-    "zod": "3.24.2"
+    "mongodb": "6.17.0",
+    "pino": "9.7.0",
+    "zod": "3.25.55"
   },
   "devDependencies": {
-    "@types/cors": "2.8.17",
-    "@types/express": "5.0.0",
-    "@types/node": "22.13.5",
-    "@vitest/coverage-v8": "^3.1.1",
-    "nodemon": "3.1.9",
+    "@types/cors": "2.8.18",
+    "@types/express": "5.0.2",
+    "@types/node": "22.15.30",
+    "@vitest/coverage-v8": "3.2.2",
+    "nodemon": "3.1.10",
     "pino-pretty": "13.0.0",
-    "tsx": "4.19.3",
-    "typescript": "5.8.2",
-    "vitest": "^3.1.1"
+    "tsx": "4.19.4",
+    "typescript": "5.8.3",
+    "vitest": "3.2.2"
   }
 }
