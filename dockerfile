@@ -1,18 +1,15 @@
 FROM node:22-slim
 
-# Set the working directory
-WORKDIR /usr/src/app
+# Install pnpm globally
+RUN npm install -g pnpm
 
-# Create a non-root user and switch to it
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 appuser
-USER appuser
+WORKDIR /app
 
 # Copy all files
 COPY . .
 
 # Install dependencies
-RUN npm install -g pnpm && pnpm install --frozen-lockfile
+RUN pnpm install && pnpm run build
 
 # Expose the ports for both backend and frontend
 EXPOSE 3000
