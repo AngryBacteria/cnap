@@ -1,14 +1,14 @@
 {
   "name": "client",
+  "description": "The client code for the cnap.ch website",
   "version": "1.0.0",
   "type": "module",
-  "description": "The client code for the cnap.ch website",
   "scripts": {
     "dev": "vite",
     "biome": "biome check --write ./src/",
-    "typecheck": "tsc -p ./tsconfig.json --noEmit",
+    "type-check": "tsc -b --noEmit",
     "preview": "vite preview",
-    "build": "tsc -p ./tsconfig.json --noEmit && vite build",
+    "build": "tsc -b --noEmit && vite build",
     "start": "serve -p 4173 -s dist"
   },
   "dependencies": {
@@ -35,8 +35,8 @@
   },
   "devDependencies": {
     "@tanstack/react-query-devtools": "5.80.6",
-    "@tanstack/router-devtools": "1.120.16",
-    "@tanstack/router-plugin": "1.120.16",
+    "@tanstack/router-devtools": "1.120.19",
+    "@tanstack/router-plugin": "1.120.18",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
     "@vitejs/plugin-react": "4.5.1",

@@ -1,25 +1,20 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { db } from "../../db/index.js";
 import dbh from "../../helpers/DBHelper.js";
 import logger from "../../helpers/Logger.js";
+import { to } from "../../helpers/Promises.js";
 import rh from "../../helpers/RiotHelper.js";
-import {
-	ChampionDBSchema,
-	ChampionReducedSchema,
-} from "../../model/Champion.js";
 import {
 	CollectionName,
 	type MongoFilter,
 	type MongoPipeline,
 } from "../../model/Database.js";
-import { ItemDBSchema } from "../../model/Item.js";
 import type { MatchV5Participant } from "../../model/MatchV5.js";
-import { QueueDBSchema } from "../../model/Queue.js";
 import {
 	SummonerDbSchema,
 	SummonerSummarySchema,
 } from "../../model/Summoner.js";
-import { SummonerSpellDBSchema } from "../../model/SummonerSpell.js";
 import { loggedProcedure } from "../middlewares/executionTime.js";
 import { router } from "../trcp.js";
 
@@ -28,61 +23,53 @@ await rh.testConnection();
 
 export const lolRouter = router({
 	getChampionsReduced: loggedProcedure.query(async () => {
-		const result = await dbh.genericGet(
-			CollectionName.CHAMPION,
-			{
-				limit: 1000,
-				projection: {
-					_id: 0,
-					id: 1,
-					name: 1,
-					alias: 1,
-					title: 1,
-					shortBio: 1,
-					uncenteredSplashPath: 1,
-				},
-			},
-			ChampionReducedSchema,
+		const [champions, error] = await to(
+			db.query.LEAGUE_CHAMPIONS_TABLE.findMany(),
 		);
-		if (!result.success) {
-			logger.error({ error: result.error }, "API:getChampionsReduced");
+
+		if (error) {
+			logger.error({ err: error }, "API:getChampionsReduced");
 			throw new TRPCError({
 				message: `Champions couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
 			});
 		}
+
 		logger.info("API:getChampionsReduced");
-		return result.data;
+		return champions;
 	}),
 	getChampionById: loggedProcedure.input(z.number()).query(async (opts) => {
-		const dbResult = await dbh.genericGet(
-			CollectionName.CHAMPION,
-			{
-				filter: { id: opts.input },
-			},
-			ChampionDBSchema,
+		const [champion, error] = await to(
+			db.query.LEAGUE_CHAMPIONS_TABLE.findFirst({
+				where: (champion, { eq }) => eq(champion.id, opts.input),
+				with: {
+					playstyle: true,
+					tacticalInfo: true,
+					skins: true,
+					passives: true,
+					spells: true,
+				},
+			}),
 		);
 
-		if (!dbResult.success) {
-			logger.error({ error: dbResult.error }, "API:getChampionById");
+		if (error) {
+			logger.error({ err: error }, "API:getChampionById");
 			throw new TRPCError({
 				message: `Champion couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
 			});
 		}
 
-		if (!dbResult.data[0]) {
+		if (!champion) {
 			logger.error({ operationInputs: opts.input }, "API:getChampionById");
 			throw new TRPCError({
 				message: `Champion not found: ${opts.input}`,
 				code: "NOT_FOUND",
 			});
 		}
-		logger.info(
-			{ operationInputs: opts.input, cached: false },
-			"API:getChampionById",
-		);
-		return dbResult.data[0];
+
+		logger.info({ operationInputs: opts.input }, "API:getChampionById");
+		return champion;
 	}),
 	getMatchesParticipant: loggedProcedure
 		.input(
@@ -204,13 +191,9 @@ export const lolRouter = router({
 			return dbResult.data;
 		}),
 	getQueues: loggedProcedure.query(async () => {
-		const result = await dbh.genericGet(
-			CollectionName.QUEUE,
-			{ limit: 1000 },
-			QueueDBSchema,
-		);
-		if (!result.success) {
-			logger.error({ error: result.error }, "API:getQueues");
+		const [queues, error] = await to(db.query.LEAGUE_QUEUES_TABLE.findMany());
+		if (error) {
+			logger.error({ err: error }, "API:getQueues");
 			throw new TRPCError({
 				message: `Queues couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
@@ -218,16 +201,12 @@ export const lolRouter = router({
 		}
 
 		logger.info("API:getQueues");
-		return result.data;
+		return queues;
 	}),
 	getItems: loggedProcedure.query(async () => {
-		const results = await dbh.genericGet(
-			CollectionName.ITEM,
-			{ limit: 1000 },
-			ItemDBSchema,
-		);
-		if (!results.success) {
-			logger.error({ error: results.error }, "API:getItems");
+		const [items, error] = await to(db.query.LEAGUE_ITEMS_TABLE.findMany());
+		if (error) {
+			logger.error({ err: error }, "API:getItems");
 			throw new TRPCError({
 				message: `Items couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
@@ -235,16 +214,14 @@ export const lolRouter = router({
 		}
 
 		logger.info("API:getItems");
-		return results.data;
+		return items;
 	}),
 	getSummonerSpells: loggedProcedure.query(async () => {
-		const result = await dbh.genericGet(
-			CollectionName.SUMMONER_SPELL,
-			{ limit: 1000 },
-			SummonerSpellDBSchema,
+		const [spells, error] = await to(
+			db.query.LEAGUE_SUMMONER_SPELLS_TABLE.findMany(),
 		);
-		if (!result.success) {
-			logger.error({ error: result.error }, "API:getSummonerSpells");
+		if (error) {
+			logger.error({ err: error }, "API:getSummonerSpells");
 			throw new TRPCError({
 				message: `SummonerSpells couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
@@ -252,16 +229,14 @@ export const lolRouter = router({
 		}
 
 		logger.info("API:getSummonerSpells");
-		return result.data;
+		return spells;
 	}),
 	getSummoners: loggedProcedure.query(async () => {
-		const summonerResponse = await dbh.genericGet(
-			CollectionName.SUMMONER,
-			{ limit: 1000 },
-			SummonerDbSchema,
+		const [summoners, error] = await to(
+			db.query.LEAGUE_SUMMONERS_TABLE.findMany(),
 		);
-		if (!summonerResponse.success) {
-			logger.error({ error: summonerResponse.error }, "API:getSummoners");
+		if (error) {
+			logger.error({ err: error }, "API:getSummoners");
 			throw new TRPCError({
 				message: `Summoners couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
@@ -269,7 +244,7 @@ export const lolRouter = router({
 		}
 
 		logger.info("API:getSummoners");
-		return summonerResponse.data;
+		return summoners;
 	}),
 	getSummonerByName: loggedProcedure
 		.input(
@@ -279,21 +254,18 @@ export const lolRouter = router({
 			}),
 		)
 		.query(async (opts) => {
-			const summonerResponse = await dbh.genericGet(
-				CollectionName.SUMMONER,
-				{
-					filter: {
-						gameName: opts.input.gameName,
-						tagLine: opts.input.tagLine,
-					},
-				},
-				SummonerDbSchema,
+			const [summoner, error] = await to(
+				db.query.LEAGUE_SUMMONERS_TABLE.findFirst({
+					where: (summoner, { eq }) =>
+						eq(summoner.gameName, opts.input.gameName) &&
+						eq(summoner.tagLine, opts.input.tagLine),
+				}),
 			);
 
-			if (!summonerResponse.success) {
+			if (error) {
 				logger.error(
 					{
-						error: summonerResponse.error,
+						err: error,
 						puuid: opts.input,
 						code: "INTERNAL_SERVER_ERROR",
 					},
@@ -305,7 +277,7 @@ export const lolRouter = router({
 				});
 			}
 
-			if (!summonerResponse.data[0]) {
+			if (!summoner) {
 				logger.warn(
 					{
 						puuid: opts.input,
@@ -320,11 +292,8 @@ export const lolRouter = router({
 				});
 			}
 
-			logger.info(
-				{ operationInputs: opts.input, cached: false },
-				"API:getSummonerByName",
-			);
-			return summonerResponse.data[0];
+			logger.info({ operationInputs: opts.input }, "API:getSummonerByName");
+			return summoner;
 		}),
 	getSummonerSummaryByName: loggedProcedure
 		.input(

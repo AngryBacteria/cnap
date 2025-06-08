@@ -94,6 +94,7 @@ export const LEAGUE_CHAMPION_SKINS_TABLE = LEAGUE_SCHEMA.table(
 		isLegacy: boolean().notNull(),
 		splashVideoPath: varchar(),
 		featuresText: varchar(),
+		description: varchar(),
 	},
 );
 export const championSkinsRelations = relations(
@@ -148,6 +149,7 @@ export const LEAGUE_CHAMPION_SPELLS_TABLE = LEAGUE_SCHEMA.table(
 		range: real().array().notNull(),
 		costCoefficients: real().array().notNull(),
 		cooldownCoefficients: real().array().notNull(),
+		spellKey: varchar().notNull(),
 	},
 );
 export const championSpellsRelations = relations(

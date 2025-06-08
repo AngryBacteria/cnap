@@ -25,7 +25,7 @@ export function ChampionAbilitiesTabs({ champion }: Props) {
 					</Tabs.List>
 
 					<Tabs.Panel value="P">
-						<ChampionAbility championAbility={champion.passive} />
+						<ChampionAbility championAbility={champion.passives[0]} />
 					</Tabs.Panel>
 
 					{champion.spells.map((spell) => {

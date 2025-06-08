@@ -11,7 +11,6 @@ export const db = drizzle({
 		connectionString: process.env.DATABASE_URL,
 		ssl: false, // TODO
 	},
-	casing: "snake_case",
 	schema,
 });
 
@@ -63,7 +62,7 @@ export const getAllOnConflictColumns = <
 	return Object.entries(cls).reduce(
 		(acc, [columnKey, column]) => {
 			if (columnKey !== excludeColumn) {
-				acc[columnKey] = sql.raw(`excluded.${column.name}`);
+				acc[columnKey] = sql.raw(`excluded."${column.name}"`);
 			}
 			return acc;
 		},

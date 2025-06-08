@@ -1,5 +1,6 @@
 {
   "name": "cnap",
+  "description": "The monorepo for the cnap.ch website",
   "private": true,
   "scripts": {
     "dev": "concurrently -c \"blue.bold,green.bold\" -n \"CLIENT,SERVER\" \"pnpm dev:client\" \"pnpm dev:server\"",
@@ -19,8 +20,8 @@
   },
   "dependencies": {
     "concurrently": "9.1.2",
-    "dotenv": "16.4.7",
-    "drizzle-orm": "^0.43.1",
+    "dotenv": "16.5.0",
+    "drizzle-orm": "^0.44.2",
     "pg": "^8.16.0",
     "rimraf": "6.0.1"
   },
@@ -29,6 +30,6 @@
     "@types/pg": "^8.15.2",
     "drizzle-kit": "^0.31.1",
     "husky": "^9.1.7",
-    "tsx": "4.19.3"
+    "tsx": "4.19.4"
   }
 }

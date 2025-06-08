@@ -1,6 +1,5 @@
 import { relations } from "drizzle-orm";
 import { integer, varchar } from "drizzle-orm/pg-core";
-import { LEAGUE_MATCH_PARTICIPANTS_TABLE } from "./LeagueMatch.js";
 import { MEMBERS_TABLE } from "./Member.js";
 import { LEAGUE_SCHEMA } from "./PGSchemas.js";
 
@@ -19,11 +18,10 @@ export const LEAGUE_SUMMONERS_TABLE = LEAGUE_SCHEMA.table("summoners", {
 
 export const leagueSummonersRelations = relations(
 	LEAGUE_SUMMONERS_TABLE,
-	({ one, many }) => ({
+	({ one }) => ({
 		member: one(MEMBERS_TABLE, {
 			fields: [LEAGUE_SUMMONERS_TABLE.memberGameName],
 			references: [MEMBERS_TABLE.gameName],
 		}),
-		leagueMatchParticipant: many(LEAGUE_MATCH_PARTICIPANTS_TABLE),
 	}),
 );
