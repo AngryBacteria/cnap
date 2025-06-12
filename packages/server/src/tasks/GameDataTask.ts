@@ -322,7 +322,7 @@ export class GameDataTask {
 		await this.updateSummonerIcons();
 		await this.updateSummonerSpells();
 
-		logger.info("Task:updateEverything - All game data updated");
+		logger.debug("Task:updateEverything - All game data updated");
 	}
 }
 

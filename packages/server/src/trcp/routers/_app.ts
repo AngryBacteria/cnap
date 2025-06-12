@@ -33,13 +33,13 @@ const spaFilesPath = join(
 
 // Validate paths exist
 if (!fs.existsSync(staticFilesPath)) {
-	logger.warn(
+	logger.error(
 		`The folder at ${staticFilesPath} does not exist. Static files will not be served`,
 	);
 }
 
 if (!fs.existsSync(spaFilesPath)) {
-	logger.warn(
+	logger.error(
 		`The client/dist folder at ${spaFilesPath} does not exist. Frontend will not work`,
 	);
 }
@@ -78,7 +78,7 @@ app.get("*", (req, res, next) => {
 });
 
 app.listen(BACKEND_PORT);
-logger.info(
+logger.debug(
 	{
 		port: BACKEND_PORT,
 		baseUrl: "http://localhost",

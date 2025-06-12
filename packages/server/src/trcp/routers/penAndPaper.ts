@@ -29,18 +29,18 @@ export const penAndPaperRouter = router({
 		if (error) {
 			logger.error(
 				{ err: error, code: 500, sessionId: opts.input },
-				"API:getSessions",
+				"API:getSession - failed to fetch sessions from db",
 			);
 			throw new TRPCError({
-				message: `Sessions could not be loaded: ${error.message}`,
+				message: `Session could not be loaded: ${error.message}`,
 				code: "INTERNAL_SERVER_ERROR",
 			});
 		}
 
 		if (!session) {
 			logger.error(
-				{ message: "Session not found", code: 404, sessionId: opts.input },
-				"API:getSessions",
+				{ code: 404, sessionId: opts.input },
+				"API:getSessions - no session found in db",
 			);
 			throw new TRPCError({
 				message: `Session with id ${opts.input} not found`,
@@ -48,7 +48,7 @@ export const penAndPaperRouter = router({
 			});
 		}
 
-		logger.info("API:getSession");
+		logger.debug("API:getSession - fetched session from db");
 		return session;
 	}),
 	getSessions: loggedProcedure.query(async () => {
@@ -56,14 +56,17 @@ export const penAndPaperRouter = router({
 			db.query.PEN_AND_PAPER_SESSION_TABLE.findMany(),
 		);
 		if (error) {
-			logger.error({ err: error, code: 500 }, "API:getSessions");
+			logger.error(
+				{ err: error, code: 500 },
+				"API:getSessions - failed to fetch sessions from db",
+			);
 			throw new TRPCError({
 				message: `Sessions could not be loaded: ${error.message}`,
 				code: "INTERNAL_SERVER_ERROR",
 			});
 		}
 
-		logger.info("API:getSessions");
+		logger.debug("API:getSessions - fetched sessions from db");
 		return sessions;
 	}),
 });

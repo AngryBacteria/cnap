@@ -44,7 +44,7 @@ export class SummonerTask {
 					target: LEAGUE_SUMMONERS_TABLE.puuid,
 					set: getAllOnConflictColumns(LEAGUE_SUMMONERS_TABLE, "puuid"),
 				});
-			logger.info("Task:updateSummonerData - Summoner data updated");
+			logger.debug("Task:updateSummonerData - Summoner data updated");
 		} catch (e) {
 			logger.error(
 				{ err: e },

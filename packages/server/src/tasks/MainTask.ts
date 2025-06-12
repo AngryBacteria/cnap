@@ -14,7 +14,7 @@ export async function intervalUpdate(
 ): Promise<void> {
 	let iteration = initialIteration;
 
-	logger.info(
+	logger.debug(
 		{ iteration, initialIteration, intervalTime },
 		"Task:intervalUpdate - Starting interval update ",
 	);

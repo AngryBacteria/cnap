@@ -43,10 +43,13 @@ export class DBHelper {
 	async disconnect(): Promise<boolean> {
 		try {
 			await this.mongoClient.close();
-			logger.debug("DBHelper:disconnect");
+			logger.debug("DBHelper:disconnect - disconnected from db");
 			return true;
 		} catch (error) {
-			logger.error({ error }, "DBHelper:disconnect");
+			logger.error(
+				{ err: error },
+				"DBHelper:disconnect - could not disconnect from db",
+			);
 			return false;
 		}
 	}
@@ -60,10 +63,16 @@ export class DBHelper {
 		try {
 			// Ping the database
 			await this.database.command({ ping: 1 });
-			logger.debug({ connected: true }, "DBHelper:testConnection");
+			logger.debug(
+				{ connected: true },
+				"DBHelper:testConnection - db connection test successful",
+			);
 			return true;
 		} catch (e) {
-			logger.error({ connected: false, error: e }, "DBHelper:testConnection");
+			logger.error(
+				{ connected: false, err: e },
+				"DBHelper:testConnection - db connection test failed",
+			);
 			return false;
 		}
 	}
@@ -162,7 +171,10 @@ export class DBHelper {
 			logger.debug("DBHelper:initIndexes - All indexes created successfully");
 			return true;
 		} catch (error) {
-			logger.error({ error }, "DBHelper:initIndexes - Error creating indexes");
+			logger.error(
+				{ err: error },
+				"DBHelper:initIndexes - Error creating indexes",
+			);
 			return false;
 		}
 	}
@@ -217,7 +229,10 @@ export class DBHelper {
 				success: true,
 			};
 		} catch (error) {
-			logger.error({ error, collectionName }, "DBHelper:getNonExistingIds");
+			logger.error(
+				{ err: error, collectionName },
+				"DBHelper:getNonExistingIds",
+			);
 			return {
 				data: [],
 				success: false,
@@ -281,7 +296,7 @@ export class DBHelper {
 				success: true,
 			};
 		} catch (error) {
-			logger.error({ error, collectionName }, "DBHelper:genericGet");
+			logger.error({ err: error, collectionName }, "DBHelper:genericGet");
 			return {
 				data: [],
 				success: false,
@@ -360,7 +375,7 @@ export class DBHelper {
 			);
 			return true;
 		} catch (error) {
-			logger.error({ error, collectionName }, "DBHelper:genericUpsert");
+			logger.error({ err: error, collectionName }, "DBHelper:genericUpsert");
 			return false;
 		}
 	}
@@ -395,7 +410,7 @@ export class DBHelper {
 				success: true,
 			};
 		} catch (error) {
-			logger.error({ error, collectionName }, "DBHelper:genericPipeline");
+			logger.error({ err: error, collectionName }, "DBHelper:genericPipeline");
 			return {
 				data: [],
 				success: false,
@@ -464,7 +479,7 @@ export class DBHelper {
 			};
 		} catch (error) {
 			logger.error(
-				{ error, collectionName },
+				{ err: error, collectionName },
 				"DBHelper:genericPaginatedPipeline",
 			);
 			return {

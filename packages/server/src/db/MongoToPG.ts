@@ -20,7 +20,7 @@ import {
 } from "./schemas/index.js";
 
 async function migrateMembers() {
-	logger.debug("Migrating members from MongoDB");
+	logger.debug("MongoToPG:migrateMembers - Migrating members from MongoDB");
 
 	const membersMongodb = await dbh.genericGet(
 		CollectionName.MEMBER,
@@ -55,7 +55,8 @@ async function migrateMembers() {
 	await db.insert(MEMBERS_TABLE).values(membersPG);
 
 	logger.debug(
-		`Members Migration completed! Total members processed: ${members.length}`,
+		{ amount: members.length },
+		"MongoToPG:migrateMembers - Members Migration completed! Total members processed",
 	);
 }
 
@@ -70,7 +71,7 @@ async function migrateSummoners() {
 		},
 	});
 
-	logger.debug("Migrating summoners from MongoDB");
+	logger.debug("MongoToPG:migrateSummoners - Migrating summoners from MongoDB");
 
 	const memberResponse = await dbh.genericPipeline(
 		pipeline,
@@ -97,7 +98,8 @@ async function migrateSummoners() {
 	await db.insert(LEAGUE_SUMMONERS_TABLE).values(pgSummoners);
 
 	logger.debug(
-		`Summoners Migration completed! Total summoners processed: ${pgSummoners.length}`,
+		{ amount: pgSummoners.length },
+		"MongoToPG:migrateSummoners - Summoners Migration completed! Total summoners processed",
 	);
 }
 
@@ -145,7 +147,9 @@ async function migratePnP() {
 		},
 	];
 
-	logger.debug("Migrating Pen and Paper sessions and characters from MongoDB");
+	logger.debug(
+		"MongoToPG:migratePnP - Migrating Pen and Paper sessions and characters from MongoDB",
+	);
 
 	const sessionResponse = await dbh.genericPipeline(
 		SESSION_PIPELINE,
@@ -214,13 +218,12 @@ async function migratePnP() {
 		.values(sessionCharacterRelations);
 
 	logger.debug(
-		`PnP Migration completed! Total sessions processed: ${sessions.length}`,
-	);
-	logger.debug(
-		`PnP Migration completed! Total characters processed: ${charactersPG.size}`,
-	);
-	logger.debug(
-		`PnP Migration completed! Total session-character relations processed: ${sessionCharacterRelations.length}`,
+		{
+			amountCharacters: charactersPG.size,
+			amountSessions: sessions.length,
+			sessionCharacterRelationAmount: sessionCharacterRelations.length,
+		},
+		"MongoToPG:migratePnP - PnP Migration completed",
 	);
 }
 
@@ -230,12 +233,15 @@ async function migrateTimeline() {
 	let hasMoreData = true;
 
 	// Clear tables once at the beginning
-	logger.debug("Clearing existing Timelines data");
+	logger.debug("MongoToPG:migrateTimeline - Clearing existing Timelines data");
 	await db.delete(LEAGUE_TIMELINES_TABLE);
 
 	let totalProcessed = 0;
 	while (hasMoreData) {
-		logger.debug(`Processing batch starting at offset ${offset}...`);
+		logger.debug(
+			{ offset },
+			"MongoToPG:migrateTimeline - Processing batch starting",
+		);
 
 		const timelinesMongo = await dbh.genericGet(CollectionName.TIMELINE, {
 			limit: batchSize,
@@ -268,7 +274,10 @@ async function migrateTimeline() {
 		await db.insert(LEAGUE_TIMELINES_TABLE).values(timelines);
 
 		totalProcessed += timelines.length;
-		logger.debug(`Processed ${totalProcessed} matches so far...`);
+		logger.debug(
+			{ amount: totalProcessed },
+			`MongoToPG:migrateTimeline - Processed ${totalProcessed} matches so far...`,
+		);
 
 		offset += batchSize;
 
@@ -286,14 +295,17 @@ async function migrateMatches() {
 	let hasMoreData = true;
 
 	// Clear tables once at the beginning
-	logger.debug("Clearing existing Matches data");
+	logger.debug("MongoToPG:migrateMatches - Clearing existing Matches data");
 	await db.delete(LEAGUE_MATCHES_TABLE);
 	await db.delete(LEAGUE_MATCH_PARTICIPANTS_TABLE);
 
 	let totalProcessed = 0;
 
 	while (hasMoreData) {
-		logger.debug(`Processing batch starting at offset ${offset}...`);
+		logger.debug(
+			{ offset },
+			"MongoToPG:migrateMatches - Processing batch starting",
+		);
 
 		const matchesMongo = await dbh.genericGet(CollectionName.MATCH, {
 			limit: batchSize,
@@ -349,7 +361,10 @@ async function migrateMatches() {
 		await db.insert(LEAGUE_MATCH_PARTICIPANTS_TABLE).values(participants);
 
 		totalProcessed += matches.length;
-		logger.debug(`Processed ${totalProcessed} matches so far...`);
+		logger.debug(
+			{ amount: totalProcessed },
+			`MongoToPG:migrateMatches - Processed ${totalProcessed} matches so far...`,
+		);
 
 		offset += batchSize;
 
@@ -361,7 +376,8 @@ async function migrateMatches() {
 	}
 
 	logger.debug(
-		`Matches Migration completed! Total matches processed: ${totalProcessed}`,
+		{ amount: totalProcessed },
+		"MongoToPG:migrateMatches - Matches Migration completed",
 	);
 }
 
@@ -374,9 +390,9 @@ async function migrate() {
 }
 
 migrate()
-	.then(() => logger.debug("Successfully migrated"))
+	.then(() => logger.debug("MongoToPG:migrate - Successfully migrated"))
 	.catch((error) => {
-		logger.error({ err: error }, "Migration failed:");
+		logger.error({ err: error }, "MongoToPG:migrate - Migration failed:");
 	});
 
 /**

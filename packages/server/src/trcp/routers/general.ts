@@ -32,7 +32,10 @@ export const generalRouter = router({
 			);
 
 			if (error) {
-				logger.error({ err: error }, "Failed to fetch members from Database");
+				logger.error(
+					{ err: error },
+					"API:getMembers - Failed to fetch members from Database",
+				);
 				throw new TRPCError({
 					message: "Failed to fetch members from Database",
 					code: "INTERNAL_SERVER_ERROR",
@@ -40,14 +43,14 @@ export const generalRouter = router({
 			}
 
 			if (data.length === 0) {
-				logger.warn("No members found in Database");
+				logger.warn("API:getMembers - No members found in Database");
 				throw new TRPCError({
 					message: "No members found in the database",
 					code: "NOT_FOUND",
 				});
 			}
 
-			logger.info("API:getMembers");
+			logger.debug("API:getMembers - returned members");
 			return data;
 		}),
 });

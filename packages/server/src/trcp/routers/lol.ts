@@ -28,14 +28,17 @@ export const lolRouter = router({
 		);
 
 		if (error) {
-			logger.error({ err: error }, "API:getChampionsReduced");
+			logger.error(
+				{ err: error },
+				"API:getChampionsReduced - failed to fetch champions from db",
+			);
 			throw new TRPCError({
 				message: `Champions couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
 			});
 		}
 
-		logger.info("API:getChampionsReduced");
+		logger.debug("API:getChampionsReduced - fetched champions from db");
 		return champions;
 	}),
 	getChampionById: loggedProcedure.input(z.number()).query(async (opts) => {
@@ -53,7 +56,10 @@ export const lolRouter = router({
 		);
 
 		if (error) {
-			logger.error({ err: error }, "API:getChampionById");
+			logger.error(
+				{ err: error },
+				"API:getChampionById - failed to fetch champion by id",
+			);
 			throw new TRPCError({
 				message: `Champion couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
@@ -61,14 +67,20 @@ export const lolRouter = router({
 		}
 
 		if (!champion) {
-			logger.error({ operationInputs: opts.input }, "API:getChampionById");
+			logger.error(
+				{ operationInputs: opts.input },
+				"API:getChampionById - no champion found with this id",
+			);
 			throw new TRPCError({
 				message: `Champion not found: ${opts.input}`,
 				code: "NOT_FOUND",
 			});
 		}
 
-		logger.info({ operationInputs: opts.input }, "API:getChampionById");
+		logger.debug(
+			{ operationInputs: opts.input },
+			"API:getChampionById - fetched champion by id",
+		);
 		return champion;
 	}),
 	getMatchesParticipant: loggedProcedure
@@ -125,8 +137,8 @@ export const lolRouter = router({
 				);
 				if (!existingPuuidsResponse.success) {
 					logger.error(
-						{ error: existingPuuidsResponse.error },
-						"API:getMatchesParticipant",
+						{ err: existingPuuidsResponse.error },
+						"API:getMatchesParticipant - fetching existing summoners failed",
 					);
 					throw new TRPCError({
 						message: `Summoners couldn't be fetched`,
@@ -177,43 +189,49 @@ export const lolRouter = router({
 				page,
 			);
 			if (!dbResult.success) {
-				logger.error({ error: dbResult.error }, "API:getMatchesParticipant");
+				logger.error({ err: dbResult.error }, "API:getMatchesParticipant");
 				throw new TRPCError({
 					message: `Matches couldn't be fetched`,
 					code: "INTERNAL_SERVER_ERROR",
 				});
 			}
 
-			logger.info(
-				{ operationInputs: opts.input, cached: false },
-				"API:getMatchesParticipant",
+			logger.debug(
+				{ operationInputs: opts.input },
+				"API:getMatchesParticipant - fetching matches for participant failed",
 			);
 			return dbResult.data;
 		}),
 	getQueues: loggedProcedure.query(async () => {
 		const [queues, error] = await to(db.query.LEAGUE_QUEUES_TABLE.findMany());
 		if (error) {
-			logger.error({ err: error }, "API:getQueues");
+			logger.error(
+				{ err: error },
+				"API:getQueues - fetching queues from db failed",
+			);
 			throw new TRPCError({
 				message: `Queues couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
 			});
 		}
 
-		logger.info("API:getQueues");
+		logger.debug("API:getQueues - fetched queues from db");
 		return queues;
 	}),
 	getItems: loggedProcedure.query(async () => {
 		const [items, error] = await to(db.query.LEAGUE_ITEMS_TABLE.findMany());
 		if (error) {
-			logger.error({ err: error }, "API:getItems");
+			logger.error(
+				{ err: error },
+				"API:getItems - failed to fetch items from db",
+			);
 			throw new TRPCError({
 				message: `Items couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
 			});
 		}
 
-		logger.info("API:getItems");
+		logger.debug("API:getItems - fetched items from db");
 		return items;
 	}),
 	getSummonerSpells: loggedProcedure.query(async () => {
@@ -221,14 +239,17 @@ export const lolRouter = router({
 			db.query.LEAGUE_SUMMONER_SPELLS_TABLE.findMany(),
 		);
 		if (error) {
-			logger.error({ err: error }, "API:getSummonerSpells");
+			logger.error(
+				{ err: error },
+				"API:getSummonerSpells - failed to fetch summonerSpells from db",
+			);
 			throw new TRPCError({
 				message: `SummonerSpells couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
 			});
 		}
 
-		logger.info("API:getSummonerSpells");
+		logger.debug("API:getSummonerSpells - fetched summonerSpells from db");
 		return spells;
 	}),
 	getSummoners: loggedProcedure.query(async () => {
@@ -236,14 +257,17 @@ export const lolRouter = router({
 			db.query.LEAGUE_SUMMONERS_TABLE.findMany(),
 		);
 		if (error) {
-			logger.error({ err: error }, "API:getSummoners");
+			logger.error(
+				{ err: error },
+				"API:getSummoners - failed to fetch summoners from db",
+			);
 			throw new TRPCError({
 				message: `Summoners couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
 			});
 		}
 
-		logger.info("API:getSummoners");
+		logger.debug("API:getSummoners - fetched summoners from db");
 		return summoners;
 	}),
 	getSummonerByName: loggedProcedure
@@ -269,7 +293,7 @@ export const lolRouter = router({
 						puuid: opts.input,
 						code: "INTERNAL_SERVER_ERROR",
 					},
-					"API:getSummonerByName",
+					"API:getSummonerByName - failed to fetch summoner by name from db",
 				);
 				throw new TRPCError({
 					message: `Summoner couldn't be fetched`,
@@ -282,17 +306,19 @@ export const lolRouter = router({
 					{
 						puuid: opts.input,
 						code: "NOT_FOUND",
-						message: `Database returned no members for PUUID: ${opts.input}`,
 					},
-					"API:getSummonerByName",
+					"API:getSummonerByName - no summoner found with this name in db",
 				);
 				throw new TRPCError({
-					message: `Database returned no members for PUUID: ${opts.input}`,
+					message: `Database returned no members for name: ${opts.input}`,
 					code: "NOT_FOUND",
 				});
 			}
 
-			logger.info({ operationInputs: opts.input }, "API:getSummonerByName");
+			logger.debug(
+				{ operationInputs: opts.input },
+				"API:getSummonerByName - fetched summoner by name from db",
+			);
 			return summoner;
 		}),
 	getSummonerSummaryByName: loggedProcedure
@@ -316,12 +342,12 @@ export const lolRouter = router({
 			if (!summonerResponse.success) {
 				logger.error(
 					{
-						error: summonerResponse.error,
+						err: summonerResponse.error,
 						gameName: opts.input.gameName,
 						tagLine: opts.input.tagLine,
 						code: "INTERNAL_SERVER_ERROR",
 					},
-					"API:getSummonerSummaryByName",
+					"API:getSummonerSummaryByName - failed to fetch summoner summary by name from db",
 				);
 				throw new TRPCError({
 					message: `Summoner couldn't be fetched`,
@@ -335,9 +361,8 @@ export const lolRouter = router({
 						gameName: opts.input.gameName,
 						tagLine: opts.input.tagLine,
 						code: "NOT_FOUND",
-						message: `Database returned no summoner: ${opts.input}`,
 					},
-					"API:getSummonerSummaryByName",
+					"API:getSummonerSummaryByName - no summoner summary found in db with this name",
 				);
 				throw new TRPCError({
 					message: `Database returned no summoners: ${opts.input}`,
@@ -424,14 +449,19 @@ export const lolRouter = router({
 				SummonerSummarySchema,
 			);
 			if (!result.success) {
-				logger.error({ error: result.error }, "API:getSummonerSummaryByName");
+				logger.error(
+					{ err: result.error },
+					"API:getSummonerSummaryByName - failed to fetch summoner summary ba name",
+				);
 				throw new TRPCError({
 					message: `Summoner summary couldn't be fetched`,
 					code: "INTERNAL_SERVER_ERROR",
 				});
 			}
 
-			logger.info({ cached: false }, "API:getSummonerSummaryByName");
+			logger.debug(
+				"API:getSummonerSummaryByName - fetched summoner summary by nanme",
+			);
 			return result.data;
 		}),
 });
