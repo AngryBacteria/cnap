@@ -12,6 +12,8 @@ import type { MatchV5DB } from "../model/MatchV5.js";
 
 //TODO migrate
 
+export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
+
 export class MatchTask {
 	async updateMatchData(count = 69, offset = 0): Promise<void> {
 		const [summonersData, summonersError] = await to(
@@ -54,9 +56,11 @@ export class MatchTask {
 			}
 
 			// Add new matches, timelines and match-participants to the database
-			await this.addMatchesToDB(matchData, summoner.puuid);
-			await this.addMatchParticipantsToDB(matchData, summoner.puuid);
-			await this.addTimelinesToDB(nonExistingDBMatchIds, summoner.puuid);
+			await db.transaction(async (tx) => {
+				await this.addMatchesToDB(matchData, summoner.puuid, tx);
+				await this.addMatchParticipantsToDB(matchData, summoner.puuid, tx);
+				await this.addTimelinesToDB(nonExistingDBMatchIds, summoner.puuid, tx);
+			});
 
 			logger.debug(
 				{
@@ -74,7 +78,11 @@ export class MatchTask {
 		);
 	}
 
-	async addMatchesToDB(matches: MatchV5DB[], puuid: string): Promise<void> {
+	async addMatchesToDB(
+		matches: MatchV5DB[],
+		puuid: string,
+		tx: Transaction,
+	): Promise<void> {
 		if (matches.length === 0) {
 			logger.debug(
 				{ puuid },
@@ -91,7 +99,7 @@ export class MatchTask {
 			};
 		});
 		const [_, insertMatchError] = await to(
-			db.insert(LEAGUE_MATCHES_TABLE).values(matchData),
+			tx.insert(LEAGUE_MATCHES_TABLE).values(matchData),
 		);
 		if (insertMatchError) {
 			logger.error(
@@ -104,6 +112,7 @@ export class MatchTask {
 	async addMatchParticipantsToDB(
 		matches: MatchV5DB[],
 		puuid: string,
+		tx: Transaction,
 	): Promise<void> {
 		if (matches.length === 0) {
 			logger.debug(
@@ -135,7 +144,7 @@ export class MatchTask {
 
 		if (participantsData.length > 0) {
 			const [__, insertMatchParticipantError] = await to(
-				db.insert(LEAGUE_MATCH_PARTICIPANTS_TABLE).values(participantsData),
+				tx.insert(LEAGUE_MATCH_PARTICIPANTS_TABLE).values(participantsData),
 			);
 			if (insertMatchParticipantError) {
 				logger.error(
@@ -146,7 +155,7 @@ export class MatchTask {
 		}
 	}
 
-	async addTimelinesToDB(matchIds: string[], puuid: string) {
+	async addTimelinesToDB(matchIds: string[], puuid: string, tx: Transaction) {
 		const timelineData: (typeof LEAGUE_TIMELINES_TABLE.$inferInsert)[] = [];
 		for (const matchId of matchIds) {
 			const timeline = await rh.getTimeline(matchId);
@@ -161,7 +170,7 @@ export class MatchTask {
 
 		if (timelineData.length > 0) {
 			const [__, insertTimelineError] = await to(
-				db.insert(LEAGUE_TIMELINES_TABLE).values(timelineData),
+				tx.insert(LEAGUE_TIMELINES_TABLE).values(timelineData),
 			);
 			if (insertTimelineError) {
 				logger.error(

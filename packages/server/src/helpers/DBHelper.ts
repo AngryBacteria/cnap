@@ -4,7 +4,6 @@
  * and exposes methods for common database operations.
  */
 
-import "dotenv/config";
 import { type Collection, type Db, MongoClient } from "mongodb";
 import type { z } from "zod";
 import {
@@ -16,6 +15,7 @@ import {
 	type MongoPipeline,
 	type MongoProjection,
 } from "../model/Database.js";
+import { MONGODB_CONNECTION_STRING } from "./EnvironmentConfig.js";
 import logger from "./Logger.js";
 
 export class DBHelper {
@@ -24,12 +24,11 @@ export class DBHelper {
 
 	constructor() {
 		// Initialize MongoDB Connection
-		const mongodbConnectionString = process.env.MONGODB_CONNECTION_STRING;
-		if (!mongodbConnectionString) {
+		if (!MONGODB_CONNECTION_STRING) {
 			throw new Error("No MongoDB Connection String found in Environment");
 		}
 
-		this.mongoClient = new MongoClient(mongodbConnectionString);
+		this.mongoClient = new MongoClient(MONGODB_CONNECTION_STRING);
 		this.database = this.mongoClient.db("cnap");
 	}
 

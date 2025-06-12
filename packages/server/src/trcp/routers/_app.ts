@@ -4,6 +4,11 @@ import { fileURLToPath } from "node:url";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import cors from "cors";
 import express from "express";
+import {
+	BACKEND_PORT,
+	RUN_TASKS,
+	UPDATE_INTERVAL,
+} from "../../helpers/EnvironmentConfig.js";
 import logger from "../../helpers/Logger.js";
 import { intervalUpdate } from "../../tasks/MainTask.js";
 import { router } from "../trcp.js";
@@ -72,23 +77,18 @@ app.get("*", (req, res, next) => {
 	});
 });
 
-const PORT = process.env.PROD_PORT ? Number(process.env.PROD_PORT) : 3000;
-app.listen(PORT);
+app.listen(BACKEND_PORT);
 logger.info(
 	{
-		port: PORT,
+		port: BACKEND_PORT,
 		baseUrl: "http://localhost",
-		url: `http://localhost:${PORT}/trpc`,
+		url: `http://localhost:${BACKEND_PORT}/trpc`,
 	},
 	"API:Startup - tRPC Server is running",
 );
 
 export type AppRouter = typeof appRouter;
 
-const RUN_TASKS = process.env.RUN_TASKS?.toLowerCase() === "true";
 if (RUN_TASKS) {
-	const UPDATE_INTERVAL = process.env.UPDATE_INTERVAL
-		? Number(process.env.UPDATE_INTERVAL)
-		: 3600000;
 	intervalUpdate(0, UPDATE_INTERVAL).catch(logger.error);
 }

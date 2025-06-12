@@ -1,4 +1,3 @@
-import "dotenv/config";
 import { eq } from "drizzle-orm";
 import { db, getAllOnConflictColumns } from "../db/index.js";
 import { LEAGUE_SUMMONERS_TABLE } from "../db/schemas/Summoner.js";

@@ -1,14 +1,14 @@
-import "dotenv/config";
 import { type SQL, getTableColumns, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { customType } from "drizzle-orm/pg-core";
+import { DB_URL } from "../helpers/EnvironmentConfig.js";
 import logger from "../helpers/Logger.js";
 import * as schema from "./schemas/index.js";
 
 export const db = drizzle({
 	connection: {
-		connectionString: process.env.DATABASE_URL,
+		connectionString: DB_URL,
 		ssl: false, // TODO
 	},
 	schema,

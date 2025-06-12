@@ -1,5 +1,4 @@
 import { RateLimiter } from "limiter";
-import "dotenv/config";
 import { z } from "zod";
 import { type AccountDB, AccountDBSchema } from "../model/Account.js";
 import {
@@ -26,6 +25,7 @@ import {
 	type SummonerSpellDB,
 	SummonerSpellDBSchema,
 } from "../model/SummonerSpell.js";
+import { RIOT_API_KEY } from "./EnvironmentConfig.js";
 import logger from "./Logger.js";
 
 /**
@@ -56,12 +56,11 @@ export class RiotHelper {
 
 	constructor() {
 		// Initialize Riot API Key
-		const riotKey = process.env.RIOT_API_KEY;
-		if (!riotKey) {
+		if (!RIOT_API_KEY) {
 			throw new Error("No Riot API Key found in Environment");
 		}
 
-		this.riotApiKey = riotKey;
+		this.riotApiKey = RIOT_API_KEY;
 
 		// Initialize rate limiter (80 requests per 120 seconds)
 		this.limiter1 = new RateLimiter({
