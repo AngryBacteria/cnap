@@ -1,11 +1,6 @@
-import { ObjectId } from "mongodb";
-import { z } from "zod";
-
 export type MongoPipeline = Record<string, unknown>[];
 export type MongoFilter = Record<string, unknown>;
 export type MongoProjection = Record<string, number>;
-
-export const MongoDBIDSchema = z.instanceof(ObjectId).nullish();
 
 export type DBResponse<T> = {
 	data: T[];
@@ -13,33 +8,6 @@ export type DBResponse<T> = {
 	error?: Error;
 	message?: string;
 };
-
-export type DBResponsePaginated<T> = {
-	data: {
-		data: T[];
-		page: number;
-		maxPage: number;
-	};
-	success: boolean;
-	error?: Error;
-	message?: string;
-};
-
-/**
- * Response from MongoDB for a paginated query (pipeline)
- */
-export const MongoDBPaginationSchema = z
-	.object({
-		data: z.unknown(),
-		metadata: z
-			.object({
-				total: z.number(),
-			})
-			.array(),
-	})
-	.array();
-
-export type MongoDBPagination = z.infer<typeof MongoDBPaginationSchema>;
 
 /**
  * Enum representing the names of various collections in the MongoDB database.

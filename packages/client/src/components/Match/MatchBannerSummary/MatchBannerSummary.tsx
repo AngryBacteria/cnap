@@ -7,22 +7,12 @@ import styles from "./MatchBannerSummary.module.css";
 
 interface Props {
 	match: Outputs["lol"]["getMatchesParticipant"]["data"][number];
-	queues: Outputs["lol"]["getQueues"];
-	summonerSpells: Outputs["lol"]["getSummonerSpells"];
-	items: Outputs["lol"]["getItems"];
 }
 
-export function MatchBannerSummary({
-	match,
-	queues,
-	summonerSpells,
-	items,
-}: Props) {
-	const participant = match.info.participants;
+export function MatchBannerSummary({ match }: Props) {
+	const participant = match.participant;
 
-	const championImage = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/champion-icons/${participant.championId}.png`;
-
-	const formattedGameDuration = `${Math.round(match.info.gameDuration / 60)} minutes`;
+	const formattedGameDuration = `${Math.round(participant.gameDuration / 60)} minutes`;
 
 	const kda =
 		participant.deaths === 0
@@ -32,17 +22,7 @@ export function MatchBannerSummary({
 				);
 
 	const csPerMinute = Math.round(
-		(participant.totalMinionsKilled + participant.neutralMinionsKilled) /
-			Math.round(match.info.gameDuration / 60),
-	);
-
-	const queue = queues.find((q) => q.queueId === match.info.queueId);
-
-	const summonerSpell1 = summonerSpells.find(
-		(s) => s.id === participant.summoner1Id,
-	);
-	const summonerSpell2 = summonerSpells.find(
-		(s) => s.id === participant.summoner2Id,
+		participant.totalMinionsKilled / Math.round(participant.gameDuration / 60),
 	);
 
 	return (
@@ -56,11 +36,11 @@ export function MatchBannerSummary({
 				<Card.Section withBorder inheritPadding py="4px">
 					<Flex direction={"row"} gap={"md"}>
 						<Text>
-							{queue?.description?.replace("games", "").trim() ||
+							{match.queue?.description?.replace("games", "").trim() ??
 								"Unknown Queue"}
 						</Text>
 
-						<FormattedDateText unixTimestamp={match.info.gameCreation} />
+						<FormattedDateText unixTimestamp={participant.gameCreation} />
 
 						<Text c="dimmed">{formattedGameDuration}</Text>
 					</Flex>
@@ -81,23 +61,28 @@ export function MatchBannerSummary({
 							gap={"2px"}
 						>
 							<Tooltip
-								label={participant.championName}
+								label={match.champion?.name}
 								color={PRIMARY_COLOR}
 								position="bottom"
 								transitionProps={{ transition: "fade-up", duration: 300 }}
 							>
-								<Image src={championImage} h={50} w={50} radius="5px" />
+								<Image
+									src={match.champion?.squarePortraitPath}
+									h={50}
+									w={50}
+									radius="5px"
+								/>
 							</Tooltip>
 
 							<Flex direction={"column"} gap={"2px"}>
 								<Image
-									src={summonerSpell1?.iconPath}
+									src={match.summonerSpell1?.iconPath}
 									h={24}
 									w={24}
 									radius="5px"
 								/>
 								<Image
-									src={summonerSpell2?.iconPath}
+									src={match.summonerSpell2?.iconPath}
 									h={24}
 									w={24}
 									radius="5px"
@@ -125,11 +110,7 @@ export function MatchBannerSummary({
 						</Flex>
 
 						<Flex direction={"column"} justify={"center"} align={"center"}>
-							<Text>
-								{participant.totalMinionsKilled +
-									participant.neutralMinionsKilled}{" "}
-								CS
-							</Text>
+							<Text>{participant.totalMinionsKilled} CS</Text>
 							<Tooltip
 								label="A CS per minute of 5 or above is considered good"
 								color={PRIMARY_COLOR}
@@ -142,7 +123,7 @@ export function MatchBannerSummary({
 							</Tooltip>
 						</Flex>
 
-						<LeagueItemGrid participant={participant} items={items} />
+						<LeagueItemGrid match={match} />
 					</Flex>
 				</Card.Section>
 			</Card>

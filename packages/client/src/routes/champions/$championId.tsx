@@ -8,10 +8,6 @@ import { ChampionSkins } from "../../components/Champion/ChampionSkins/ChampionS
 import { MatchBannerSummaryLoader } from "../../components/Match/MatchBannerSummaryLoader.tsx";
 import { QueueIdSelector } from "../../components/Match/QueueIdSelector.tsx";
 import { useChampion } from "../../hooks/api/useChampion.ts";
-import { useItems } from "../../hooks/api/useItems.ts";
-import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts";
-import { useQueues } from "../../hooks/api/useQueues.ts";
-import { useSummonerSpells } from "../../hooks/api/useSummonerSpells.ts";
 
 export const Route = createFileRoute("/champions/$championId")({
 	component: ChampionPage,
@@ -24,15 +20,6 @@ export function ChampionPage() {
 
 	// Fetch champion
 	const query = useChampion(Number(championId));
-
-	// Prefetch data for the MatchBannerSummaryLoader
-	useItems(true);
-	useMatchesParticipant(
-		{ page, championId: Number(championId), queueId: Number(selectedQueueId) },
-		true,
-	);
-	useQueues(true);
-	useSummonerSpells(true);
 
 	if (query.status === "pending") {
 		return (

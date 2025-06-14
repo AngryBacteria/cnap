@@ -15,6 +15,7 @@ import type { MatchV5DB } from "../model/MatchV5.js";
 export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 export class MatchTask {
+	//TODO fill gaps function
 	async updateMatchData(count = 69, offset = 0): Promise<void> {
 		const [summonersData, summonersError] = await to(
 			db.query.LEAGUE_SUMMONERS_TABLE.findMany(),
@@ -66,7 +67,8 @@ export class MatchTask {
 				{
 					puuid: summoner.puuid,
 					totalMatchIds: riotMatchIds.length,
-					nonExistingMatchIds: nonExistingDBMatchIds.length,
+					existingDBMatchIds: existingDBMatchIds.length,
+					nonExistingDBMatchIds: nonExistingDBMatchIds.length,
 				},
 				"Task:updateMatchData Updated match data for summoner",
 			);

@@ -5,6 +5,7 @@ import { CollectionName, type MongoPipeline } from "../model/Database.js";
 import type { MatchV5DB } from "../model/MatchV5.js";
 import { MemberDBSchema, MemberWithSummonerSchema } from "../model/Member.js";
 import { PenAndPaperSessionSchema } from "../model/PenAndPaper.js";
+import { GameDataTask } from "../tasks/GameDataTask.js";
 import { db } from "./index.js";
 import { MEMBERS_TABLE } from "./schemas/Member.js";
 import { LEAGUE_SUMMONERS_TABLE } from "./schemas/Summoner.js";
@@ -228,7 +229,7 @@ async function migratePnP() {
 }
 
 async function migrateTimeline() {
-	const batchSize = 20;
+	const batchSize = 100;
 	let offset = 0;
 	let hasMoreData = true;
 
@@ -290,7 +291,7 @@ async function migrateTimeline() {
 }
 
 async function migrateMatches() {
-	const batchSize = 20;
+	const batchSize = 100;
 	let offset = 0;
 	let hasMoreData = true;
 
@@ -385,8 +386,9 @@ async function migrate() {
 	await migrateMembers();
 	await migrateSummoners();
 	await migratePnP();
-	// await migrateMatches();
-	// await migrateTimeline();
+	await new GameDataTask().updateEverything();
+	await migrateMatches();
+	await migrateTimeline();
 }
 
 migrate()

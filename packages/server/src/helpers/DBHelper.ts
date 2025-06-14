@@ -9,8 +9,6 @@ import type { z } from "zod";
 import {
 	CollectionName,
 	type DBResponse,
-	type DBResponsePaginated,
-	MongoDBPaginationSchema,
 	type MongoFilter,
 	type MongoPipeline,
 	type MongoProjection,
@@ -317,69 +315,6 @@ export class DBHelper {
 		);
 	}
 
-	/**
-	 * Generic upsert method for inserting or updating documents.
-	 * Validates the data if a validator is supplied and uses a bulk operation to upsert the data.
-	 * Upserting means that if a document with the same keyField exists, it will be updated/replaced.
-	 * If not, it will be inserted.
-	 * @param data - The array of data objects.
-	 * @param keyField - The field used as a unique identifier.
-	 * @param collectionName - The target collection.
-	 * @param validator - Optional Zod validator for data validation.
-	 * @returns True if the operation was successful.
-	 */
-	async genericUpsert<T extends object>(
-		data: T[],
-		keyField: string,
-		collectionName: CollectionName,
-		validator?: z.ZodType<T>,
-	): Promise<boolean> {
-		try {
-			const startTime = performance.now();
-			if (data.length === 0) {
-				logger.warn(
-					{ collectionName },
-					"DBHelper:genericUpsert - No data to upsert, aborted operation",
-				);
-				return true;
-			}
-
-			// Validate data if validator is provided
-			if (validator) {
-				for (const item of data) {
-					validator.parse(item);
-				}
-			}
-			// Create bulk operations using the correct MongoDB interface
-			const bulkOps = data.map((item) => ({
-				updateOne: {
-					filter: { [keyField]: this.getNestedValue(item, keyField) },
-					update: { $set: item },
-					upsert: true,
-				},
-			}));
-
-			const dbResult =
-				await this.getCollection(collectionName).bulkWrite(bulkOps);
-
-			const processingTime = performance.now() - startTime;
-			logger.debug(
-				{
-					upserted: dbResult.upsertedCount,
-					modified: dbResult.modifiedCount,
-					matched: dbResult.matchedCount,
-					collectionName,
-					processingTimeMS: processingTime.toFixed(2),
-				},
-				"DBHelper:genericUpsert",
-			);
-			return true;
-		} catch (error) {
-			logger.error({ err: error, collectionName }, "DBHelper:genericUpsert");
-			return false;
-		}
-	}
-
 	async genericPipeline<T extends object>(
 		pipeline: MongoPipeline,
 		collectionName: CollectionName,
@@ -415,80 +350,6 @@ export class DBHelper {
 				data: [],
 				success: false,
 				error: error instanceof Error ? error : new Error(String(error)),
-			};
-		}
-	}
-
-	async genericPaginatedPipeline<T extends object>(
-		pipeline: MongoPipeline,
-		collectionName: CollectionName,
-		page: number,
-		pageSize = 10,
-		validator?: z.ZodType<T>,
-	): Promise<DBResponsePaginated<T>> {
-		try {
-			const startTime = performance.now();
-
-			const amountToSkip = (page - 1) * pageSize;
-			const cursor = this.getCollection(collectionName).aggregate([
-				...pipeline,
-				{
-					$facet: {
-						metadata: [{ $count: "total" }],
-						data: [
-							{ $skip: amountToSkip },
-							{ $limit: pageSize },
-							{ $project: { _id: 0 } },
-						],
-					},
-				},
-			]);
-			const dbResultRaw = await cursor.toArray();
-			const dbResult = MongoDBPaginationSchema.parse(dbResultRaw);
-
-			if (!dbResult[0]) {
-				throw new Error("Paginated DB Response is empty");
-			}
-			const { data, metadata } = dbResult[0];
-
-			const total = metadata[0]?.total || 0;
-			const maxPage = Math.ceil(total / pageSize);
-
-			let outputData: T[];
-			if (validator) {
-				// Use validator to parse and convert the data to type T
-				outputData = validator.array().parse(data);
-			} else {
-				outputData = data as unknown as T[];
-			}
-			const processingTime = performance.now() - startTime;
-			logger.debug(
-				{
-					collectionName,
-					processingTimeMS: processingTime.toFixed(2),
-				},
-				"DBHelper:genericPaginatedPipeline",
-			);
-			return {
-				success: true,
-				data: {
-					page,
-					maxPage,
-					data: outputData,
-				},
-			};
-		} catch (error) {
-			logger.error(
-				{ err: error, collectionName },
-				"DBHelper:genericPaginatedPipeline",
-			);
-			return {
-				success: false,
-				data: {
-					page: 0,
-					maxPage: 0,
-					data: [],
-				},
 			};
 		}
 	}

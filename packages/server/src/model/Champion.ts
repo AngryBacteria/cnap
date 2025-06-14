@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { MongoDBIDSchema } from "./Database.js";
 
 //
 // Full Champion from Riot CDN
@@ -192,7 +191,6 @@ export type Skin = z.infer<typeof SkinSchema>;
  * Full Version of the Champion from the Riot CDN
  */
 export const ChampionDBSchema = z.object({
-	_id: MongoDBIDSchema,
 	id: z.number(),
 	alias: z.string(),
 	banVoPath: z.string(),
@@ -227,17 +225,3 @@ export const ChampionRiotReducedSchema = z.object({
 });
 
 export type ChampionRiotSummary = z.infer<typeof ChampionRiotReducedSchema>;
-
-/**
- * Reduced Version of Champion for the Client
- */
-export const ChampionReducedSchema = z.object({
-	id: z.number(),
-	name: z.string(),
-	alias: z.string(),
-	title: z.string(),
-	shortBio: z.string(),
-	uncenteredSplashPath: z.string(),
-});
-
-export type ChampionReduced = z.infer<typeof ChampionReducedSchema>;

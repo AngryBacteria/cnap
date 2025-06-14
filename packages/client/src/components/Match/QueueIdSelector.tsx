@@ -36,6 +36,8 @@ export function QueueIdSelector({
 			maw={400}
 			clearable
 			searchable
+			placeholder={queuesQuery.isLoading ? "Loading..." : undefined}
+			disabled={queuesQuery.isLoading}
 			data={formattedQueues}
 			value={selectedQueueId}
 			onChange={setSelectedQueueId}

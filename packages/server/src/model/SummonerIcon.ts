@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { MongoDBIDSchema } from "./Database.js";
 
 export const DescriptionSchema = z.object({
 	region: z.string(),
@@ -16,7 +15,6 @@ export const RaritySchema = z.object({
 export type Rarity = z.infer<typeof RaritySchema>;
 
 export const SummonerIconDBSchema = z.object({
-	_id: MongoDBIDSchema,
 	id: z.number(),
 	contentId: z.string(),
 	descriptions: z.array(DescriptionSchema),

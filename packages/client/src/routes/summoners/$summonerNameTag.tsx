@@ -5,12 +5,8 @@ import { useState } from "react";
 import { ChampionIdSelector } from "../../components/Match/ChampionIdSelector.tsx";
 import { MatchBannerSummaryLoader } from "../../components/Match/MatchBannerSummaryLoader.tsx";
 import { QueueIdSelector } from "../../components/Match/QueueIdSelector.tsx";
-import { useItems } from "../../hooks/api/useItems.ts";
 import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts";
-import { useQueues } from "../../hooks/api/useQueues.ts";
 import { useSummoner } from "../../hooks/api/useSummoner.ts";
-import { useSummonerSpells } from "../../hooks/api/useSummonerSpells.ts";
-import { useSummonerSummary } from "../../hooks/api/useSummonerSummary.ts";
 
 export const Route = createFileRoute("/summoners/$summonerNameTag")({
 	component: SummonerPage,
@@ -29,7 +25,6 @@ export function SummonerPage() {
 	const tagLine = summonerNameTag.split("-")[1];
 
 	const summonerQuery = useSummoner({ gameName, tagLine });
-	const summonerSummaryQuery = useSummonerSummary({ gameName, tagLine });
 
 	// Preloading
 	useMatchesParticipant(
@@ -42,14 +37,8 @@ export function SummonerPage() {
 		},
 		true,
 	);
-	useItems(true);
-	useQueues(true);
-	useSummonerSpells(true);
 
-	if (
-		summonerQuery.status === "pending" ||
-		summonerSummaryQuery.status === "pending"
-	) {
+	if (summonerQuery.status === "pending") {
 		return (
 			<Flex
 				justify={"center"}
@@ -62,10 +51,7 @@ export function SummonerPage() {
 		);
 	}
 
-	if (
-		summonerQuery.status === "error" ||
-		summonerSummaryQuery.status === "error"
-	) {
+	if (summonerQuery.status === "error") {
 		return (
 			<Alert
 				title={"Fehler beim des Summoners"}
