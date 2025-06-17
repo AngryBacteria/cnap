@@ -1,4 +1,3 @@
-import { ObjectId } from "mongodb";
 import { z } from "zod";
 
 export const SummonerRiotSchema = z.object({
@@ -21,6 +20,5 @@ export const SummonerDbSchema = z.object({
 	revisionDate: z.number(),
 	summonerLevel: z.number(),
 	tagLine: z.string(),
-	memberId: z.instanceof(ObjectId).nullish(),
 });
 export type SummonerDb = z.infer<typeof SummonerDbSchema>;
