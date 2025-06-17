@@ -13,7 +13,7 @@ export const BACKEND_PORT = z
 /**
  * The primary database URL.
  */
-export const DB_URL = z.url().parse(process.env.DATABASE_URL);
+export const DB_URL = z.url().parse(process.env.DB_URL);
 
 /**
  * The connection string for MongoDB.

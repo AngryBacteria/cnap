@@ -30,6 +30,7 @@ function RouteComponent() {
 	const sessionId = Route.useParams().sessionId;
 
 	// TODO route level validation?
+	//TODO add audio loading
 	const query = usePenAndPaperSession(Number.parseInt(sessionId));
 
 	if (query.status === "pending") {
@@ -190,13 +191,6 @@ function RouteComponent() {
 						</Card>
 					))}
 				</Flex>
-
-				<Title order={3}>Audio recording</Title>
-				<Card withBorder shadow="sm">
-					<audio controls src={session.audioFileUrls[0]}>
-						<track kind={"captions"} />
-					</audio>
-				</Card>
 			</Flex>
 		</>
 	);

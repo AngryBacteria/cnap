@@ -21,18 +21,6 @@ export const leagueMatchRelations = relations(
 	}),
 );
 
-export const LEAGUE_TIMELINES_TABLE = LEAGUE_SCHEMA.table("timelines", {
-	matchId: varchar().primaryKey(),
-	dataVersion: varchar().notNull(),
-	raw: jsonb().notNull(),
-});
-export const leagueTimelineRelations = relations(
-	LEAGUE_TIMELINES_TABLE,
-	({ many }) => ({
-		match: many(LEAGUE_MATCHES_TABLE),
-	}),
-);
-
 export const LEAGUE_MATCH_PARTICIPANTS_TABLE = LEAGUE_SCHEMA.table(
 	"match_participants",
 	{

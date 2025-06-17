@@ -1,32 +1,17 @@
 import { type SQL, getTableColumns, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { type PgTable, customType } from "drizzle-orm/pg-core";
+import type { PgTable } from "drizzle-orm/pg-core";
 import { DB_URL } from "../helpers/EnvironmentConfig.js";
+import { to } from "../helpers/General.js";
 import logger from "../helpers/Logger.js";
 import * as schema from "./schemas/index.js";
 
 export const db = drizzle({
 	connection: {
 		connectionString: DB_URL,
-		ssl: false, // TODO
+		ssl: false,
 	},
 	schema,
-});
-
-export const bytea = customType<{
-	data: Buffer;
-	driverData: Buffer;
-	config: never;
-}>({
-	dataType() {
-		return "bytea";
-	},
-	toDriver(value) {
-		return value;
-	},
-	fromDriver(value) {
-		return value;
-	},
 });
 
 export async function testDBConnection() {
@@ -69,12 +54,12 @@ export const getAllOnConflictColumns = <
 	);
 };
 
-type MissingParticipant = {
+export type MissingParticipant = {
 	matchId: string;
 	puuid: string;
 };
 
-export async function getMissingParticipants() {
+export async function getMissingMatchParticipants() {
 	const query = sql`
 		SELECT DISTINCT
 			m."matchId",
@@ -89,33 +74,18 @@ export async function getMissingParticipants() {
 		);
 	`;
 
-	const result = await db.execute(query);
+	const [result, error] = await to(db.execute(query));
+	if (error) {
+		logger.error(
+			{ err: error },
+			"getMissingParticipants: Error executing query to find missing Match Participants",
+		);
+		return [];
+	}
+
+	logger.debug(
+		{ missingAmount: result.rows.length },
+		"getMissingParticipants: Query executed successfully",
+	);
 	return result.rows as MissingParticipant[];
-}
-
-type MissingTimeline = {
-	matchId: string;
-};
-
-export async function getMissingTimelines() {
-	const query = sql`
-		SELECT DISTINCT
-			m."matchId"
-		FROM
-			league.matches AS m,
-			jsonb_array_elements(m.raw -> 'info' -> 'participants') AS p
-		WHERE
-			(p ->> 'puuid') <> 'BOT'
-		  AND NOT EXISTS (
-			SELECT
-				1
-			FROM
-				league.timelines AS mp
-			WHERE
-				mp."matchId" = m."matchId"
-		)
-	`;
-
-	const result = await db.execute(query);
-	return result.rows as MissingTimeline[];
 }

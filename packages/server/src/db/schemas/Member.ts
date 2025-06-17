@@ -9,6 +9,7 @@ export const MEMBERS_TABLE = CORE_SCHEMA.table("members", {
 	punchline: varchar(),
 	core: boolean().notNull(),
 	profilePictureBase64: varchar(),
+	profilePictureMimeType: varchar(),
 });
 
 export const membersRelations = relations(MEMBERS_TABLE, ({ many }) => ({

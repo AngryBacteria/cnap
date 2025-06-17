@@ -13,8 +13,8 @@ import {
 	LEAGUE_SUMMONERS_TABLE,
 	LEAGUE_SUMMONER_SPELLS_TABLE,
 } from "../../db/schemas/index.js";
+import { to } from "../../helpers/General.js";
 import logger from "../../helpers/Logger.js";
-import { to } from "../../helpers/Promises.js";
 import rh from "../../helpers/RiotHelper.js";
 import { loggedProcedure } from "../middlewares/executionTime.js";
 import { router } from "../trcp.js";

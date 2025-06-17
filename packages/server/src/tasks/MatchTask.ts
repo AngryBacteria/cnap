@@ -3,20 +3,16 @@ import { db } from "../db/index.js";
 import {
 	LEAGUE_MATCHES_TABLE,
 	LEAGUE_MATCH_PARTICIPANTS_TABLE,
-	LEAGUE_TIMELINES_TABLE,
 } from "../db/schemas/index.js";
+import { difference, to } from "../helpers/General.js";
 import logger from "../helpers/Logger.js";
-import { to } from "../helpers/Promises.js";
 import rh from "../helpers/RiotHelper.js";
 import type { MatchV5DB } from "../model/MatchV5.js";
-
-//TODO migrate
 
 export type Transaction = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
 export class MatchTask {
-	//TODO fill gaps function
-	async updateMatchData(count = 69, offset = 0): Promise<void> {
+	async updateSummonerMatchData(count = 69, offset = 0): Promise<void> {
 		const [summonersData, summonersError] = await to(
 			db.query.LEAGUE_SUMMONERS_TABLE.findMany(),
 		);
@@ -43,8 +39,9 @@ export class MatchTask {
 				.from(LEAGUE_MATCHES_TABLE)
 				.where(inArray(LEAGUE_MATCHES_TABLE.matchId, riotMatchIds));
 			const existingDBMatchIds = existingMatches.map((m) => m.matchId);
-			const nonExistingDBMatchIds = riotMatchIds.filter(
-				(id) => !existingDBMatchIds.includes(id),
+			const nonExistingDBMatchIds = difference(
+				riotMatchIds,
+				existingDBMatchIds,
 			);
 
 			// Get match data for non-existing matches
@@ -56,22 +53,26 @@ export class MatchTask {
 				}
 			}
 
-			// Add new matches, timelines and match-participants to the database
-			await db.transaction(async (tx) => {
-				await this.addMatchesToDB(matchData, summoner.puuid, tx);
-				await this.addMatchParticipantsToDB(matchData, summoner.puuid, tx);
-				await this.addTimelinesToDB(nonExistingDBMatchIds, summoner.puuid, tx);
-			});
-
-			logger.debug(
-				{
-					puuid: summoner.puuid,
-					totalMatchIds: riotMatchIds.length,
-					existingDBMatchIds: existingDBMatchIds.length,
-					nonExistingDBMatchIds: nonExistingDBMatchIds.length,
-				},
-				"Task:updateMatchData Updated match data for summoner",
-			);
+			try {
+				await db.transaction(async (tx) => {
+					await this.addMatchesToDB(matchData, summoner.puuid, tx);
+					await this.addMatchParticipantsToDB(matchData, summoner.puuid, tx);
+				});
+				logger.debug(
+					{
+						puuid: summoner.puuid,
+						totalMatchIds: riotMatchIds.length,
+						existingDBMatchIds: existingDBMatchIds.length,
+						nonExistingDBMatchIds: nonExistingDBMatchIds.length,
+					},
+					"Task:updateMatchData Updated match data for summoner",
+				);
+			} catch (e) {
+				logger.error(
+					{ err: e, puuid: summoner.puuid },
+					"Task:updateMatchData Error updating match data for summoner",
+				);
+			}
 		}
 
 		logger.debug(
@@ -157,36 +158,10 @@ export class MatchTask {
 		}
 	}
 
-	async addTimelinesToDB(matchIds: string[], puuid: string, tx: Transaction) {
-		const timelineData: (typeof LEAGUE_TIMELINES_TABLE.$inferInsert)[] = [];
-		for (const matchId of matchIds) {
-			const timeline = await rh.getTimeline(matchId);
-			if (timeline) {
-				timelineData.push({
-					matchId: timeline.metadata.matchId,
-					dataVersion: timeline.metadata.dataVersion,
-					raw: timeline,
-				});
-			}
-		}
-
-		if (timelineData.length > 0) {
-			const [__, insertTimelineError] = await to(
-				tx.insert(LEAGUE_TIMELINES_TABLE).values(timelineData),
-			);
-			if (insertTimelineError) {
-				logger.error(
-					{ err: insertTimelineError, puuid },
-					"Task:addTimelinesToDB Error inserting match participant data into database",
-				);
-			}
-		}
-	}
-
 	async fillMatchData() {
 		logger.debug("Task:fillMatchData Starting to fill match data");
 		for (let i = 0; i < 2000; i += 69) {
-			await this.updateMatchData(69, i);
+			await this.updateSummonerMatchData(69, i);
 		}
 		logger.debug("Task:fillMatchData Finished filling match data");
 	}

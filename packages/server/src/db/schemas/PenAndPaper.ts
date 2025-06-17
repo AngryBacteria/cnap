@@ -9,7 +9,6 @@ export const PEN_AND_PAPER_CHARACTER_TABLE = PNP_SCHEMA.table("characters", {
 	memberGameName: varchar()
 		.notNull()
 		.references(() => MEMBERS_TABLE.gameName, { onDelete: "cascade" }),
-	imageUrls: varchar().array().notNull(),
 });
 export const characterRelations = relations(
 	PEN_AND_PAPER_CHARACTER_TABLE,
@@ -32,12 +31,13 @@ export const PEN_AND_PAPER_SESSION_TABLE = PNP_SCHEMA.table("sessions", {
 		.notNull(),
 	timestamp: bigint({ mode: "number" }).notNull(),
 	sessionName: varchar().notNull(),
-	campaign: varchar("campaign").notNull(),
-	summaryLong: varchar("summary_long").notNull(),
-	summaryShort: varchar("summary_short").notNull(),
+	campaign: varchar().notNull(),
+	summaryLong: varchar().notNull(),
+	summaryShort: varchar().notNull(),
 	goals: varchar().array().notNull().notNull(),
-	transcriptions: varchar().array().notNull().notNull(),
-	audioFileUrls: varchar().array().notNull().notNull(),
+	transcriptions: varchar().array().notNull(),
+	audioFileBase64: varchar(),
+	audioFileMimeType: varchar(),
 });
 export const sessionRelations = relations(
 	PEN_AND_PAPER_SESSION_TABLE,

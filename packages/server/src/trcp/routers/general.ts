@@ -1,8 +1,8 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { db, testDBConnection } from "../../db/index.js";
+import { to } from "../../helpers/General.js";
 import logger from "../../helpers/Logger.js";
-import { to } from "../../helpers/Promises.js";
 import { loggedProcedure } from "../middlewares/executionTime.js";
 import { router } from "../trcp.js";
 
