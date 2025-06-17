@@ -16,13 +16,6 @@ export const BACKEND_PORT = z
 export const DB_URL = z.url().parse(process.env.DB_URL);
 
 /**
- * The connection string for MongoDB.
- */
-export const MONGODB_CONNECTION_STRING = z
-	.url()
-	.parse(process.env.MONGODB_CONNECTION_STRING);
-
-/**
  * Flag indicating whether periodic background tasks should run.
  * Defaults to false if not set or not "true".
  */
