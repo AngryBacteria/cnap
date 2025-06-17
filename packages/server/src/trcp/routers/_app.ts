@@ -18,7 +18,6 @@ import { penAndPaperRouter } from "./penAndPaper.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-const staticFilesPath = join(__dirname, "..", "..", "..", "..", "..", "static");
 const spaFilesPath = join(
 	__dirname,
 	"..",
@@ -31,13 +30,7 @@ const spaFilesPath = join(
 	"dist",
 );
 
-// Validate paths exist
-if (!fs.existsSync(staticFilesPath)) {
-	logger.error(
-		`The folder at ${staticFilesPath} does not exist. Static files will not be served`,
-	);
-}
-
+// Validate spa path exist
 if (!fs.existsSync(spaFilesPath)) {
 	logger.error(
 		`The client/dist folder at ${spaFilesPath} does not exist. Frontend will not work`,
@@ -52,7 +45,6 @@ const appRouter = router({
 
 const app = express();
 app.use(cors());
-app.use("/static", express.static(staticFilesPath));
 app.use(
 	"/trpc",
 	trpcExpress.createExpressMiddleware({
