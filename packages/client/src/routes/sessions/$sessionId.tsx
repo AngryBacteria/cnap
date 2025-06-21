@@ -68,6 +68,7 @@ function RouteComponent() {
 		role: string;
 		memberName: string;
 		profilePictureBase64: string | null;
+		profilePictureMimeType: string | null;
 	}
 	const playerObjects: PenAndPaperParticipant[] = session.characters.map(
 		(character) => ({
@@ -75,12 +76,14 @@ function RouteComponent() {
 			role: "Player",
 			memberName: character.character.member.gameName,
 			profilePictureBase64: character.character.member.profilePictureBase64,
+			profilePictureMimeType: character.character.member.profilePictureMimeType,
 		}),
 	);
 	const dmObject: PenAndPaperParticipant = {
 		memberName: session.dm.gameName,
 		role: "Dungeon Master",
 		profilePictureBase64: session.dm.profilePictureBase64,
+		profilePictureMimeType: session.dm.profilePictureMimeType,
 	};
 	const participants: PenAndPaperParticipant[] = [
 		...playerObjects,
@@ -179,14 +182,14 @@ function RouteComponent() {
 									<Badge color={PRIMARY_COLOR}>{participant.role}</Badge>
 								</Flex>
 								<Text c={"dimmed"}>{participant.memberName}</Text>
-								<Image
-									src={participant.profilePictureBase64}
-									fallbackSrc={
-										"https://cnap.ch/static/profilePictures/unknown.png"
-									}
-									h={200}
-									w="auto"
-								/>
+								{participant.profilePictureBase64 &&
+									participant.profilePictureMimeType && (
+										<Image
+											src={`data:${participant.profilePictureMimeType};base64,${participant.profilePictureBase64}`}
+											h={200}
+											w="auto"
+										/>
+									)}
 							</Flex>
 						</Card>
 					))}

@@ -36,11 +36,15 @@ export function MemberCard({ member }: Props) {
 						justify={{ base: "center", md: "flex-start" }}
 						wrap={"wrap"}
 					>
-						<Image
-							src={member.profilePictureBase64}
-							fallbackSrc={"https://cnap.ch/static/profilePictures/unknown.png"}
-							className={styles.memberImage}
-						/>
+						{member.profilePictureBase64 && member.profilePictureMimeType ? (
+							<Image
+								src={`data:${member.profilePictureMimeType};base64,${member.profilePictureBase64}`}
+								className={styles.memberImage}
+							/>
+						) : (
+							<div className={styles.memberImage} />
+						)}
+
 						<Flex direction={"column"}>
 							<Title order={2} ta={{ base: "center", md: "left" }}>
 								{member.gameName}

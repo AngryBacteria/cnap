@@ -47,8 +47,11 @@ export class GameDataTask {
 					}),
 				)
 				.onConflictDoUpdate({
-					target: LEAGUE_CHAMPION_PLAYSTYLES_TABLE.id,
-					set: getAllOnConflictColumns(LEAGUE_CHAMPION_PLAYSTYLES_TABLE, "id"),
+					target: LEAGUE_CHAMPION_PLAYSTYLES_TABLE.championId,
+					set: getAllOnConflictColumns(
+						LEAGUE_CHAMPION_PLAYSTYLES_TABLE,
+						"championId",
+					),
 				});
 
 			await db
@@ -62,10 +65,10 @@ export class GameDataTask {
 					}),
 				)
 				.onConflictDoUpdate({
-					target: LEAGUE_CHAMPION_TACTICAL_INFO_TABLE.id,
+					target: LEAGUE_CHAMPION_TACTICAL_INFO_TABLE.championId,
 					set: getAllOnConflictColumns(
 						LEAGUE_CHAMPION_TACTICAL_INFO_TABLE,
-						"id",
+						"championId",
 					),
 				});
 
@@ -97,8 +100,11 @@ export class GameDataTask {
 					}),
 				)
 				.onConflictDoUpdate({
-					target: LEAGUE_CHAMPION_PASSIVES_TABLE.id,
-					set: getAllOnConflictColumns(LEAGUE_CHAMPION_PASSIVES_TABLE, "id"),
+					target: LEAGUE_CHAMPION_PASSIVES_TABLE.championId,
+					set: getAllOnConflictColumns(
+						LEAGUE_CHAMPION_PASSIVES_TABLE,
+						"championId",
+					),
 				});
 
 			await db
@@ -114,7 +120,10 @@ export class GameDataTask {
 					}),
 				)
 				.onConflictDoUpdate({
-					target: LEAGUE_CHAMPION_SPELLS_TABLE.id,
+					target: [
+						LEAGUE_CHAMPION_SPELLS_TABLE.championId,
+						LEAGUE_CHAMPION_SPELLS_TABLE.spellKey,
+					],
 					set: getAllOnConflictColumns(LEAGUE_CHAMPION_SPELLS_TABLE, "id"),
 				});
 

@@ -1,5 +1,12 @@
 import { relations } from "drizzle-orm";
-import { boolean, integer, real, serial, varchar } from "drizzle-orm/pg-core";
+import {
+	boolean,
+	integer,
+	real,
+	serial,
+	unique,
+	varchar,
+} from "drizzle-orm/pg-core";
 import { LEAGUE_SCHEMA } from "./PGSchemas.js";
 
 export const LEAGUE_CHAMPIONS_TABLE = LEAGUE_SCHEMA.table("champions", {
@@ -32,10 +39,10 @@ export const championRelations = relations(
 export const LEAGUE_CHAMPION_PLAYSTYLES_TABLE = LEAGUE_SCHEMA.table(
 	"champion_playstyles",
 	{
-		id: serial().primaryKey(),
 		championId: integer()
 			.references(() => LEAGUE_CHAMPIONS_TABLE.id, { onDelete: "cascade" })
-			.notNull(),
+			.notNull()
+			.primaryKey(),
 		damage: integer().notNull(),
 		durability: integer().notNull(),
 		crowdControl: integer().notNull(),
@@ -56,10 +63,10 @@ export const championPlaystyleRelations = relations(
 export const LEAGUE_CHAMPION_TACTICAL_INFO_TABLE = LEAGUE_SCHEMA.table(
 	"champion_tactical_info",
 	{
-		id: serial().primaryKey(),
 		championId: integer()
 			.references(() => LEAGUE_CHAMPIONS_TABLE.id, { onDelete: "cascade" })
-			.notNull(),
+			.notNull()
+			.primaryKey(),
 		style: integer().notNull(),
 		difficulty: integer().notNull(),
 		damageType: varchar().notNull(),
@@ -78,7 +85,7 @@ export const championTacticalInfoRelations = relations(
 export const LEAGUE_CHAMPION_SKINS_TABLE = LEAGUE_SCHEMA.table(
 	"champion_skins",
 	{
-		id: serial().primaryKey(),
+		id: integer().primaryKey(),
 		championId: integer()
 			.references(() => LEAGUE_CHAMPIONS_TABLE.id, { onDelete: "cascade" })
 			.notNull(),
@@ -110,10 +117,10 @@ export const championSkinsRelations = relations(
 export const LEAGUE_CHAMPION_PASSIVES_TABLE = LEAGUE_SCHEMA.table(
 	"champion_passives",
 	{
-		id: serial().primaryKey(),
 		championId: integer()
 			.references(() => LEAGUE_CHAMPIONS_TABLE.id, { onDelete: "cascade" })
-			.notNull(),
+			.notNull()
+			.primaryKey(),
 		name: varchar().notNull(),
 		abilityIconPath: varchar().notNull(),
 		abilityVideoPath: varchar().notNull(),
@@ -151,6 +158,7 @@ export const LEAGUE_CHAMPION_SPELLS_TABLE = LEAGUE_SCHEMA.table(
 		cooldownCoefficients: real().array().notNull(),
 		spellKey: varchar().notNull(),
 	},
+	(t) => [unique().on(t.championId, t.spellKey)],
 );
 export const championSpellsRelations = relations(
 	LEAGUE_CHAMPION_SPELLS_TABLE,

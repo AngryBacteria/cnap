@@ -10,6 +10,10 @@ export const penAndPaperRouter = router({
 	getSession: loggedProcedure.input(z.number()).query(async (opts) => {
 		const [session, error] = await to(
 			db.query.PEN_AND_PAPER_SESSION_TABLE.findFirst({
+				columns: {
+					audioFileMimeType: false,
+					audioFileBase64: false,
+				},
 				where: (sessions, { eq }) => eq(sessions.id, opts.input),
 				with: {
 					dm: true,
@@ -53,7 +57,12 @@ export const penAndPaperRouter = router({
 	}),
 	getSessions: loggedProcedure.query(async () => {
 		const [sessions, error] = await to(
-			db.query.PEN_AND_PAPER_SESSION_TABLE.findMany(),
+			db.query.PEN_AND_PAPER_SESSION_TABLE.findMany({
+				columns: {
+					audioFileMimeType: false,
+					audioFileBase64: false,
+				},
+			}),
 		);
 		if (error) {
 			logger.error(
