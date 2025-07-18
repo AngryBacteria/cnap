@@ -262,23 +262,8 @@ export const lolRouter = router({
 							summonerSpell2Alias.id,
 						),
 					)
-					.where(
-						and(
-							gameName
-								? eq(LEAGUE_SUMMONERS_TABLE.gameName, gameName)
-								: undefined,
-							tagLine ? eq(LEAGUE_SUMMONERS_TABLE.tagLine, tagLine) : undefined,
-							championId
-								? eq(LEAGUE_MATCH_PARTICIPANTS_TABLE.championId, championId)
-								: undefined,
-							queueId
-								? eq(LEAGUE_MATCH_PARTICIPANTS_TABLE.queueId, queueId)
-								: undefined,
-							onlySummonersInDb
-								? isNotNull(LEAGUE_SUMMONERS_TABLE.puuid)
-								: undefined,
-						),
-					)
+					.where(whereConditions)
+					.orderBy(desc(LEAGUE_MATCH_PARTICIPANTS_TABLE.gameCreation))
 					.limit(PAGE_SIZE)
 					.offset(offset),
 			);

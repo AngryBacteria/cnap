@@ -91,8 +91,14 @@ export function MatchBannerSummary({ match }: Props) {
 						</Flex>
 
 						<Flex direction={"column"} justify={"center"} align={"center"}>
-							<Text>{participant.riotIdGameName}</Text>
-							<Text c="dimmed">#{participant.riotIdTagline}</Text>
+							<Text>
+								{participant.riotIdGameName
+									? participant.riotIdGameName
+									: participant.summonerName}
+							</Text>
+							{participant.riotIdTagline && (
+								<Text c="dimmed">#{participant.riotIdTagline}</Text>
+							)}
 						</Flex>
 
 						<Flex direction={"column"} justify={"center"} align={"center"}>

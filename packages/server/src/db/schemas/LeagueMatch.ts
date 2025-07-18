@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import {
 	bigint,
 	boolean,
+	index,
 	integer,
 	jsonb,
 	uniqueIndex,
@@ -71,7 +72,8 @@ export const LEAGUE_MATCH_PARTICIPANTS_TABLE = LEAGUE_SCHEMA.table(
 		totalMinionsKilled: integer().notNull(),
 	},
 	(table) => [
-		uniqueIndex("matchid-puuid-index").on(table.matchId, table.puuid),
+		uniqueIndex().on(table.matchId, table.puuid),
+		index().on(table.gameCreation),
 	],
 );
 
