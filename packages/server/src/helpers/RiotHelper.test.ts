@@ -86,14 +86,10 @@ describe("RiotHelper API", () => {
 			expect(items[0]).toBeDefined();
 		});
 
-		test(
-			"getChampions Schemas are correct",
-			async () => {
-				const champs = await riotHelper.getChampions();
-				expect(champs[0]).toBeDefined();
-			},
-			{ timeout: 20000 },
-		);
+		test("getChampions Schemas are correct", { timeout: 60000 }, async () => {
+			const champs = await riotHelper.getChampions();
+			expect(champs[0]).toBeDefined();
+		});
 
 		test("getGameModes Schemas are correct", async () => {
 			const modes = await riotHelper.getGameModes();
