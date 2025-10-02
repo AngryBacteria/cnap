@@ -1,6 +1,6 @@
 import { Alert, Badge, Card, Flex, Loader, Text, Title } from "@mantine/core";
 import { IconAlertSquareRounded } from "@tabler/icons-react";
-import { Link, createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "motion/react";
 import { FormattedDateText } from "../../components/General/FormattedDateText.tsx";
 import { usePenAndPaperSessions } from "../../hooks/api/usePenAndPaperSessions.ts";

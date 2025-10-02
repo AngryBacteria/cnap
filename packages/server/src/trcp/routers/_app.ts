@@ -1,11 +1,11 @@
 import fs from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import cors from "cors";
 import express from "express";
 import {
 	BACKEND_PORT,
+	CLIENT_DIST_PATH,
 	RUN_TASKS,
 	UPDATE_INTERVAL,
 } from "../../helpers/EnvironmentConfig.js";
@@ -16,25 +16,13 @@ import { generalRouter } from "./general.js";
 import { lolRouter } from "./lol.js";
 import { penAndPaperRouter } from "./penAndPaper.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const spaFilesPath = join(
-	__dirname,
-	"..",
-	"..",
-	"..",
-	"..",
-	"..",
-	"packages",
-	"client",
-	"dist",
-);
-
 // Validate spa path exist
-if (!fs.existsSync(spaFilesPath)) {
+if (!fs.existsSync(CLIENT_DIST_PATH)) {
 	logger.error(
-		`The client/dist folder at ${spaFilesPath} does not exist. Frontend will not work`,
+		`The client/dist folder at ${CLIENT_DIST_PATH} does not exist. Frontend will not work`,
 	);
+} else {
+	logger.info(`Serving SPA from path: ${CLIENT_DIST_PATH}`);
 }
 
 const appRouter = router({
@@ -52,7 +40,7 @@ app.use(
 	}),
 );
 // Serve SPA files
-app.use(express.static(spaFilesPath));
+app.use(express.static(CLIENT_DIST_PATH));
 
 // Fallback route for SPA client-side routing
 app.get("*", (req, res, next) => {
@@ -62,7 +50,7 @@ app.get("*", (req, res, next) => {
 	}
 
 	// Serve the SPA's index.html for all other routes
-	res.sendFile(join(spaFilesPath, "index.html"), (err) => {
+	res.sendFile(join(CLIENT_DIST_PATH, "index.html"), (err) => {
 		if (err) {
 			next(err);
 		}
@@ -70,7 +58,7 @@ app.get("*", (req, res, next) => {
 });
 
 app.listen(BACKEND_PORT);
-logger.debug(
+logger.info(
 	{
 		port: BACKEND_PORT,
 		baseUrl: "http://localhost",

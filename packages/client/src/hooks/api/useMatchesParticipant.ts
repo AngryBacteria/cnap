@@ -6,12 +6,10 @@ export const useMatchesParticipant = (
 	queryParams: Inputs["lol"]["getMatchesParticipant"],
 	prefetchOnly?: boolean,
 ) => {
-	if (prefetchOnly) {
-		return useQuery(
-			trpc.lol.getMatchesParticipant.queryOptions(queryParams, {
+	const options = prefetchOnly
+		? trpc.lol.getMatchesParticipant.queryOptions(queryParams, {
 				notifyOnChangeProps: [],
-			}),
-		);
-	}
-	return useQuery(trpc.lol.getMatchesParticipant.queryOptions(queryParams));
+			})
+		: trpc.lol.getMatchesParticipant.queryOptions(queryParams);
+	return useQuery(options);
 };

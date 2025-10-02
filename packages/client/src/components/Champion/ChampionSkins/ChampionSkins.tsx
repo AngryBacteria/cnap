@@ -1,10 +1,9 @@
 import { Carousel } from "@mantine/carousel";
 import { Badge, Card, Image, Modal, Text, Title } from "@mantine/core";
-import styles from "./ChampionSkins.module.css";
-
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import type { Outputs } from "../../../utils/trcp.ts";
+import styles from "./ChampionSkins.module.css";
 
 interface Props {
 	champion: Outputs["lol"]["getChampionById"];
@@ -32,8 +31,6 @@ export function ChampionSkins({ champion }: Props) {
 				<Carousel
 					slideSize={{ sm: "50%", lg: "33.333333%", xl: "25%" }}
 					slideGap={{ base: 0, sm: "sm" }}
-					align={"start"}
-					loop
 					withIndicators
 				>
 					{champion.skins.map((skin) => {

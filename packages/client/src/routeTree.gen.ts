@@ -8,118 +8,51 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-// Import Routes
+import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
+import { Route as SummonersIndexRouteImport } from './routes/summoners/index'
+import { Route as SessionsIndexRouteImport } from './routes/sessions/index'
+import { Route as ChampionsIndexRouteImport } from './routes/champions/index'
+import { Route as SummonersSummonerNameTagRouteImport } from './routes/summoners/$summonerNameTag'
+import { Route as SessionsSessionIdRouteImport } from './routes/sessions/$sessionId'
+import { Route as ChampionsChampionIdRouteImport } from './routes/champions/$championId'
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as IndexImport } from './routes/index'
-import { Route as SummonersIndexImport } from './routes/summoners/index'
-import { Route as SessionsIndexImport } from './routes/sessions/index'
-import { Route as ChampionsIndexImport } from './routes/champions/index'
-import { Route as SummonersSummonerNameTagImport } from './routes/summoners/$summonerNameTag'
-import { Route as SessionsSessionIdImport } from './routes/sessions/$sessionId'
-import { Route as ChampionsChampionIdImport } from './routes/champions/$championId'
-
-// Create/Update Routes
-
-const IndexRoute = IndexImport.update({
+const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const SummonersIndexRoute = SummonersIndexImport.update({
+const SummonersIndexRoute = SummonersIndexRouteImport.update({
   id: '/summoners/',
   path: '/summoners/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const SessionsIndexRoute = SessionsIndexImport.update({
+const SessionsIndexRoute = SessionsIndexRouteImport.update({
   id: '/sessions/',
   path: '/sessions/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const ChampionsIndexRoute = ChampionsIndexImport.update({
+const ChampionsIndexRoute = ChampionsIndexRouteImport.update({
   id: '/champions/',
   path: '/champions/',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const SummonersSummonerNameTagRoute = SummonersSummonerNameTagImport.update({
-  id: '/summoners/$summonerNameTag',
-  path: '/summoners/$summonerNameTag',
-  getParentRoute: () => rootRoute,
-} as any)
-
-const SessionsSessionIdRoute = SessionsSessionIdImport.update({
+const SummonersSummonerNameTagRoute =
+  SummonersSummonerNameTagRouteImport.update({
+    id: '/summoners/$summonerNameTag',
+    path: '/summoners/$summonerNameTag',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const SessionsSessionIdRoute = SessionsSessionIdRouteImport.update({
   id: '/sessions/$sessionId',
   path: '/sessions/$sessionId',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-const ChampionsChampionIdRoute = ChampionsChampionIdImport.update({
+const ChampionsChampionIdRoute = ChampionsChampionIdRouteImport.update({
   id: '/champions/$championId',
   path: '/champions/$championId',
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => rootRouteImport,
 } as any)
-
-// Populate the FileRoutesByPath interface
-
-declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/champions/$championId': {
-      id: '/champions/$championId'
-      path: '/champions/$championId'
-      fullPath: '/champions/$championId'
-      preLoaderRoute: typeof ChampionsChampionIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/sessions/$sessionId': {
-      id: '/sessions/$sessionId'
-      path: '/sessions/$sessionId'
-      fullPath: '/sessions/$sessionId'
-      preLoaderRoute: typeof SessionsSessionIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/summoners/$summonerNameTag': {
-      id: '/summoners/$summonerNameTag'
-      path: '/summoners/$summonerNameTag'
-      fullPath: '/summoners/$summonerNameTag'
-      preLoaderRoute: typeof SummonersSummonerNameTagImport
-      parentRoute: typeof rootRoute
-    }
-    '/champions/': {
-      id: '/champions/'
-      path: '/champions'
-      fullPath: '/champions'
-      preLoaderRoute: typeof ChampionsIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/sessions/': {
-      id: '/sessions/'
-      path: '/sessions'
-      fullPath: '/sessions'
-      preLoaderRoute: typeof SessionsIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/summoners/': {
-      id: '/summoners/'
-      path: '/summoners'
-      fullPath: '/summoners'
-      preLoaderRoute: typeof SummonersIndexImport
-      parentRoute: typeof rootRoute
-    }
-  }
-}
-
-// Create and export the route tree
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -130,7 +63,6 @@ export interface FileRoutesByFullPath {
   '/sessions': typeof SessionsIndexRoute
   '/summoners': typeof SummonersIndexRoute
 }
-
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/champions/$championId': typeof ChampionsChampionIdRoute
@@ -140,9 +72,8 @@ export interface FileRoutesByTo {
   '/sessions': typeof SessionsIndexRoute
   '/summoners': typeof SummonersIndexRoute
 }
-
 export interface FileRoutesById {
-  __root__: typeof rootRoute
+  __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/champions/$championId': typeof ChampionsChampionIdRoute
   '/sessions/$sessionId': typeof SessionsSessionIdRoute
@@ -151,7 +82,6 @@ export interface FileRoutesById {
   '/sessions/': typeof SessionsIndexRoute
   '/summoners/': typeof SummonersIndexRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
@@ -182,7 +112,6 @@ export interface FileRouteTypes {
     | '/summoners/'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ChampionsChampionIdRoute: typeof ChampionsChampionIdRoute
@@ -191,6 +120,60 @@ export interface RootRouteChildren {
   ChampionsIndexRoute: typeof ChampionsIndexRoute
   SessionsIndexRoute: typeof SessionsIndexRoute
   SummonersIndexRoute: typeof SummonersIndexRoute
+}
+
+declare module '@tanstack/react-router' {
+  interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/summoners/': {
+      id: '/summoners/'
+      path: '/summoners'
+      fullPath: '/summoners'
+      preLoaderRoute: typeof SummonersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sessions/': {
+      id: '/sessions/'
+      path: '/sessions'
+      fullPath: '/sessions'
+      preLoaderRoute: typeof SessionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/champions/': {
+      id: '/champions/'
+      path: '/champions'
+      fullPath: '/champions'
+      preLoaderRoute: typeof ChampionsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/summoners/$summonerNameTag': {
+      id: '/summoners/$summonerNameTag'
+      path: '/summoners/$summonerNameTag'
+      fullPath: '/summoners/$summonerNameTag'
+      preLoaderRoute: typeof SummonersSummonerNameTagRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sessions/$sessionId': {
+      id: '/sessions/$sessionId'
+      path: '/sessions/$sessionId'
+      fullPath: '/sessions/$sessionId'
+      preLoaderRoute: typeof SessionsSessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/champions/$championId': {
+      id: '/champions/$championId'
+      path: '/champions/$championId'
+      fullPath: '/champions/$championId'
+      preLoaderRoute: typeof ChampionsChampionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+  }
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -202,47 +185,6 @@ const rootRouteChildren: RootRouteChildren = {
   SessionsIndexRoute: SessionsIndexRoute,
   SummonersIndexRoute: SummonersIndexRoute,
 }
-
-export const routeTree = rootRoute
+export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-/* ROUTE_MANIFEST_START
-{
-  "routes": {
-    "__root__": {
-      "filePath": "__root.tsx",
-      "children": [
-        "/",
-        "/champions/$championId",
-        "/sessions/$sessionId",
-        "/summoners/$summonerNameTag",
-        "/champions/",
-        "/sessions/",
-        "/summoners/"
-      ]
-    },
-    "/": {
-      "filePath": "index.tsx"
-    },
-    "/champions/$championId": {
-      "filePath": "champions/$championId.tsx"
-    },
-    "/sessions/$sessionId": {
-      "filePath": "sessions/$sessionId.tsx"
-    },
-    "/summoners/$summonerNameTag": {
-      "filePath": "summoners/$summonerNameTag.tsx"
-    },
-    "/champions/": {
-      "filePath": "champions/index.tsx"
-    },
-    "/sessions/": {
-      "filePath": "sessions/index.tsx"
-    },
-    "/summoners/": {
-      "filePath": "summoners/index.tsx"
-    }
-  }
-}
-ROUTE_MANIFEST_END */

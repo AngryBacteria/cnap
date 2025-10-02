@@ -15,21 +15,19 @@
     "start": "concurrently \"pnpm start:client\" \"pnpm start:server\"",
     "start:client": "pnpm --filter client start",
     "start:server": "pnpm --filter server start",
-    "cleanup": "pnpm -r exec rimraf dist && rimraf node_modules pnpm-lock.yaml",
+    "cleanup": "pnpm -r cleanup",
     "prepare": "husky"
   },
   "dependencies": {
-    "concurrently": "9.1.2",
-    "dotenv": "16.5.0",
-    "drizzle-orm": "^0.44.2",
-    "pg": "^8.16.0",
+    "concurrently": "9.2.1",
+    "dotenv": "17.2.2",
     "rimraf": "6.0.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
-    "@types/pg": "^8.15.2",
-    "drizzle-kit": "^0.31.1",
-    "husky": "^9.1.7",
-    "tsx": "4.19.4"
-  }
+    "@biomejs/biome": "2.2.4",
+    "husky": "9.1.7",
+    "tsx": "4.20.5",
+    "typescript": "5.9.2"
+  },
+  "packageManager": "pnpm@10.18.0"
 }

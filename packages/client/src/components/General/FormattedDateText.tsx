@@ -22,7 +22,7 @@ export function FormattedDateText({ unixTimestamp }: Props) {
 			style: "long",
 		});
 
-		const diffTime = Math.abs(unixTimestamp - new Date().getTime());
+		const diffTime = Math.abs(unixTimestamp - Date.now());
 		const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
 		return rtf.format(-diffDays, "days");

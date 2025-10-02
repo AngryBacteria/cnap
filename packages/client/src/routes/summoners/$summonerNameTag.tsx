@@ -12,7 +12,7 @@ export const Route = createFileRoute("/summoners/$summonerNameTag")({
 	component: SummonerPage,
 });
 
-export function SummonerPage() {
+function SummonerPage() {
 	const { summonerNameTag } = Route.useParams();
 	const [page, setPage] = useState<number>(1);
 
@@ -66,30 +66,28 @@ export function SummonerPage() {
 	}
 
 	return (
-		<>
-			<Flex direction={"column"} gap={"md"}>
-				<Title order={2}>Matches from {summonerQuery.data.gameName}</Title>
+		<Flex direction={"column"} gap={"md"}>
+			<Title order={2}>Matches from {summonerQuery.data.gameName}</Title>
 
-				<Flex direction={"row"} gap={"md"} wrap={"wrap"}>
-					<QueueIdSelector
-						selectedQueueId={selectedQueueId}
-						setSelectedQueueId={setSelectedQueueId}
-					/>
-					<ChampionIdSelector
-						selectedChampionId={selectedChampionId}
-						setSelectedChampionId={setSelectedChampionId}
-					/>
-				</Flex>
-
-				<MatchBannerSummaryLoader
-					gameName={gameName}
-					tagLine={tagLine}
-					page={page}
-					setPage={setPage}
-					queueId={Number(selectedQueueId)}
-					championId={Number(selectedChampionId)}
+			<Flex direction={"row"} gap={"md"} wrap={"wrap"}>
+				<QueueIdSelector
+					selectedQueueId={selectedQueueId}
+					setSelectedQueueId={setSelectedQueueId}
+				/>
+				<ChampionIdSelector
+					selectedChampionId={selectedChampionId}
+					setSelectedChampionId={setSelectedChampionId}
 				/>
 			</Flex>
-		</>
+
+			<MatchBannerSummaryLoader
+				gameName={gameName}
+				tagLine={tagLine}
+				page={page}
+				setPage={setPage}
+				queueId={Number(selectedQueueId)}
+				championId={Number(selectedChampionId)}
+			/>
+		</Flex>
 	);
 }

@@ -37,3 +37,11 @@ export const UPDATE_INTERVAL = z
  * The API key for the Riot Games API.
  */
 export const RIOT_API_KEY = z.string().parse(process.env.RIOT_API_KEY);
+
+/**
+ * The path to the built client files.
+ */
+export const CLIENT_DIST_PATH = z
+	.string()
+	.default("/client/dist")
+	.parse(process.env.CLIENT_DIST_PATH);

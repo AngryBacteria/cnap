@@ -110,7 +110,7 @@ export function LeagueItemGrid({ match }: Props) {
 						transitionProps={{ transition: "fade-up", duration: 300 }}
 						shadow="md"
 						width={300}
-						// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+						// biome-ignore lint/suspicious/noArrayIndexKey: we need the index for unique id as multiple items can be the same
 						key={index + item.id}
 					>
 						<HoverCard.Target>
@@ -141,7 +141,7 @@ export function LeagueItemGrid({ match }: Props) {
 				) : (
 					<div
 						key={`empty-item-${
-							// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+							// biome-ignore lint/suspicious/noArrayIndexKey: we need the index for unique id as multiple items can be the same
 							index
 						}`}
 						className={styles.emptyItem}

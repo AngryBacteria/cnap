@@ -31,7 +31,7 @@ function RouteComponent() {
 
 	// TODO route level validation?
 	//TODO add audio loading
-	const query = usePenAndPaperSession(Number.parseInt(sessionId));
+	const query = usePenAndPaperSession(Number.parseInt(sessionId, 10));
 
 	if (query.status === "pending") {
 		return (
@@ -91,110 +91,102 @@ function RouteComponent() {
 	].sort(() => Math.random() - 0.5);
 
 	return (
-		<>
-			<Flex direction={"column"} gap={"md"}>
-				<Flex direction={"row"} gap={"md"} align={"center"} wrap={"wrap"}>
-					<Title order={2}>{session.sessionName}</Title>
-					<FormattedDateText unixTimestamp={session.timestamp} />
-					<Badge color={PRIMARY_COLOR}>{session.framework}</Badge>
-				</Flex>
-
-				<Card withBorder shadow="sm">
-					<Tabs defaultValue="shortSummary">
-						<Tabs.List>
-							<Tabs.Tab
-								value="shortSummary"
-								leftSection={<IconClipboardText size={12} />}
-							>
-								Summary (Short)
-							</Tabs.Tab>
-							<Tabs.Tab
-								value="longSummary"
-								leftSection={<IconScript size={12} />}
-							>
-								Summary (Long)
-							</Tabs.Tab>
-							<Tabs.Tab
-								value="goals"
-								leftSection={<IconTargetArrow size={12} />}
-							>
-								Goals
-							</Tabs.Tab>
-							<Tabs.Tab
-								value="transcript"
-								leftSection={<IconScript size={12} />}
-							>
-								Full Transcript
-							</Tabs.Tab>
-						</Tabs.List>
-
-						<Tabs.Panel value="shortSummary" p={"sm"}>
-							<Text>{session.summaryShort}</Text>
-						</Tabs.Panel>
-
-						<Tabs.Panel value="longSummary" p={"sm"}>
-							<ScrollArea h={"50vh"} offsetScrollbars>
-								<Text style={{ whiteSpace: "pre-line" }}>
-									{session.summaryLong}
-								</Text>
-							</ScrollArea>
-						</Tabs.Panel>
-
-						<Tabs.Panel value="goals" p={"sm"}>
-							<List>
-								{session.goals.map((goal) => (
-									<List.Item key={goal}>{goal}</List.Item>
-								))}
-							</List>
-						</Tabs.Panel>
-
-						<Tabs.Panel value="transcript" p={"sm"}>
-							<ScrollArea h={"50vh"} offsetScrollbars>
-								<Text style={{ whiteSpace: "pre-line" }}>{transcription}</Text>
-							</ScrollArea>
-						</Tabs.Panel>
-					</Tabs>
-				</Card>
-
-				<Title order={3}>Participants</Title>
-				<Flex
-					direction={"row"}
-					wrap={"wrap"}
-					gap={"md"}
-					justify={{ base: "center", sm: "flex-start" }}
-				>
-					{participants.map((participant) => (
-						<Card
-							withBorder
-							shadow="sm"
-							style={{ flex: "1 0 300px" }}
-							key={participant.memberName}
-						>
-							<Flex direction={"column"} align={"center"} gap={"sm"} p="md">
-								<Flex
-									direction={"row"}
-									gap={"sm"}
-									align={"center"}
-									justify={"center"}
-									wrap={"wrap"}
-								>
-									<Title order={4}>{participant.characterName}</Title>
-									<Badge color={PRIMARY_COLOR}>{participant.role}</Badge>
-								</Flex>
-								<Text c={"dimmed"}>{participant.memberName}</Text>
-								{participant.profilePictureBase64 &&
-									participant.profilePictureMimeType && (
-										<Image
-											src={`data:${participant.profilePictureMimeType};base64,${participant.profilePictureBase64}`}
-											h={200}
-											w="auto"
-										/>
-									)}
-							</Flex>
-						</Card>
-					))}
-				</Flex>
+		<Flex direction={"column"} gap={"md"}>
+			<Flex direction={"row"} gap={"md"} align={"center"} wrap={"wrap"}>
+				<Title order={2}>{session.sessionName}</Title>
+				<FormattedDateText unixTimestamp={session.timestamp} />
+				<Badge color={PRIMARY_COLOR}>{session.framework}</Badge>
 			</Flex>
-		</>
+
+			<Card withBorder shadow="sm">
+				<Tabs defaultValue="shortSummary">
+					<Tabs.List>
+						<Tabs.Tab
+							value="shortSummary"
+							leftSection={<IconClipboardText size={12} />}
+						>
+							Summary (Short)
+						</Tabs.Tab>
+						<Tabs.Tab
+							value="longSummary"
+							leftSection={<IconScript size={12} />}
+						>
+							Summary (Long)
+						</Tabs.Tab>
+						<Tabs.Tab value="goals" leftSection={<IconTargetArrow size={12} />}>
+							Goals
+						</Tabs.Tab>
+						<Tabs.Tab value="transcript" leftSection={<IconScript size={12} />}>
+							Full Transcript
+						</Tabs.Tab>
+					</Tabs.List>
+
+					<Tabs.Panel value="shortSummary" p={"sm"}>
+						<Text>{session.summaryShort}</Text>
+					</Tabs.Panel>
+
+					<Tabs.Panel value="longSummary" p={"sm"}>
+						<ScrollArea h={"50vh"} offsetScrollbars>
+							<Text style={{ whiteSpace: "pre-line" }}>
+								{session.summaryLong}
+							</Text>
+						</ScrollArea>
+					</Tabs.Panel>
+
+					<Tabs.Panel value="goals" p={"sm"}>
+						<List>
+							{session.goals.map((goal) => (
+								<List.Item key={goal}>{goal}</List.Item>
+							))}
+						</List>
+					</Tabs.Panel>
+
+					<Tabs.Panel value="transcript" p={"sm"}>
+						<ScrollArea h={"50vh"} offsetScrollbars>
+							<Text style={{ whiteSpace: "pre-line" }}>{transcription}</Text>
+						</ScrollArea>
+					</Tabs.Panel>
+				</Tabs>
+			</Card>
+
+			<Title order={3}>Participants</Title>
+			<Flex
+				direction={"row"}
+				wrap={"wrap"}
+				gap={"md"}
+				justify={{ base: "center", sm: "flex-start" }}
+			>
+				{participants.map((participant) => (
+					<Card
+						withBorder
+						shadow="sm"
+						style={{ flex: "1 0 300px" }}
+						key={participant.memberName}
+					>
+						<Flex direction={"column"} align={"center"} gap={"sm"} p="md">
+							<Flex
+								direction={"row"}
+								gap={"sm"}
+								align={"center"}
+								justify={"center"}
+								wrap={"wrap"}
+							>
+								<Title order={4}>{participant.characterName}</Title>
+								<Badge color={PRIMARY_COLOR}>{participant.role}</Badge>
+							</Flex>
+							<Text c={"dimmed"}>{participant.memberName}</Text>
+							{participant.profilePictureBase64 &&
+								participant.profilePictureMimeType && (
+									<Image
+										src={`data:${participant.profilePictureMimeType};base64,${participant.profilePictureBase64}`}
+										h={200}
+										w="auto"
+									/>
+								)}
+						</Flex>
+					</Card>
+				))}
+			</Flex>
+		</Flex>
 	);
 }

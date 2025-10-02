@@ -11,7 +11,7 @@ export const Route = createFileRoute("/champions/")({
 	component: ChampionsPage,
 });
 
-export function ChampionsPage() {
+function ChampionsPage() {
 	const [nameSearch, setNameSearch] = useState<string>("");
 
 	const championsQuery = useChampions();
@@ -66,37 +66,35 @@ export function ChampionsPage() {
 	}
 
 	return (
-		<>
-			<section>
-				<Title order={1} pb={"sm"}>
-					League of legends Champions
-				</Title>
-				<section className={styles.filters}>
-					<TextInput
-						placeholder="Champion Name"
-						onChange={(event) => setNameSearch(event.currentTarget.value)}
-					/>
-				</section>
-
-				<section className={styles.champions}>
-					<AnimatePresence mode={"popLayout"}>
-						{filteredChampions.map((champion) => {
-							return (
-								<motion.div
-									className={"fillSpacePointer"}
-									initial={{ opacity: 0, scale: 0.9 }}
-									animate={{ opacity: 1, scale: 1 }}
-									exit={{ opacity: 0, scale: 0.9 }}
-									transition={{ duration: 0.25 }}
-									key={champion.id}
-								>
-									<ChampionReducedCard champion={champion} />
-								</motion.div>
-							);
-						})}
-					</AnimatePresence>
-				</section>
+		<section>
+			<Title order={1} pb={"sm"}>
+				League of legends Champions
+			</Title>
+			<section className={styles.filters}>
+				<TextInput
+					placeholder="Champion Name"
+					onChange={(event) => setNameSearch(event.currentTarget.value)}
+				/>
 			</section>
-		</>
+
+			<section className={styles.champions}>
+				<AnimatePresence mode={"popLayout"}>
+					{filteredChampions.map((champion) => {
+						return (
+							<motion.div
+								className={"fillSpacePointer"}
+								initial={{ opacity: 0, scale: 0.9 }}
+								animate={{ opacity: 1, scale: 1 }}
+								exit={{ opacity: 0, scale: 0.9 }}
+								transition={{ duration: 0.25 }}
+								key={champion.id}
+							>
+								<ChampionReducedCard champion={champion} />
+							</motion.div>
+						);
+					})}
+				</AnimatePresence>
+			</section>
+		</section>
 	);
 }

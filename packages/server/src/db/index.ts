@@ -1,4 +1,4 @@
-import { type SQL, getTableColumns, sql } from "drizzle-orm";
+import { getTableColumns, type SQL, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { DB_URL } from "../helpers/EnvironmentConfig.js";

@@ -10,8 +10,8 @@ import {
 	LEAGUE_MAPS_TABLE,
 	LEAGUE_MATCH_PARTICIPANTS_TABLE,
 	LEAGUE_QUEUES_TABLE,
-	LEAGUE_SUMMONERS_TABLE,
 	LEAGUE_SUMMONER_SPELLS_TABLE,
+	LEAGUE_SUMMONERS_TABLE,
 } from "../../db/schemas/index.js";
 import { to } from "../../helpers/General.js";
 import logger from "../../helpers/Logger.js";

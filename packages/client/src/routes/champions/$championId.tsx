@@ -13,7 +13,7 @@ export const Route = createFileRoute("/champions/$championId")({
 	component: ChampionPage,
 });
 
-export function ChampionPage() {
+function ChampionPage() {
 	const { championId } = Route.useParams();
 	const [page, setPage] = useState<number>(1);
 	const [selectedQueueId, setSelectedQueueId] = useState<string | null>(null);
@@ -49,26 +49,24 @@ export function ChampionPage() {
 	}
 
 	return (
-		<>
-			<Flex direction={"column"} gap={"md"}>
-				<ChampionHeader champion={query.data} />
-				<ChampionAbilitiesTabs champion={query.data} />
-				<ChampionSkins champion={query.data} />
+		<Flex direction={"column"} gap={"md"}>
+			<ChampionHeader champion={query.data} />
+			<ChampionAbilitiesTabs champion={query.data} />
+			<ChampionSkins champion={query.data} />
 
-				<Title order={2}>Matches from CnAP Players on this champion</Title>
+			<Title order={2}>Matches from CnAP Players on this champion</Title>
 
-				<QueueIdSelector
-					selectedQueueId={selectedQueueId}
-					setSelectedQueueId={setSelectedQueueId}
-				/>
+			<QueueIdSelector
+				selectedQueueId={selectedQueueId}
+				setSelectedQueueId={setSelectedQueueId}
+			/>
 
-				<MatchBannerSummaryLoader
-					championId={query.data.id}
-					page={page}
-					setPage={setPage}
-					queueId={Number(selectedQueueId)}
-				/>
-			</Flex>
-		</>
+			<MatchBannerSummaryLoader
+				championId={query.data.id}
+				page={page}
+				setPage={setPage}
+				queueId={Number(selectedQueueId)}
+			/>
+		</Flex>
 	);
 }

@@ -1,8 +1,8 @@
 import { inArray } from "drizzle-orm";
 import { db } from "../db/index.js";
 import {
-	LEAGUE_MATCHES_TABLE,
 	LEAGUE_MATCH_PARTICIPANTS_TABLE,
+	LEAGUE_MATCHES_TABLE,
 } from "../db/schemas/index.js";
 import { difference, to } from "../helpers/General.js";
 import logger from "../helpers/Logger.js";

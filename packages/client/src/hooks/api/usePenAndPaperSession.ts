@@ -5,12 +5,10 @@ export const usePenAndPaperSession = (
 	sessionId: number,
 	prefetchOnly?: boolean,
 ) => {
-	if (prefetchOnly) {
-		return useQuery(
-			trpc.penAndPaper.getSession.queryOptions(sessionId, {
+	const options = prefetchOnly
+		? trpc.penAndPaper.getSession.queryOptions(sessionId, {
 				notifyOnChangeProps: [],
-			}),
-		);
-	}
-	return useQuery(trpc.penAndPaper.getSession.queryOptions(sessionId));
+			})
+		: trpc.penAndPaper.getSession.queryOptions(sessionId);
+	return useQuery(options);
 };

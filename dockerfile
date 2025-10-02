@@ -1,17 +1,32 @@
-FROM node:22-slim
+# -------------------------------
+# Base image
+# -------------------------------
+FROM node:22-slim AS base
 
-# Install pnpm globally
-RUN npm install -g pnpm
+# -------------------------------
+# Builder stage
+# -------------------------------
+FROM base AS builder
 
 WORKDIR /app
-
-# Copy all files
+RUN corepack enable
 COPY . .
 
-# Install dependencies
-RUN pnpm install && pnpm run build
+RUN pnpm install
+RUN pnpm build
+RUN pnpm deploy --filter server --prod /app/server_deploy
 
-# Expose the ports for both backend and frontend
+# -------------------------------
+# Runtime stage
+# -------------------------------
+FROM base AS runner
+WORKDIR /app
+
+COPY --from=builder /app/packages/server/dist /app/dist
+COPY --from=builder /app/server_deploy/node_modules /app/node_modules
+COPY --from=builder /app/packages/client/dist /app/client_dist
+
+ENV DIST_DIR=/app/client_dist
 EXPOSE 3000
 
-CMD ["pnpm", "run", "start:server"]
+CMD ["node", "dist/trcp/routers/_app.js"]

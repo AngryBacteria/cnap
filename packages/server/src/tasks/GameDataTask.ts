@@ -1,21 +1,21 @@
 import { db, getAllOnConflictColumns } from "../db/index.js";
 import {
-	LEAGUE_CHAMPIONS_TABLE,
 	LEAGUE_CHAMPION_PASSIVES_TABLE,
 	LEAGUE_CHAMPION_PLAYSTYLES_TABLE,
 	LEAGUE_CHAMPION_SKINS_TABLE,
 	LEAGUE_CHAMPION_SPELLS_TABLE,
 	LEAGUE_CHAMPION_TACTICAL_INFO_TABLE,
+	LEAGUE_CHAMPIONS_TABLE,
 } from "../db/schemas/Champion.js";
 import { LEAGUE_GAME_MODES_TABLE } from "../db/schemas/GameMode.js";
 import { LEAGUE_GAME_TYPES_TABLE } from "../db/schemas/GameType.js";
 import { LEAGUE_ITEMS_TABLE } from "../db/schemas/Item.js";
-import { LEAGUE_QUEUES_TABLE } from "../db/schemas/Queue.js";
 import {
 	LEAGUE_MAPS_TABLE,
 	LEAGUE_SUMMONER_ICONS_TABLE,
 	LEAGUE_SUMMONER_SPELLS_TABLE,
 } from "../db/schemas/index.js";
+import { LEAGUE_QUEUES_TABLE } from "../db/schemas/Queue.js";
 import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
 
