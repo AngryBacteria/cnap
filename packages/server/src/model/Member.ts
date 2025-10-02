@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { SummonerDbSchema } from "./Summoner.js";
 
 export const MemberDBSchema = z.object({

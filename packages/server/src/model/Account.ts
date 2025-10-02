@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const AccountDBSchema = z.object({
 	puuid: z.string(),

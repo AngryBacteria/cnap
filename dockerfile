@@ -12,7 +12,7 @@ WORKDIR /app
 RUN corepack enable
 COPY . .
 
-RUN pnpm install
+RUN pnpm install --frozen-lockfile
 RUN pnpm build
 RUN pnpm deploy --filter server --prod /app/server_deploy
 

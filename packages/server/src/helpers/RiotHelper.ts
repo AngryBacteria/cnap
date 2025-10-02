@@ -1,5 +1,5 @@
 import { RateLimiter } from "limiter";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { type AccountDB, AccountDBSchema } from "../model/Account.js";
 import {
 	type ChampionDB,

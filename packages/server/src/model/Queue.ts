@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 
 export const QueueDBSchema = z.object({
 	queueId: z.number(),

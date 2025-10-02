@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { and, count, desc, eq, isNotNull, sql, sum } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { z } from "zod";
+import { z } from "zod/v4";
 import { db } from "../../db/index.js";
 import {
 	LEAGUE_CHAMPIONS_TABLE,
