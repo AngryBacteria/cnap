@@ -1,5 +1,5 @@
-import viteReact from '@vitejs/plugin-react'
 import {defineConfig} from "vite";
+import react from '@vitejs/plugin-react';
 import {tanstackRouter} from '@tanstack/router-plugin/vite'
 
 // https://vite.dev/config/
@@ -9,7 +9,11 @@ export default defineConfig({
             target: 'react',
             autoCodeSplitting: true,
         }),
-        viteReact(),
+        react({
+            babel: {
+                plugins: ['babel-plugin-react-compiler'],
+            },
+        }),
     ],
     resolve: {
         alias: {

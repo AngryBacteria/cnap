@@ -171,6 +171,9 @@ importers:
       '@vitest/coverage-v8':
         specifier: 3.2.4
         version: 3.2.4(vitest@3.2.4(@types/node@24.5.2)(sugarss@5.0.1(postcss@8.5.6))(tsx@4.20.5))
+      babel-plugin-react-compiler:
+        specifier: 19.1.0-rc.3
+        version: 19.1.0-rc.3
       drizzle-kit:
         specifier: 0.31.4
         version: 0.31.4
@@ -1272,6 +1275,9 @@ packages:
 
   babel-dead-code-elimination@1.0.10:
     resolution: {integrity: sha512-DV5bdJZTzZ0zn0DC24v3jD7Mnidh6xhKa4GfKCbq3sfW8kaWhDdZjP3i81geA8T33tdYqWKw4D3fVv0CwEgKVA==}
+
+  babel-plugin-react-compiler@19.1.0-rc.3:
+    resolution: {integrity: sha512-mjRn69WuTz4adL0bXGx8Rsyk1086zFJeKmes6aK0xPuK3aaXmDJdLHqwKKMrpm6KAI1MCoUK72d2VeqQbu8YIA==}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -3833,6 +3839,10 @@ snapshots:
       '@babel/types': 7.28.4
     transitivePeerDependencies:
       - supports-color
+
+  babel-plugin-react-compiler@19.1.0-rc.3:
+    dependencies:
+      '@babel/types': 7.28.4
 
   balanced-match@1.0.2: {}
 

@@ -5,7 +5,12 @@ export async function URLToBase64(
 	const arrayBuffer = await response.arrayBuffer();
 	const buffer = Buffer.from(arrayBuffer);
 	const base64 = buffer.toString("base64");
-	const mimeType = response.headers.get("content-type") || "";
+
+	const mimeType = response.headers.get("content-type");
+	if (!mimeType) {
+		throw new Error("Could not determine MIME type");
+	}
+
 	return { base64, mimeType };
 }
 
@@ -32,5 +37,3 @@ export async function to<T, E = Error>(
 		return [null, error as E] as Failure<E>;
 	}
 }
-
-//TODO add mime type to db

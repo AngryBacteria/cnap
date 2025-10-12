@@ -417,6 +417,20 @@ export const lolRouter = router({
 			}),
 		)
 		.query(async (opts) => {
+			const [summoner, _] = await to(
+				db.query.LEAGUE_SUMMONERS_TABLE.findFirst({
+					where: (summoner, { eq }) =>
+						eq(summoner.gameName, opts.input.gameName) &&
+						eq(summoner.tagLine, opts.input.tagLine),
+				}),
+			);
+			if (!summoner) {
+				throw new TRPCError({
+					message: `Summoner not found: ${opts.input.gameName} and tagLine: ${opts.input.tagLine}`,
+					code: "NOT_FOUND",
+				});
+			}
+
 			const gamesCount = count().as("games");
 			const winCount = sql<number>`COUNT(CASE WHEN win = TRUE THEN 1 END)`.as(
 				"wins",
@@ -471,12 +485,7 @@ export const lolRouter = router({
 							LEAGUE_CHAMPIONS_TABLE.id,
 						),
 					)
-					.where(
-						eq(
-							LEAGUE_MATCH_PARTICIPANTS_TABLE.puuid,
-							"zk1tF-l0TT1SrT9SbUmofKLT4R2gLKxzhGSyNuuxTCbmjr6dOqTCw1GcYrHoRp5DV2f5M17GMLPEFw",
-						),
-					)
+					.where(eq(LEAGUE_MATCH_PARTICIPANTS_TABLE.puuid, summoner.puuid))
 					.groupBy(
 						LEAGUE_MATCH_PARTICIPANTS_TABLE.teamPosition,
 						LEAGUE_QUEUES_TABLE.description,

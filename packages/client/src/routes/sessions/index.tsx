@@ -66,12 +66,15 @@ function RouteComponent() {
 								<Flex
 									wrap={"wrap"}
 									direction={"row"}
+									justify={"space-between"}
 									align={"center"}
 									gap={"md"}
 								>
 									<Title order={2}>{session.sessionName}</Title>
-									<FormattedDateText unixTimestamp={session.timestamp} />
-									<Badge color={PRIMARY_COLOR}>{session.framework}</Badge>
+									<Flex direction={"row"} gap={"md"} align={"center"}>
+										<FormattedDateText unixTimestamp={session.timestamp} />
+										<Badge color={PRIMARY_COLOR}>{session.framework}</Badge>
+									</Flex>
 								</Flex>
 								<Text hiddenFrom={"sm"}>
 									{truncateText(session.summaryShort, 500)}

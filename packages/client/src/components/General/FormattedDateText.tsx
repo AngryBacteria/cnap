@@ -7,7 +7,7 @@ interface Props {
 }
 
 export function FormattedDateText({ unixTimestamp }: Props) {
-	const formattedDate = new Intl.DateTimeFormat("en-US", {
+	const formattedDate = new Intl.DateTimeFormat("de-CH", {
 		hour: "numeric",
 		minute: "numeric",
 		day: "numeric",
@@ -17,7 +17,7 @@ export function FormattedDateText({ unixTimestamp }: Props) {
 	}).format(new Date(unixTimestamp));
 
 	const formattedTimeAgo = useMemo(() => {
-		const rtf = new Intl.RelativeTimeFormat("en", {
+		const rtf = new Intl.RelativeTimeFormat("de-CH", {
 			numeric: "auto",
 			style: "long",
 		});

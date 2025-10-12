@@ -58,6 +58,7 @@ export const penAndPaperRouter = router({
 	getSessions: loggedProcedure.query(async () => {
 		const [sessions, error] = await to(
 			db.query.PEN_AND_PAPER_SESSION_TABLE.findMany({
+				orderBy: (sessions, { desc }) => [desc(sessions.timestamp)],
 				columns: {
 					audioFileMimeType: false,
 					audioFileBase64: false,
