@@ -21,6 +21,7 @@
     "cors": "2.8.5",
     "dotenv": "17.2.2",
     "drizzle-orm": "0.44.5",
+    "drizzle-zod": "0.8.3",
     "express": "4.21.2",
     "limiter": "3.0.0",
     "pg": "8.16.3",
@@ -35,9 +36,7 @@
     "@vitest/coverage-v8": "3.2.4",
     "babel-plugin-react-compiler": "19.1.0-rc.3",
     "drizzle-kit": "0.31.4",
-    "nodemon": "3.1.10",
     "pino-pretty": "13.1.1",
-    "tsx": "4.20.5",
     "vitest": "3.2.4"
   }
 }

@@ -39,6 +39,7 @@ export const generalRouter = router({
 				throw new TRPCError({
 					message: "Failed to fetch members from Database",
 					code: "INTERNAL_SERVER_ERROR",
+					cause: error,
 				});
 			}
 

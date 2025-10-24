@@ -1,6 +1,7 @@
 import {
 	Alert,
 	Badge,
+	Button,
 	Card,
 	Flex,
 	Image,
@@ -14,23 +15,22 @@ import {
 import {
 	IconAlertSquareRounded,
 	IconClipboardText,
+	IconEdit,
 	IconScript,
 	IconTargetArrow,
 } from "@tabler/icons-react";
-import { createFileRoute } from "@tanstack/react-router";
-import { FormattedDateText } from "../../components/General/FormattedDateText.tsx";
-import { usePenAndPaperSession } from "../../hooks/api/usePenAndPaperSession.ts";
-import { PRIMARY_COLOR } from "../../main.tsx";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { FormattedDateText } from "../../../components/General/FormattedDateText.tsx";
+import { usePenAndPaperSession } from "../../../hooks/api/usePenAndPaperSession.ts";
+import { PRIMARY_COLOR } from "../../../main.tsx";
 
-export const Route = createFileRoute("/sessions/$sessionId")({
+export const Route = createFileRoute("/sessions/view/$sessionId")({
 	component: RouteComponent,
 });
 
 function RouteComponent() {
 	const sessionId = Route.useParams().sessionId;
-
-	// TODO route level validation?
-	//TODO add audio loading
+	const navigate = useNavigate();
 	const query = usePenAndPaperSession(Number.parseInt(sessionId, 10));
 
 	if (query.status === "pending") {
@@ -92,10 +92,27 @@ function RouteComponent() {
 
 	return (
 		<Flex direction={"column"} gap={"md"}>
-			<Flex direction={"row"} gap={"md"} align={"center"} wrap={"wrap"}>
-				<Title order={2}>{session.sessionName}</Title>
-				<FormattedDateText unixTimestamp={session.timestamp} />
-				<Badge color={PRIMARY_COLOR}>{session.framework}</Badge>
+			<Flex
+				direction={"row"}
+				gap={"md"}
+				align={"center"}
+				justify={"space-between"}
+				wrap={"wrap"}
+			>
+				<Flex direction={"row"} align={"center"} gap={"md"} wrap={"wrap"}>
+					<Title order={2}>{session.sessionName}</Title>
+					<FormattedDateText unixTimestamp={session.timestamp.valueOf()} />
+					<Badge color={PRIMARY_COLOR}>{session.framework}</Badge>
+				</Flex>
+
+				<Button
+					leftSection={<IconEdit size={16} />}
+					variant="light"
+					color={PRIMARY_COLOR}
+					onClick={() => navigate({ to: `/sessions/edit/${sessionId}` })}
+				>
+					Edit
+				</Button>
 			</Flex>
 
 			<Card withBorder shadow="sm">

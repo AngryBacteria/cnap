@@ -1,5 +1,12 @@
 import { relations } from "drizzle-orm";
-import { bigint, integer, serial, varchar } from "drizzle-orm/pg-core";
+import {
+	integer,
+	pgEnum,
+	serial,
+	timestamp,
+	varchar,
+} from "drizzle-orm/pg-core";
+import { createUpdateSchema } from "drizzle-zod";
 import { MEMBERS_TABLE } from "./Member.js";
 import { PNP_SCHEMA } from "./PGSchemas.js";
 
@@ -21,15 +28,17 @@ export const characterRelations = relations(
 	}),
 );
 
+export const frameworkEnum = pgEnum("framework", ["SWN", "DND (2024)"]);
+
 export const PEN_AND_PAPER_SESSION_TABLE = PNP_SCHEMA.table("sessions", {
 	id: serial().primaryKey(),
-	framework: varchar().notNull(),
+	framework: frameworkEnum().notNull(),
 	dmMemberGameName: varchar()
 		.references(() => MEMBERS_TABLE.gameName, {
 			onDelete: "set null",
 		})
 		.notNull(),
-	timestamp: bigint({ mode: "number" }).notNull(),
+	timestamp: timestamp({ withTimezone: true }).notNull(),
 	sessionName: varchar().notNull(),
 	campaign: varchar().notNull(),
 	summaryLong: varchar().notNull(),
@@ -39,6 +48,11 @@ export const PEN_AND_PAPER_SESSION_TABLE = PNP_SCHEMA.table("sessions", {
 	audioFileBase64: varchar(),
 	audioFileMimeType: varchar(),
 });
+
+export const PEN_AND_PAPER_SESSION_TABLE_UPDATE_SCHEMA = createUpdateSchema(
+	PEN_AND_PAPER_SESSION_TABLE,
+);
+
 export const sessionRelations = relations(
 	PEN_AND_PAPER_SESSION_TABLE,
 	({ one, many }) => ({

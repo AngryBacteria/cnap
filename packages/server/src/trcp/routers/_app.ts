@@ -5,6 +5,7 @@ import cors from "cors";
 import express from "express";
 import {
 	BACKEND_PORT,
+	BACKGROUND_TASK_INITIAL_DELAY,
 	CLIENT_DIST_PATH,
 	RUN_TASKS,
 	UPDATE_INTERVAL,
@@ -70,5 +71,8 @@ logger.info(
 export type AppRouter = typeof appRouter;
 
 if (RUN_TASKS) {
-	intervalUpdate(0, UPDATE_INTERVAL).catch(logger.error);
+	logger.info(`Starting task in ${BACKGROUND_TASK_INITIAL_DELAY} ms...`);
+	setTimeout(() => {
+		intervalUpdate(0, UPDATE_INTERVAL).catch(logger.error);
+	}, BACKGROUND_TASK_INITIAL_DELAY);
 }

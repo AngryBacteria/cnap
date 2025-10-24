@@ -57,7 +57,7 @@ function RouteComponent() {
 					key={session.id}
 				>
 					<Link
-						to={"/sessions/$sessionId"}
+						to={"/sessions/view/$sessionId"}
 						params={{ sessionId: `${session.id}` }}
 						className={styles.navigationItem}
 					>
@@ -72,7 +72,9 @@ function RouteComponent() {
 								>
 									<Title order={2}>{session.sessionName}</Title>
 									<Flex direction={"row"} gap={"md"} align={"center"}>
-										<FormattedDateText unixTimestamp={session.timestamp} />
+										<FormattedDateText
+											unixTimestamp={session.timestamp.valueOf()}
+										/>
 										<Badge color={PRIMARY_COLOR}>{session.framework}</Badge>
 									</Flex>
 								</Flex>

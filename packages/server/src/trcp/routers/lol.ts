@@ -53,6 +53,7 @@ export const lolRouter = router({
 			throw new TRPCError({
 				message: `Champions couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
+				cause: error,
 			});
 		}
 
@@ -81,6 +82,7 @@ export const lolRouter = router({
 			throw new TRPCError({
 				message: `Champion couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
+				cause: error,
 			});
 		}
 
@@ -162,6 +164,7 @@ export const lolRouter = router({
 				throw new TRPCError({
 					message: `Participants couldn't be counted for pagination`,
 					code: "INTERNAL_SERVER_ERROR",
+					cause: countError,
 				});
 			}
 
@@ -269,13 +272,12 @@ export const lolRouter = router({
 			);
 
 			if (error) {
-				if (error) {
-					logger.error({ err: error }, "API:getMatchesParticipant");
-					throw new TRPCError({
-						message: `Matches couldn't be fetched`,
-						code: "INTERNAL_SERVER_ERROR",
-					});
-				}
+				logger.error({ err: error }, "API:getMatchesParticipant");
+				throw new TRPCError({
+					message: `Matches couldn't be fetched`,
+					code: "INTERNAL_SERVER_ERROR",
+					cause: error,
+				});
 			}
 
 			return {
@@ -298,6 +300,7 @@ export const lolRouter = router({
 			throw new TRPCError({
 				message: `Queues couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
+				cause: error,
 			});
 		}
 
@@ -314,6 +317,7 @@ export const lolRouter = router({
 			throw new TRPCError({
 				message: `Items couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
+				cause: error,
 			});
 		}
 
@@ -332,6 +336,7 @@ export const lolRouter = router({
 			throw new TRPCError({
 				message: `SummonerSpells couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
+				cause: error,
 			});
 		}
 
@@ -350,6 +355,7 @@ export const lolRouter = router({
 			throw new TRPCError({
 				message: `Summoners couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
+				cause: error,
 			});
 		}
 
@@ -385,6 +391,7 @@ export const lolRouter = router({
 				throw new TRPCError({
 					message: `Summoner couldn't be fetched`,
 					code: "INTERNAL_SERVER_ERROR",
+					cause: error,
 				});
 			}
 
@@ -507,6 +514,7 @@ export const lolRouter = router({
 				throw new TRPCError({
 					message: `Summoner couldn't be fetched`,
 					code: "INTERNAL_SERVER_ERROR",
+					cause: error,
 				});
 			}
 
