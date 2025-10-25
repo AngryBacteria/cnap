@@ -3,9 +3,11 @@ import {
 	Button,
 	FileInput,
 	Flex,
+	Grid,
 	Group,
 	Loader,
 	MultiSelect,
+	Paper,
 	Select,
 	Textarea,
 	TextInput,
@@ -215,168 +217,248 @@ function SessionEditView({ session, members, characters }: Props) {
 		return "Beim Aktualisieren der Session ist ein unbekannter Fehler aufgetreten.";
 	}
 
+	//TODO make this also possible to edit a session
+
 	return (
 		<form onSubmit={form.onSubmit((values) => mutateFunction(values))}>
-			<Flex direction={"column"} gap={"md"}>
-				{mutation.status === "error" && (
-					<Alert
-						title={`Fehler beim Aktualisieren der PenAndPaper Session: ${session.id}`}
-						variant={"light"}
-						color={"red"}
-						icon={<IconAlertSquareRounded />}
+			{mutation.status === "error" && (
+				<Alert
+					title={`Fehler beim Aktualisieren der PenAndPaper Session: ${session.id}`}
+					variant={"light"}
+					color={"red"}
+					icon={<IconAlertSquareRounded />}
+				>
+					{getErrorMessage()}
+				</Alert>
+			)}
+			<Grid gutter="md">
+				<Grid.Col span={{ base: 12, md: 6 }}>
+					<Paper
+						shadow="md"
+						p="md"
+						radius="md"
+						withBorder
+						style={{ height: "100%" }}
 					>
-						{getErrorMessage()}
-					</Alert>
-				)}
+						<Title order={4} mb="sm">
+							Allgemeine Informationen
+						</Title>
+						<Flex direction={"column"} gap={"sm"}>
+							<Select
+								withAsterisk
+								label={"Framework"}
+								disabled={isLoading}
+								data={session.frameworkOptions.map((option) => {
+									return { value: option, label: option };
+								})}
+								key={form.key("framework")}
+								{...form.getInputProps("framework")}
+							></Select>
 
-				<Title order={1}>{session.sessionName}</Title>
+							<DatePickerInput
+								withAsterisk
+								label={"Datum"}
+								disabled={isLoading}
+								key={form.key("timestamp")}
+								{...form.getInputProps("timestamp")}
+							></DatePickerInput>
 
-				<Select
-					withAsterisk
-					label={"Framework"}
-					disabled={isLoading}
-					data={session.frameworkOptions.map((option) => {
-						return { value: option, label: option };
-					})}
-					key={form.key("framework")}
-					{...form.getInputProps("framework")}
-				></Select>
-
-				<DatePickerInput
-					withAsterisk
-					label={"Datum"}
-					disabled={isLoading}
-					key={form.key("timestamp")}
-					{...form.getInputProps("timestamp")}
-				></DatePickerInput>
-
-				<TextInput
-					withAsterisk
-					label={"Session Name"}
-					disabled={isLoading}
-					key={form.key("sessionName")}
-					{...form.getInputProps("sessionName")}
-				></TextInput>
-
-				<TextInput
-					withAsterisk
-					label={"Kampagne"}
-					disabled={isLoading}
-					key={form.key("campaign")}
-					{...form.getInputProps("campaign")}
-				></TextInput>
-
-				<Textarea
-					withAsterisk
-					label={"Kurze Zusammenfassung"}
-					resize="vertical"
-					disabled={isLoading}
-					autosize
-					maxRows={3}
-					key={form.key("summaryShort")}
-					{...form.getInputProps("summaryShort")}
-				></Textarea>
-
-				<Textarea
-					withAsterisk
-					label={"Lange Zusammenfassung"}
-					resize="vertical"
-					disabled={isLoading}
-					autosize
-					maxRows={4}
-					key={form.key("summaryLong")}
-					{...form.getInputProps("summaryLong")}
-				></Textarea>
-
-				<Select
-					withAsterisk
-					label={"Dungeon Master"}
-					disabled={isLoading}
-					data={members.map((option) => {
-						return { value: option.gameName, label: option.gameName };
-					})}
-					key={form.key("dmMemberGameName")}
-					{...form.getInputProps("dmMemberGameName")}
-				></Select>
-
-				<MultiSelect
-					withAsterisk
-					label={"Charaktere"}
-					disabled={isLoading}
-					data={characters.map((option) => {
-						return { value: `${option.id}`, label: option.name };
-					})}
-					key={form.key("characterIds")}
-					{...form.getInputProps("characterIds")}
-				></MultiSelect>
-
-				<Flex direction="column" gap="sm">
-					<Group justify="space-between" align="center">
-						<Title order={5}>Charakterziele</Title>
-						<Button
-							leftSection={<IconPlus size={16} />}
-							variant="light"
-							size="xs"
-							onClick={() => form.insertListItem("goals", "")}
-						>
-							Ziel hinzufügen
-						</Button>
-					</Group>
-
-					{form.values.goals.map((goal, index) => (
-						<Group key={goal} align="center">
 							<TextInput
-								placeholder="Zielbeschreibung"
-								style={{ flex: 1 }}
-								{...form.getInputProps(`goals.${index}`)}
-							/>
-							<Button
-								color="red"
-								variant="light"
-								onClick={() => form.removeListItem("goals", index)}
-							>
-								<IconTrash size={16} />
-							</Button>
-						</Group>
-					))}
-				</Flex>
+								withAsterisk
+								label={"Session Name"}
+								disabled={isLoading}
+								key={form.key("sessionName")}
+								{...form.getInputProps("sessionName")}
+							></TextInput>
 
-				<FileInput
-					label={"Audiodatei (optional)"}
-					accept={"audio/*"}
-					key={form.key("audioFile")}
-					disabled={isLoading}
-					{...form.getInputProps("audioFile")}
-				/>
-
-				<TextInput
-					withAsterisk
-					label={"Admin Passwort"}
-					type="password"
-					disabled={isLoading}
-					key={form.key("password")}
-					{...form.getInputProps("password")}
-				></TextInput>
-
-				<Group justify="flex-start">
-					<Button type="submit" variant={"light"} loading={isLoading}>
-						Aktualisieren
-					</Button>
-
-					<Button
-						variant="light"
-						color="gray"
-						onClick={() =>
-							navigate({
-								to: "/sessions/view/$sessionId",
-								params: { sessionId: `${session.id}` },
-							})
-						}
+							<TextInput
+								withAsterisk
+								label={"Kampagne"}
+								disabled={isLoading}
+								key={form.key("campaign")}
+								{...form.getInputProps("campaign")}
+							></TextInput>
+						</Flex>
+					</Paper>
+				</Grid.Col>
+				<Grid.Col span={{ base: 12, md: 6 }}>
+					<Paper
+						shadow="md"
+						p="md"
+						radius="md"
+						withBorder
+						style={{ height: "100%" }}
 					>
-						Abbrechen
-					</Button>
-				</Group>
-			</Flex>
+						<Title order={4} mb="sm">
+							Zusammenfassungen
+						</Title>
+						<Flex direction={"column"} gap={"sm"}>
+							<Textarea
+								withAsterisk
+								label={"Kurze Zusammenfassung"}
+								resize="vertical"
+								disabled={isLoading}
+								autosize
+								maxRows={3}
+								key={form.key("summaryShort")}
+								{...form.getInputProps("summaryShort")}
+							></Textarea>
+
+							<Textarea
+								withAsterisk
+								label={"Lange Zusammenfassung"}
+								resize="vertical"
+								disabled={isLoading}
+								autosize
+								maxRows={4}
+								key={form.key("summaryLong")}
+								{...form.getInputProps("summaryLong")}
+							></Textarea>
+						</Flex>
+					</Paper>
+				</Grid.Col>
+				<Grid.Col span={{ base: 12, md: 6 }}>
+					<Paper
+						shadow="md"
+						p="md"
+						radius="md"
+						withBorder
+						style={{ height: "100%" }}
+					>
+						<Title order={4} mb="sm">
+							Mitwirkende
+						</Title>
+						<Flex direction={"column"} gap={"sm"}>
+							<Select
+								withAsterisk
+								label={"Dungeon Master"}
+								disabled={isLoading}
+								data={members.map((option) => {
+									return { value: option.gameName, label: option.gameName };
+								})}
+								key={form.key("dmMemberGameName")}
+								{...form.getInputProps("dmMemberGameName")}
+							></Select>
+
+							<MultiSelect
+								withAsterisk
+								label={"Charaktere"}
+								disabled={isLoading}
+								data={characters.map((option) => {
+									return { value: `${option.id}`, label: option.name };
+								})}
+								key={form.key("characterIds")}
+								{...form.getInputProps("characterIds")}
+							></MultiSelect>
+						</Flex>
+					</Paper>
+				</Grid.Col>
+				<Grid.Col span={{ base: 12, md: 6 }}>
+					<Paper
+						shadow="md"
+						p="md"
+						radius="md"
+						withBorder
+						style={{ height: "100%" }}
+					>
+						<Flex direction={"column"} gap={"sm"}>
+							<Group justify="space-between" align="center">
+								<Title order={4} mb="sm">
+									Charakterziele
+								</Title>
+								<Button
+									disabled={isLoading}
+									leftSection={<IconPlus size={16} />}
+									variant="light"
+									size="xs"
+									onClick={() => form.insertListItem("goals", "")}
+								>
+									Ziel hinzufügen
+								</Button>
+							</Group>
+
+							{form.values.goals.map((goal, index) => (
+								<Group key={goal} align="center">
+									<TextInput
+										placeholder="Zielbeschreibung"
+										style={{ flex: 1 }}
+										{...form.getInputProps(`goals.${index}`)}
+									/>
+									<Button
+										disabled={isLoading}
+										color="red"
+										variant="light"
+										onClick={() => form.removeListItem("goals", index)}
+									>
+										<IconTrash size={16} />
+									</Button>
+								</Group>
+							))}
+						</Flex>
+					</Paper>
+				</Grid.Col>
+
+				<Grid.Col span={{ base: 12, md: 6 }}>
+					<Paper
+						shadow="md"
+						p="md"
+						radius="md"
+						withBorder
+						style={{ height: "100%" }}
+					>
+						<Title order={4} mb="sm">
+							Audio
+						</Title>
+						<FileInput
+							label={"Audiodatei (optional)"}
+							accept={"audio/*"}
+							key={form.key("audioFile")}
+							disabled={isLoading}
+							{...form.getInputProps("audioFile")}
+						/>
+					</Paper>
+				</Grid.Col>
+
+				<Grid.Col span={{ base: 12, md: 6 }}>
+					<Paper
+						shadow="md"
+						p="md"
+						radius="md"
+						withBorder
+						style={{ height: "100%" }}
+					>
+						<Flex direction={"column"} gap={"sm"}>
+							<TextInput
+								withAsterisk
+								label={"Admin Passwort"}
+								type="password"
+								disabled={isLoading}
+								key={form.key("password")}
+								{...form.getInputProps("password")}
+							></TextInput>
+
+							<Group justify="flex-start">
+								<Button type="submit" variant={"light"} loading={isLoading}>
+									Aktualisieren
+								</Button>
+
+								<Button
+									variant="light"
+									color="gray"
+									onClick={() =>
+										navigate({
+											to: "/sessions/view/$sessionId",
+											params: { sessionId: `${session.id}` },
+										})
+									}
+								>
+									Abbrechen
+								</Button>
+							</Group>
+						</Flex>
+					</Paper>
+				</Grid.Col>
+			</Grid>
 		</form>
 	);
 }
