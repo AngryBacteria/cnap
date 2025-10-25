@@ -4,6 +4,7 @@ import { z } from "zod/v4";
 import { db } from "../../db/index.js";
 import {
 	frameworkEnum,
+	PEN_AND_PAPER_SESSION_CHARACTERS_TABLE,
 	PEN_AND_PAPER_SESSION_TABLE,
 	PEN_AND_PAPER_SESSION_TABLE_UPDATE_SCHEMA,
 } from "../../db/schemas/index.js";
@@ -90,6 +91,25 @@ export const penAndPaperRouter = router({
 		logger.debug("API:getSessions - fetched sessions from db");
 		return sessions;
 	}),
+	getCharacters: loggedProcedure.query(async () => {
+		const [characters, error] = await to(
+			db.query.PEN_AND_PAPER_CHARACTER_TABLE.findMany(),
+		);
+		if (error) {
+			logger.error(
+				{ err: error, code: 500 },
+				"API:getCharacters - failed to fetch characters from db",
+			);
+			throw new TRPCError({
+				message: `Characters could not be loaded: ${error.message}`,
+				code: "INTERNAL_SERVER_ERROR",
+				cause: error,
+			});
+		}
+
+		logger.debug("API:getCharacters - fetched characters from db");
+		return characters;
+	}),
 	updateSession: loggedProcedure
 		.input(
 			z.object({
@@ -97,10 +117,14 @@ export const penAndPaperRouter = router({
 				password: z.string(),
 				data: PEN_AND_PAPER_SESSION_TABLE_UPDATE_SCHEMA.omit({
 					id: true,
-					dmMemberGameName: true,
 					transcriptions: true,
-					goals: true,
-				}),
+				})
+					.required()
+					.extend({
+						characterIds: z.array(z.number()),
+						audioFileBase64: z.string().nullish(),
+						audioFileMimeType: z.string().nullish(),
+					}),
 			}),
 		)
 		.mutation(async (opts) => {
@@ -117,33 +141,41 @@ export const penAndPaperRouter = router({
 				});
 			}
 
-			const [updatedSession, error] = await to(
-				db
-					.update(PEN_AND_PAPER_SESSION_TABLE)
-					.set(data)
-					.where(eq(PEN_AND_PAPER_SESSION_TABLE.id, sessionId)),
+			const [, txError] = await to(
+				db.transaction(async (tx) => {
+					// Update session data
+					await tx
+						.update(PEN_AND_PAPER_SESSION_TABLE)
+						.set(data)
+						.where(eq(PEN_AND_PAPER_SESSION_TABLE.id, sessionId));
+
+					// Delete existing character-session connections
+					await tx
+						.delete(PEN_AND_PAPER_SESSION_CHARACTERS_TABLE)
+						.where(
+							eq(PEN_AND_PAPER_SESSION_CHARACTERS_TABLE.sessionId, sessionId),
+						);
+
+					// Insert new character-session connections
+					const characterConnections = data.characterIds.map((charId) => ({
+						sessionId: sessionId,
+						characterId: charId,
+					}));
+					await tx
+						.insert(PEN_AND_PAPER_SESSION_CHARACTERS_TABLE)
+						.values(characterConnections);
+				}),
 			);
 
-			if (error) {
+			if (txError) {
 				logger.error(
-					{ err: error, code: 500, sessionId: sessionId },
+					{ err: txError, code: 500, sessionId: sessionId },
 					"API:updateSession - failed to update session in db",
 				);
 				throw new TRPCError({
-					message: `Session update failed: ${error.message}`,
+					message: `Session update failed: ${txError.message}`,
 					code: "INTERNAL_SERVER_ERROR",
-					cause: error,
-				});
-			}
-
-			if (!updatedSession?.rowCount) {
-				logger.error(
-					{ code: 404, sessionId: sessionId },
-					"API:updateSession - session not found in db",
-				);
-				throw new TRPCError({
-					message: `Session with id ${sessionId} not found`,
-					code: "NOT_FOUND",
+					cause: txError,
 				});
 			}
 
