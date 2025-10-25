@@ -16,6 +16,8 @@ jobs:
     env:
       RIOT_API_KEY: ${{ secrets.RIOT_API_KEY }}
       DB_URL: ${{ secrets.DB_URL }}
+      ADMIN_PASSWORD_HASH: ${{ secrets.ADMIN_PASSWORD_HASH }}
+      ADMIN_PASSWORD_SALT: ${{ secrets.ADMIN_PASSWORD_SALT }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
