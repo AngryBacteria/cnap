@@ -9,25 +9,22 @@ importers:
 
   .:
     dependencies:
-      concurrently:
-        specifier: 9.2.1
-        version: 9.2.1
       dotenv:
         specifier: 17.2.2
         version: 17.2.2
-      rimraf:
-        specifier: 6.0.1
-        version: 6.0.1
-      superjson:
-        specifier: 2.2.3
-        version: 2.2.3
     devDependencies:
       '@biomejs/biome':
         specifier: 2.2.4
         version: 2.2.4
+      concurrently:
+        specifier: 9.2.1
+        version: 9.2.1
       husky:
         specifier: 9.1.7
         version: 9.1.7
+      rimraf:
+        specifier: 6.0.1
+        version: 6.0.1
       tsx:
         specifier: 4.20.5
         version: 4.20.5
@@ -97,6 +94,9 @@ importers:
       recharts:
         specifier: 3.2.1
         version: 3.2.1(@types/react@19.1.13)(react-dom@19.1.1(react@19.1.1))(react-is@18.3.1)(react@19.1.1)(redux@5.0.1)
+      superjson:
+        specifier: 2.2.3
+        version: 2.2.3
     devDependencies:
       '@tanstack/react-query-devtools':
         specifier: 5.89.0
@@ -161,6 +161,9 @@ importers:
       pino:
         specifier: 9.11.0
         version: 9.11.0
+      superjson:
+        specifier: 2.2.3
+        version: 2.2.3
       zod:
         specifier: 4.1.9
         version: 4.1.9
