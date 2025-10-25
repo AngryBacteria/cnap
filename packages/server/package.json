@@ -26,7 +26,8 @@
     "limiter": "3.0.0",
     "pg": "8.16.3",
     "pino": "9.11.0",
-    "zod": "4.1.9"
+    "zod": "4.1.9",
+    "superjson": "2.2.3"
   },
   "devDependencies": {
     "@types/cors": "2.8.19",

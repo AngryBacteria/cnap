@@ -31,7 +31,8 @@
     "motion": "12.23.16",
     "react": "19.1.1",
     "react-dom": "19.1.1",
-    "recharts": "3.2.1"
+    "recharts": "3.2.1",
+    "superjson": "2.2.3"
   },
   "devDependencies": {
     "@tanstack/react-query-devtools": "5.89.0",
