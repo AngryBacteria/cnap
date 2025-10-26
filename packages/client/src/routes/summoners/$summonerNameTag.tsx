@@ -65,6 +65,7 @@ function SummonerPage() {
 		);
 	}
 
+	//TODO name not correct
 	return (
 		<Flex direction={"column"} gap={"md"}>
 			<Title order={2}>Matches from {summonerQuery.data.gameName}</Title>

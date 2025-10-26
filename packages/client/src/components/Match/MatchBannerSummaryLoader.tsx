@@ -21,8 +21,6 @@ export function MatchBannerSummaryLoader({
 	setPage,
 	queueId,
 }: Props) {
-	//TODO scroll to title
-
 	const matchesParticipantQuery = useMatchesParticipant({
 		page,
 		championId,

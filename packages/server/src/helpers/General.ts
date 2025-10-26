@@ -1,5 +1,4 @@
-import { timingSafeEqual } from "node:crypto";
-import { pbkdf2Sync, randomBytes } from "crypto";
+import { pbkdf2Sync, randomBytes, timingSafeEqual } from "node:crypto";
 import {
 	ADMIN_PASSWORD_HASH,
 	ADMIN_PASSWORD_ITERATIONS,

@@ -1,8 +1,20 @@
-import { Alert, Badge, Card, Flex, Loader, Text, Title } from "@mantine/core";
-import { IconAlertSquareRounded } from "@tabler/icons-react";
+import {
+	ActionIcon,
+	Alert,
+	Badge,
+	Card,
+	Flex,
+	Loader,
+	Menu,
+	Text,
+	Title,
+} from "@mantine/core";
+import { IconAlertSquareRounded, IconEdit } from "@tabler/icons-react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { motion } from "motion/react";
+import { useState } from "react";
 import { FormattedDateText } from "../../components/General/FormattedDateText.tsx";
+import { CreateCharacterModal } from "../../components/Session/createCharacterModal.tsx";
+import { CreateEmptySessionModal } from "../../components/Session/createEmptySessionModal.tsx";
 import { usePenAndPaperSessions } from "../../hooks/api/usePenAndPaperSessions.ts";
 import { PRIMARY_COLOR } from "../../main.tsx";
 import { truncateText } from "../../utils/GeneralUtil.ts";
@@ -13,9 +25,14 @@ export const Route = createFileRoute("/sessions/")({
 });
 
 function RouteComponent() {
-	const query = usePenAndPaperSessions();
+	const sessionQuery = usePenAndPaperSessions();
 
-	if (query.status === "pending") {
+	const [emptySessionOpen, setEmptySessionOpen] = useState(false);
+	const [characterOpen, setCharacterOpen] = useState(false);
+
+	//TODO make own components for edit
+
+	if (sessionQuery.status === "pending") {
 		return (
 			<Flex
 				justify={"center"}
@@ -28,7 +45,7 @@ function RouteComponent() {
 		);
 	}
 
-	if (query.status === "error") {
+	if (sessionQuery.status === "error") {
 		return (
 			<Alert
 				title={"Fehler beim Laden der PenAndPaper Sessions"}
@@ -44,18 +61,37 @@ function RouteComponent() {
 
 	return (
 		<Flex direction={"column"} gap={"md"}>
-			{query.data?.map((session) => (
-				<motion.div
-					layout
-					initial={{ opacity: 0, scale: 0.9 }}
-					animate={{ opacity: 1, scale: 1 }}
-					exit={{ opacity: 0, scale: 0.9 }}
-					transition={{
-						duration: 0.25,
-					}}
-					className={"fillSpace"}
-					key={session.id}
-				>
+			<Flex justify={"flex-end"}>
+				<Menu shadow="md">
+					<Menu.Target>
+						<ActionIcon size="lg" variant="light" aria-label="Settings">
+							<IconEdit style={{ width: "70%", height: "70%" }} stroke={1.5} />
+						</ActionIcon>
+					</Menu.Target>
+					<Menu.Dropdown>
+						<Menu.Dropdown>
+							<Menu.Item onClick={() => setEmptySessionOpen(true)}>
+								Session erstellen
+							</Menu.Item>
+							<Menu.Item onClick={() => setCharacterOpen(true)}>
+								Charakter erstellen
+							</Menu.Item>
+						</Menu.Dropdown>
+					</Menu.Dropdown>
+				</Menu>
+			</Flex>
+
+			<CreateEmptySessionModal
+				opened={emptySessionOpen}
+				onClose={() => setEmptySessionOpen(false)}
+			/>
+			<CreateCharacterModal
+				opened={characterOpen}
+				onClose={() => setCharacterOpen(false)}
+			/>
+
+			{sessionQuery.data?.map((session) => (
+				<div className={"fillSpace"} key={session.id}>
 					<Link
 						to={"/sessions/view/$sessionId"}
 						params={{ sessionId: `${session.id}` }}
@@ -85,7 +121,7 @@ function RouteComponent() {
 							</Flex>
 						</Card>
 					</Link>
-				</motion.div>
+				</div>
 			))}
 		</Flex>
 	);

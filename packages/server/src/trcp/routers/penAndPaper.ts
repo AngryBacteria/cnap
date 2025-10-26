@@ -4,6 +4,7 @@ import { z } from "zod/v4";
 import { db } from "../../db/index.js";
 import {
 	frameworkEnum,
+	PEN_AND_PAPER_CHARACTER_TABLE,
 	PEN_AND_PAPER_SESSION_CHARACTERS_TABLE,
 	PEN_AND_PAPER_SESSION_TABLE,
 	PEN_AND_PAPER_SESSION_TABLE_UPDATE_SCHEMA,
@@ -110,6 +111,122 @@ export const penAndPaperRouter = router({
 		logger.debug("API:getCharacters - fetched characters from db");
 		return characters;
 	}),
+	createCharacter: loggedProcedure
+		.input(
+			z.object({
+				password: z.string(),
+				name: z.string(),
+				memberGameName: z.string(),
+			}),
+		)
+		.mutation(async (opts) => {
+			const { password, name, memberGameName } = opts.input;
+
+			if (!verifyAdminPassword(password)) {
+				logger.error(
+					{ code: 401 },
+					"API:createEmptySession - unauthorized attempt to create empty session",
+				);
+				throw new TRPCError({
+					message: "Unauthorized: Invalid admin password",
+					code: "UNAUTHORIZED",
+				});
+			}
+
+			const [newCharacter, error] = await to(
+				db
+					.insert(PEN_AND_PAPER_CHARACTER_TABLE)
+					.values({
+						memberGameName,
+						name,
+					})
+					.returning({ id: PEN_AND_PAPER_CHARACTER_TABLE.id }),
+			);
+
+			if (error || !newCharacter[0]?.id) {
+				logger.error(
+					{ err: error, code: 500 },
+					"API:createCharacter - failed to create character in db",
+				);
+				throw new TRPCError({
+					message: `Character could not be created`,
+					code: "INTERNAL_SERVER_ERROR",
+					cause: error,
+				});
+			}
+
+			return newCharacter[0].id;
+		}),
+	createEmptySession: loggedProcedure
+		.input(
+			z.object({
+				password: z.string(),
+				dmMemberGameName: z.string(),
+			}),
+		)
+		.mutation(async (opts) => {
+			const { password, dmMemberGameName } = opts.input;
+
+			if (!verifyAdminPassword(password)) {
+				logger.error(
+					{ code: 401 },
+					"API:createEmptySession - unauthorized attempt to create empty session",
+				);
+				throw new TRPCError({
+					message: "Unauthorized: Invalid admin password",
+					code: "UNAUTHORIZED",
+				});
+			}
+
+			const date = new Date();
+
+			const [newSession, error] = await to(
+				db
+					.insert(PEN_AND_PAPER_SESSION_TABLE)
+					.values({
+						sessionName: `Session from ${date.toISOString()}`,
+						campaign: "",
+						dmMemberGameName,
+						framework: "DND (2024)",
+						goals: [],
+						summaryLong: "",
+						summaryShort: "",
+						transcriptions: [],
+						audioFileBase64: null,
+						audioFileMimeType: null,
+						timestamp: new Date(),
+					})
+					.returning({ id: PEN_AND_PAPER_SESSION_TABLE.id }),
+			);
+
+			if (error) {
+				logger.error(
+					{ err: error, code: 500 },
+					"API:createEmptySession - failed to create empty session in db",
+				);
+				throw new TRPCError({
+					message: `Empty session could not be created: ${error.message}`,
+					code: "INTERNAL_SERVER_ERROR",
+					cause: error,
+				});
+			}
+			if (!newSession[0]?.id) {
+				logger.error(
+					{ code: 500 },
+					"API:createEmptySession - no session id returned after creation",
+				);
+				throw new TRPCError({
+					message: "Empty session could not be created",
+					code: "INTERNAL_SERVER_ERROR",
+				});
+			}
+
+			logger.debug(
+				{ sessionId: newSession[0].id },
+				"API:createEmptySession - created empty session in db",
+			);
+			return newSession[0].id;
+		}),
 	updateSession: loggedProcedure
 		.input(
 			z.object({
@@ -117,7 +234,6 @@ export const penAndPaperRouter = router({
 				password: z.string(),
 				data: PEN_AND_PAPER_SESSION_TABLE_UPDATE_SCHEMA.omit({
 					id: true,
-					transcriptions: true,
 				})
 					.required()
 					.extend({

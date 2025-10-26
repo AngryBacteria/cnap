@@ -1,7 +1,6 @@
 import { Alert, Flex, Loader, TextInput, Title } from "@mantine/core";
 import { IconAlertSquareRounded } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
-import { AnimatePresence, motion } from "motion/react";
 import { useMemo, useState } from "react";
 import { SummonerCard } from "../../components/Summoner/SummonerCard.tsx";
 import { useSummoners } from "../../hooks/api/useSummoners.ts";
@@ -71,25 +70,13 @@ function SummonersPage() {
 			</Flex>
 
 			<section className={styles.summoners}>
-				<AnimatePresence mode={"popLayout"}>
-					{filteredSummoners.map((summoner) => {
-						return (
-							<motion.div
-								layout
-								initial={{ opacity: 0, scale: 0.9 }}
-								animate={{ opacity: 1, scale: 1 }}
-								exit={{ opacity: 0, scale: 0.9 }}
-								transition={{
-									duration: 0.25,
-								}}
-								className={"fillSpace"}
-								key={summoner.puuid}
-							>
-								<SummonerCard summoner={summoner} />
-							</motion.div>
-						);
-					})}
-				</AnimatePresence>
+				{filteredSummoners.map((summoner) => {
+					return (
+						<div className={"fillSpace"} key={summoner.puuid}>
+							<SummonerCard summoner={summoner} />
+						</div>
+					);
+				})}
 			</section>
 		</>
 	);

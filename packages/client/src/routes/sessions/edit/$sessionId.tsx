@@ -8,6 +8,7 @@ import {
 	Loader,
 	MultiSelect,
 	Paper,
+	PasswordInput,
 	Select,
 	Textarea,
 	TextInput,
@@ -106,6 +107,7 @@ function SessionEditView({ session, members, characters }: Props) {
 			characterIds: session.characters.map((char) => `${char.character.id}`),
 			goals: session.goals,
 			audioFile: null as File | null,
+			transcript: session.transcriptions.join("\n") ?? "",
 			password: "",
 		},
 		validate: {
@@ -167,12 +169,18 @@ function SessionEditView({ session, members, characters }: Props) {
 				}
 				return null;
 			},
+			transcript: (value) => {
+				if (!value) return "Transkript ist erforderlich";
+				return null;
+			},
 			password: (value) => {
 				if (!value) return "Admin Passwort ist erforderlich";
 				return null;
 			},
 		},
 	});
+
+	//TODO filtermöglichkeiten in sessions view
 
 	async function mutateFunction(formValues: typeof form.values) {
 		let audioFileBase64: string | undefined;
@@ -189,23 +197,30 @@ function SessionEditView({ session, members, characters }: Props) {
 			);
 		}
 
-		await mutation.mutateAsync({
-			sessionId: session.id,
-			password: formValues.password,
-			data: {
-				...formValues,
-				audioFileBase64,
-				audioFileMimeType,
-				timestamp: new Date(formValues.timestamp),
-				characterIds: formValues.characterIds.map((id) =>
-					Number.parseInt(id, 10),
-				),
+		mutation.mutate(
+			{
+				sessionId: session.id,
+				password: formValues.password,
+				data: {
+					...formValues,
+					audioFileBase64,
+					audioFileMimeType,
+					timestamp: new Date(formValues.timestamp),
+					characterIds: formValues.characterIds.map((id) =>
+						Number.parseInt(id, 10),
+					),
+					transcriptions: [formValues.transcript],
+				},
 			},
-		});
-		await navigate({
-			to: "/sessions/view/$sessionId",
-			params: { sessionId: `${session.id}` },
-		});
+			{
+				onSuccess: async () => {
+					await navigate({
+						to: "/sessions/view/$sessionId",
+						params: { sessionId: `${session.id}` },
+					});
+				},
+			},
+		);
 	}
 
 	const isLoading = mutation.status === "pending";
@@ -216,8 +231,6 @@ function SessionEditView({ session, members, characters }: Props) {
 		}
 		return "Beim Aktualisieren der Session ist ein unbekannter Fehler aufgetreten.";
 	}
-
-	//TODO make this also possible to edit a session
 
 	return (
 		<form onSubmit={form.onSubmit((values) => mutateFunction(values))}>
@@ -416,6 +429,16 @@ function SessionEditView({ session, members, characters }: Props) {
 							disabled={isLoading}
 							{...form.getInputProps("audioFile")}
 						/>
+						<Textarea
+							withAsterisk
+							label={"Transkript"}
+							resize="vertical"
+							disabled={isLoading}
+							autosize
+							maxRows={4}
+							key={form.key("transcript")}
+							{...form.getInputProps("transcript")}
+						></Textarea>
 					</Paper>
 				</Grid.Col>
 
@@ -428,14 +451,13 @@ function SessionEditView({ session, members, characters }: Props) {
 						style={{ height: "100%" }}
 					>
 						<Flex direction={"column"} gap={"sm"}>
-							<TextInput
+							<PasswordInput
 								withAsterisk
 								label={"Admin Passwort"}
-								type="password"
 								disabled={isLoading}
 								key={form.key("password")}
 								{...form.getInputProps("password")}
-							></TextInput>
+							></PasswordInput>
 
 							<Group justify="flex-start">
 								<Button type="submit" variant={"light"} loading={isLoading}>
