@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { z } from "zod/v4";
 import { db } from "../../db/index.js";
 import {
@@ -67,32 +67,69 @@ export const penAndPaperRouter = router({
 			frameworkOptions: frameworkEnum.enumValues,
 		};
 	}),
-	getSessions: loggedProcedure.query(async () => {
-		const [sessions, error] = await to(
-			db.query.PEN_AND_PAPER_SESSION_TABLE.findMany({
-				where: (sessions, { eq }) => eq(sessions.status, "valid"),
-				orderBy: (sessions, { desc }) => [desc(sessions.timestamp)],
-				columns: {
-					audioFileMimeType: false,
-					audioFileBase64: false,
-				},
-			}),
+	getCampaignOptions: loggedProcedure.query(async () => {
+		const [campaigns, error] = await to(
+			db
+				.selectDistinct({
+					campaign: PEN_AND_PAPER_SESSION_TABLE.campaign,
+				})
+				.from(PEN_AND_PAPER_SESSION_TABLE)
+				.where(eq(PEN_AND_PAPER_SESSION_TABLE.status, "valid")),
 		);
 		if (error) {
 			logger.error(
 				{ err: error, code: 500 },
-				"API:getSessions - failed to fetch sessions from db",
+				"API:getCampaignOptions - failed to fetch campaigns from db",
 			);
 			throw new TRPCError({
-				message: `Sessions could not be loaded: ${error.message}`,
+				message: `Campaigns could not be loaded: ${error.message}`,
 				code: "INTERNAL_SERVER_ERROR",
 				cause: error,
 			});
 		}
-
-		logger.debug("API:getSessions - fetched sessions from db");
-		return sessions;
+		logger.debug("API:getCampaignOptions - fetched campaigns from db");
+		return campaigns.map((c) => c.campaign);
 	}),
+	getSessions: loggedProcedure
+		.input(
+			z.object({
+				campaign: z.string().optional(),
+			}),
+		)
+		.query(async (opts) => {
+			const [sessions, error] = await to(
+				db.query.PEN_AND_PAPER_SESSION_TABLE.findMany({
+					where: (sessions, { eq }) => {
+						const conditions = [eq(sessions.status, "valid")];
+						if (opts.input.campaign) {
+							conditions.push(
+								eq(PEN_AND_PAPER_SESSION_TABLE.campaign, opts.input.campaign),
+							);
+						}
+						return and(...conditions);
+					},
+					orderBy: (sessions, { desc }) => [desc(sessions.timestamp)],
+					columns: {
+						audioFileMimeType: false,
+						audioFileBase64: false,
+					},
+				}),
+			);
+			if (error) {
+				logger.error(
+					{ err: error, code: 500 },
+					"API:getSessions - failed to fetch sessions from db",
+				);
+				throw new TRPCError({
+					message: `Sessions could not be loaded: ${error.message}`,
+					code: "INTERNAL_SERVER_ERROR",
+					cause: error,
+				});
+			}
+
+			logger.debug("API:getSessions - fetched sessions from db");
+			return sessions;
+		}),
 	getCharacters: loggedProcedure.query(async () => {
 		const [characters, error] = await to(
 			db.query.PEN_AND_PAPER_CHARACTER_TABLE.findMany(),
