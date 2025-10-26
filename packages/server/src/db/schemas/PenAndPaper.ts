@@ -3,6 +3,7 @@ import {
 	integer,
 	pgEnum,
 	serial,
+	text,
 	timestamp,
 	varchar,
 } from "drizzle-orm/pg-core";
@@ -29,6 +30,11 @@ export const characterRelations = relations(
 );
 
 export const frameworkEnum = pgEnum("framework", ["SWN", "DND (2024)"]);
+export const statusEnum = pgEnum("session_status", [
+	"draft",
+	"valid",
+	"deleted",
+]);
 
 export const PEN_AND_PAPER_SESSION_TABLE = PNP_SCHEMA.table("sessions", {
 	id: serial().primaryKey(),
@@ -44,9 +50,10 @@ export const PEN_AND_PAPER_SESSION_TABLE = PNP_SCHEMA.table("sessions", {
 	summaryLong: varchar().notNull(),
 	summaryShort: varchar().notNull(),
 	goals: varchar().array().notNull().notNull(),
-	transcriptions: varchar().array().notNull(),
+	transcription: text(),
 	audioFileBase64: varchar(),
 	audioFileMimeType: varchar(),
+	status: statusEnum().notNull(),
 });
 
 export const PEN_AND_PAPER_SESSION_TABLE_UPDATE_SCHEMA = createUpdateSchema(

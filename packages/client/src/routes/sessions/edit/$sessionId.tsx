@@ -107,7 +107,7 @@ function SessionEditView({ session, members, characters }: Props) {
 			characterIds: session.characters.map((char) => `${char.character.id}`),
 			goals: session.goals,
 			audioFile: null as File | null,
-			transcript: session.transcriptions.join("\n") ?? "",
+			transcript: session.transcription ?? "",
 			password: "",
 		},
 		validate: {
@@ -209,7 +209,8 @@ function SessionEditView({ session, members, characters }: Props) {
 					characterIds: formValues.characterIds.map((id) =>
 						Number.parseInt(id, 10),
 					),
-					transcriptions: [formValues.transcript],
+					transcription: formValues.transcript,
+					status: "valid",
 				},
 			},
 			{

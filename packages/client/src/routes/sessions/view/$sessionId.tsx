@@ -61,7 +61,6 @@ function RouteComponent() {
 	}
 
 	const session = query.data;
-	const transcription = session.transcriptions.join("\n");
 
 	interface PenAndPaperParticipant {
 		characterName?: string;
@@ -160,7 +159,9 @@ function RouteComponent() {
 
 					<Tabs.Panel value="transcript" p={"sm"}>
 						<ScrollArea h={"50vh"} offsetScrollbars>
-							<Text style={{ whiteSpace: "pre-line" }}>{transcription}</Text>
+							<Text style={{ whiteSpace: "pre-line" }}>
+								{session.transcription}
+							</Text>
 						</ScrollArea>
 					</Tabs.Panel>
 				</Tabs>

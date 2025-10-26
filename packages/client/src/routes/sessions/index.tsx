@@ -30,8 +30,6 @@ function RouteComponent() {
 	const [emptySessionOpen, setEmptySessionOpen] = useState(false);
 	const [characterOpen, setCharacterOpen] = useState(false);
 
-	//TODO make own components for edit
-
 	if (sessionQuery.status === "pending") {
 		return (
 			<Flex
