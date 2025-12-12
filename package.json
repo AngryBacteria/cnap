@@ -15,19 +15,19 @@
     "start": "concurrently \"pnpm start:client\" \"pnpm start:server\"",
     "start:client": "pnpm --filter client start",
     "start:server": "pnpm --filter server start",
-    "cleanup": "pnpm -r cleanup",
+    "cleanup": "pnpm -r cleanup && rimraf node_modules",
     "prepare": "husky"
   },
   "dependencies": {
-    "dotenv": "17.2.2"
+    "dotenv": "17.2.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.2.4",
+    "@biomejs/biome": "2.3.8",
+    "concurrently": "9.2.1",
     "husky": "9.1.7",
-    "tsx": "4.20.5",
-    "typescript": "5.9.2",
-    "rimraf": "6.0.1",
-    "concurrently": "9.2.1"
+    "rimraf": "6.1.2",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3"
   },
   "packageManager": "pnpm@10.18.0"
 }
