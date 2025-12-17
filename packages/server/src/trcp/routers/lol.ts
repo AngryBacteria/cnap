@@ -372,9 +372,11 @@ export const lolRouter = router({
 		.query(async (opts) => {
 			const [summoner, error] = await to(
 				db.query.LEAGUE_SUMMONERS_TABLE.findFirst({
-					where: (summoner, { eq }) =>
-						eq(summoner.gameName, opts.input.gameName) &&
-						eq(summoner.tagLine, opts.input.tagLine),
+					where: (summoner, { eq, and }) =>
+						and(
+							eq(summoner.gameName, opts.input.gameName),
+							eq(summoner.tagLine, opts.input.tagLine),
+						),
 				}),
 			);
 
@@ -426,9 +428,11 @@ export const lolRouter = router({
 		.query(async (opts) => {
 			const [summoner, _] = await to(
 				db.query.LEAGUE_SUMMONERS_TABLE.findFirst({
-					where: (summoner, { eq }) =>
-						eq(summoner.gameName, opts.input.gameName) &&
-						eq(summoner.tagLine, opts.input.tagLine),
+					where: (summoner, { eq, and }) =>
+						and(
+							eq(summoner.memberGameName, opts.input.gameName),
+							eq(summoner.tagLine, opts.input.tagLine),
+						),
 				}),
 			);
 			if (!summoner) {
