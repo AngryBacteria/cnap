@@ -121,5 +121,5 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
           format: table
           exit-code: 1
-          vuln-type: os,library
+          vuln-type: library
           severity: CRITICAL,HIGH

@@ -15,7 +15,7 @@
     "start": "concurrently \"pnpm start:client\" \"pnpm start:server\"",
     "start:client": "pnpm --filter client start",
     "start:server": "pnpm --filter server start",
-    "cleanup": "pnpm -r cleanup && rimraf node_modules",
+    "cleanup": "pnpm -r cleanup && rimraf node_modules || 0",
     "prepare": "husky"
   },
   "dependencies": {
@@ -29,5 +29,10 @@
     "tsx": "4.21.0",
     "typescript": "5.9.3"
   },
-  "packageManager": "pnpm@10.26.0"
+  "packageManager": "pnpm@10.26.0",
+  "pnpm": {
+    "overrides": {
+      "glob": "13.0.0"
+    }
+  }
 }
