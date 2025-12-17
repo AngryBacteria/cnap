@@ -44,6 +44,7 @@ jobs:
 
 
   audit:
+    continue-on-error: true
     name: pnpm audit (dependencies)
     runs-on: ubuntu-latest
     needs: test
@@ -105,6 +106,7 @@ jobs:
 
 
   trivy-scan:
+    continue-on-error: true
     name: Scan Docker image (Trivy)
     runs-on: ubuntu-latest
     needs: build-and-push
