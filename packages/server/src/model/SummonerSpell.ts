@@ -1,8 +1,6 @@
-import { z } from "zod";
-import { MongoDBIDSchema } from "./Database.js";
+import { z } from "zod/v4";
 
 export const SummonerSpellDBSchema = z.object({
-	_id: MongoDBIDSchema,
 	id: z.number(),
 	cooldown: z.number(),
 	description: z.string(),

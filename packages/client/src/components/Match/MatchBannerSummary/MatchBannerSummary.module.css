@@ -1,7 +1,7 @@
 .wonCard {
-	border-left: 8px solid var(--mantine-color-green-7) !important;
+	border-left: 8px solid var(--mantine-color-green-7);
 }
 
 .lostCard {
-	border-left: 8px solid var(--mantine-color-red-7) !important;
+	border-left: 8px solid var(--mantine-color-red-7);
 }

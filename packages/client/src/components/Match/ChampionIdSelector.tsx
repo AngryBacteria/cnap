@@ -33,6 +33,8 @@ export function ChampionIdSelector({
 			maw={400}
 			clearable
 			searchable
+			placeholder={championsQuery.isLoading ? "Loading..." : undefined}
+			disabled={championsQuery.isLoading}
 			data={formattedChampions}
 			value={selectedChampionId}
 			onChange={setSelectedChampionId}

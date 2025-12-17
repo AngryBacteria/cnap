@@ -9,14 +9,14 @@ interface Props {
 
 export function ChampionAttributeRadar({ champion }: Props) {
 	const chartData = useMemo(() => {
-		const output = Object.entries(champion.playstyleInfo).map(
-			([key, value]) => {
+		const output = Object.entries(champion.playstyle)
+			.filter(([key]) => key !== "id" && key !== "championId")
+			.map(([key, value]) => {
 				return {
 					attribute: key,
-					value: value as number,
+					value: value,
 				};
-			},
-		);
+			});
 
 		output.push({
 			attribute: "difficulty",

@@ -4,8 +4,7 @@ import type { Outputs } from "../../../utils/trcp.ts";
 import styles from "./LeagueItemGrid.module.css";
 
 interface Props {
-	participant: Outputs["lol"]["getMatchesParticipant"]["data"][number]["info"]["participants"];
-	items: Outputs["lol"]["getItems"];
+	match: Outputs["lol"]["getMatchesParticipant"]["data"][number];
 }
 
 interface PreparedItem {
@@ -16,96 +15,92 @@ interface PreparedItem {
 	abilities: { name: string; description: string }[];
 }
 
-export function LeagueItemGrid({ participant, items }: Props) {
+export function LeagueItemGrid({ match }: Props) {
 	const itemsFiltered = useMemo(() => {
 		return [
-			participant.item0,
-			participant.item1,
-			participant.item2,
-			participant.item3,
-			participant.item4,
-			participant.item5,
-			participant.item6,
-		]
-			.map((itemId) => items.find((item) => item.id === itemId))
-			.map((item) => {
-				const defaultItem: PreparedItem = {
-					id: item?.id || -1,
-					name: item?.name || "",
-					iconPath: item?.iconPath || "",
-					stats: [],
-					abilities: [],
-				};
+			match.item0,
+			match.item1,
+			match.item2,
+			match.item3,
+			match.item4,
+			match.item5,
+			match.item6,
+		].map((item) => {
+			const defaultItem: PreparedItem = {
+				id: item?.id || -1,
+				name: item?.name || "",
+				iconPath: item?.iconPath || "",
+				stats: [],
+				abilities: [],
+			};
 
-				if (!item) {
-					return undefined;
+			if (!item) {
+				return undefined;
+			}
+
+			// If main text available, parse it, else return empty string
+			const parser = new DOMParser();
+			const doc = parser.parseFromString(item.description, "text/html");
+			const mainText = doc.querySelector("mainText");
+			if (!mainText) {
+				return undefined;
+			}
+
+			// If stats element available, parse it, else return empty string
+			const statsElement = mainText.querySelector("stats");
+			if (!statsElement) {
+				return undefined;
+			}
+
+			// Add stats to description
+			const statLines = statsElement.innerHTML.split("<br>").filter(Boolean);
+			for (const line of statLines) {
+				const value = line.match(/<attention>(.*?)<\/attention>/)?.[1]?.trim();
+				const name = line
+					.replace(/<attention>.*?<\/attention>/, "")
+					.replace(":", "")
+					.trim();
+
+				if (!name || !value) {
+					continue;
 				}
 
-				// If main text available, parse it, else return empty string
-				const parser = new DOMParser();
-				const doc = parser.parseFromString(item.description, "text/html");
-				const mainText = doc.querySelector("mainText");
-				if (!mainText) {
-					return undefined;
+				defaultItem.stats.push({ name, value });
+			}
+
+			// Add active/passive to description
+			const abilities = mainText.querySelectorAll("active, passive");
+			for (const ability of abilities) {
+				const abilityName = ability.textContent?.replace(":", "").trim();
+				if (!abilityName) {
+					continue;
 				}
 
-				// If stats element available, parse it, else return empty string
-				const statsElement = mainText.querySelector("stats");
-				if (!statsElement) {
-					return undefined;
-				}
-
-				// Add stats to description
-				const statLines = statsElement.innerHTML.split("<br>").filter(Boolean);
-				for (const line of statLines) {
-					const value = line
-						.match(/<attention>(.*?)<\/attention>/)?.[1]
-						?.trim();
-					const name = line
-						.replace(/<attention>.*?<\/attention>/, "")
-						.replace(":", "")
-						.trim();
-
-					if (!name || !value) {
-						continue;
+				const abilityTexts = [];
+				let currentNode = ability.nextSibling;
+				while (currentNode) {
+					if (
+						currentNode.nodeName.toLowerCase() === "passive" ||
+						currentNode.nodeName.toLowerCase() === "active"
+					) {
+						break;
 					}
 
-					defaultItem.stats.push({ name, value });
+					if (currentNode.textContent?.trim()) {
+						abilityTexts.push(currentNode.textContent.trim());
+					}
+					currentNode = currentNode.nextSibling;
 				}
 
-				// Add active/passive to description
-				const abilities = mainText.querySelectorAll("active, passive");
-				for (const ability of abilities) {
-					const abilityName = ability.textContent?.replace(":", "").trim();
-					if (!abilityName) {
-						continue;
-					}
+				defaultItem.abilities.push({
+					name: abilityName,
+					description: abilityTexts.join(" "),
+				});
+			}
 
-					const abilityTexts = [];
-					let currentNode = ability.nextSibling;
-					while (currentNode) {
-						if (
-							currentNode.nodeName.toLowerCase() === "passive" ||
-							currentNode.nodeName.toLowerCase() === "active"
-						) {
-							break;
-						}
-
-						if (currentNode.textContent?.trim()) {
-							abilityTexts.push(currentNode.textContent.trim());
-						}
-						currentNode = currentNode.nextSibling;
-					}
-
-					defaultItem.abilities.push({
-						name: abilityName,
-						description: abilityTexts.join(" "),
-					});
-				}
-
-				return defaultItem;
-			});
-	}, [participant, items]);
+			return defaultItem;
+		});
+	}, [match]);
 
 	return (
 		<Flex direction={"row"} wrap={"wrap"} gap={"5px"}>
@@ -115,7 +110,7 @@ export function LeagueItemGrid({ participant, items }: Props) {
 						transitionProps={{ transition: "fade-up", duration: 300 }}
 						shadow="md"
 						width={300}
-						// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+						// biome-ignore lint/suspicious/noArrayIndexKey: we need the index for unique id as multiple items can be the same
 						key={index + item.id}
 					>
 						<HoverCard.Target>
@@ -146,7 +141,7 @@ export function LeagueItemGrid({ participant, items }: Props) {
 				) : (
 					<div
 						key={`empty-item-${
-							// biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+							// biome-ignore lint/suspicious/noArrayIndexKey: we need the index for unique id as multiple items can be the same
 							index
 						}`}
 						className={styles.emptyItem}

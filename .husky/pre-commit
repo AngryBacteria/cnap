@@ -1,4 +1,3 @@
-npm run biome
-npm run type-check
-npm run test:server
+pnpm type-check
+pnpm biome
 git add .

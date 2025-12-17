@@ -1,9 +1,15 @@
 import fs from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import * as trpcExpress from "@trpc/server/adapters/express";
 import cors from "cors";
 import express from "express";
+import {
+	BACKEND_PORT,
+	BACKGROUND_TASK_INITIAL_DELAY,
+	CLIENT_DIST_PATH,
+	RUN_TASKS,
+	UPDATE_INTERVAL,
+} from "../../helpers/EnvironmentConfig.js";
 import logger from "../../helpers/Logger.js";
 import { intervalUpdate } from "../../tasks/MainTask.js";
 import { router } from "../trcp.js";
@@ -11,32 +17,13 @@ import { generalRouter } from "./general.js";
 import { lolRouter } from "./lol.js";
 import { penAndPaperRouter } from "./penAndPaper.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-const staticFilesPath = join(__dirname, "..", "..", "..", "..", "..", "static");
-const spaFilesPath = join(
-	__dirname,
-	"..",
-	"..",
-	"..",
-	"..",
-	"..",
-	"packages",
-	"client",
-	"dist",
-);
-
-// Validate paths exist
-if (!fs.existsSync(staticFilesPath)) {
-	logger.warn(
-		`The folder at ${staticFilesPath} does not exist. Static files will not be served`,
+// Validate spa path exist
+if (!fs.existsSync(CLIENT_DIST_PATH)) {
+	logger.error(
+		`The client/dist folder at ${CLIENT_DIST_PATH} does not exist. Frontend will not work`,
 	);
-}
-
-if (!fs.existsSync(spaFilesPath)) {
-	logger.warn(
-		`The client/dist folder at ${spaFilesPath} does not exist. Frontend will not work`,
-	);
+} else {
+	logger.info(`Serving SPA from path: ${CLIENT_DIST_PATH}`);
 }
 
 const appRouter = router({
@@ -47,7 +34,6 @@ const appRouter = router({
 
 const app = express();
 app.use(cors());
-app.use("/static", express.static(staticFilesPath));
 app.use(
 	"/trpc",
 	trpcExpress.createExpressMiddleware({
@@ -55,7 +41,7 @@ app.use(
 	}),
 );
 // Serve SPA files
-app.use(express.static(spaFilesPath));
+app.use(express.static(CLIENT_DIST_PATH));
 
 // Fallback route for SPA client-side routing
 app.get("*", (req, res, next) => {
@@ -65,30 +51,28 @@ app.get("*", (req, res, next) => {
 	}
 
 	// Serve the SPA's index.html for all other routes
-	res.sendFile(join(spaFilesPath, "index.html"), (err) => {
+	res.sendFile(join(CLIENT_DIST_PATH, "index.html"), (err) => {
 		if (err) {
 			next(err);
 		}
 	});
 });
 
-const PORT = process.env.PROD_PORT ? Number(process.env.PROD_PORT) : 3000;
-app.listen(PORT);
+app.listen(BACKEND_PORT);
 logger.info(
 	{
-		port: PORT,
+		port: BACKEND_PORT,
 		baseUrl: "http://localhost",
-		url: `http://localhost:${PORT}/trpc`,
+		url: `http://localhost:${BACKEND_PORT}/trpc`,
 	},
 	"API:Startup - tRPC Server is running",
 );
 
 export type AppRouter = typeof appRouter;
 
-const RUN_TASKS = process.env.RUN_TASKS?.toLowerCase() === "true";
 if (RUN_TASKS) {
-	const UPDATE_INTERVAL = process.env.UPDATE_INTERVAL
-		? Number(process.env.UPDATE_INTERVAL)
-		: 3600000;
-	intervalUpdate(0, UPDATE_INTERVAL).catch(logger.error);
+	logger.info(`Starting task in ${BACKGROUND_TASK_INITIAL_DELAY} ms...`);
+	setTimeout(() => {
+		intervalUpdate(0, UPDATE_INTERVAL).catch(logger.error);
+	}, BACKGROUND_TASK_INITIAL_DELAY);
 }

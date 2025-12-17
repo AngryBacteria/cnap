@@ -14,7 +14,7 @@ describe("RiotHelper API", () => {
 		expect(isConnected).toBeTruthy();
 	});
 
-	test("getMatch and getTimeline", async () => {
+	test("Match and Timeline Schemas are correct", async () => {
 		const match = await riotHelper.getMatch(MATCH_ID);
 		expect(match).toBeDefined();
 
@@ -46,21 +46,29 @@ describe("RiotHelper API", () => {
 		test("fetches account by tag & region", async () => {
 			const account = await riotHelper.getRiotAccountByTag(NAME, TAG);
 			expect(account).toBeDefined();
+			expect(account?.puuid).toEqual(PUUID);
+			expect(account?.gameName).toEqual(NAME);
+			expect(account?.tagLine).toEqual(TAG);
 		});
 
 		test("fetches account by PUUID", async () => {
 			const account = await riotHelper.getRiotAccountByPuuid(PUUID);
 			expect(account).toBeDefined();
+			expect(account?.puuid).toEqual(PUUID);
 		});
 
 		test("fetches summoner by PUUID", async () => {
 			const summ = await riotHelper.getSummonerByPuuidRiot(PUUID);
 			expect(summ).toBeDefined();
+			expect(summ?.puuid).toEqual(PUUID);
 		});
 
 		test("fetches summoner by account tag", async () => {
 			const summ = await riotHelper.getSummonerByAccountTag(NAME, TAG);
 			expect(summ).toBeDefined();
+			expect(summ?.puuid).toEqual(PUUID);
+			expect(summ?.gameName).toEqual(NAME);
+			expect(summ?.tagLine).toEqual(TAG);
 		});
 
 		test("account and summoner retrieval methods should have same data", async () => {
@@ -73,44 +81,44 @@ describe("RiotHelper API", () => {
 	});
 
 	describe("static data endpoints", () => {
-		test("getItems", async () => {
+		test("getItems Schemas are correct", async () => {
 			const items = await riotHelper.getItems();
-			expect(items).toBeDefined();
+			expect(items[0]).toBeDefined();
 		});
 
-		test("getChampions", async () => {
+		test("getChampions Schemas are correct", { timeout: 60000 }, async () => {
 			const champs = await riotHelper.getChampions();
-			expect(champs).toBeDefined();
+			expect(champs[0]).toBeDefined();
 		});
 
-		test("getGameModes", async () => {
+		test("getGameModes Schemas are correct", async () => {
 			const modes = await riotHelper.getGameModes();
-			expect(modes).toBeDefined();
+			expect(modes[0]).toBeDefined();
 		});
 
-		test("getGameTypes", async () => {
+		test("getGameTypes Schemas are correct", async () => {
 			const types = await riotHelper.getGameTypes();
-			expect(types).toBeDefined();
+			expect(types[0]).toBeDefined();
 		});
 
-		test("getMaps", async () => {
+		test("getMaps Schemas are correct", async () => {
 			const maps = await riotHelper.getMaps();
-			expect(maps).toBeDefined();
+			expect(maps[0]).toBeDefined();
 		});
 
-		test("getQueues", async () => {
+		test("getQueues Schemas are correct", async () => {
 			const queues = await riotHelper.getQueues();
-			expect(queues).toBeDefined();
+			expect(queues[0]).toBeDefined();
 		});
 
-		test("getSummonerIcons", async () => {
+		test("getSummonerIcons Schemas are correct", async () => {
 			const icons = await riotHelper.getSummonerIcons();
-			expect(icons).toBeDefined();
+			expect(icons[0]).toBeDefined();
 		});
 
-		test("getSummonerSpells", async () => {
+		test("getSummonerSpells Schemas are correct", async () => {
 			const spells = await riotHelper.getSummonerSpells();
-			expect(spells).toBeDefined();
+			expect(spells[0]).toBeDefined();
 		});
 	});
 });

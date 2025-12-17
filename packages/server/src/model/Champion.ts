@@ -1,5 +1,4 @@
-import { z } from "zod";
-import { MongoDBIDSchema } from "./Database.js";
+import { z } from "zod/v4";
 
 //
 // Full Champion from Riot CDN
@@ -37,15 +36,6 @@ export const RaritySchema = z.object({
 });
 
 export type Rarity = z.infer<typeof RaritySchema>;
-
-export const OverlaySchema = z.object({
-	centeredLCOverlayPath: z.string(),
-	uncenteredLCOverlayPath: z.string(),
-	socialCardLCOverlayPath: z.string(),
-	tileLCOverlayPath: z.string(),
-});
-
-export type Overlay = z.infer<typeof OverlaySchema>;
 
 export const LayerSchema = z.object({
 	contentId: z.string(),
@@ -102,20 +92,6 @@ export const TacticalInfoSchema = z.object({
 
 export type TacticalInfo = z.infer<typeof TacticalInfoSchema>;
 
-export const AugmentSchema = z.object({
-	contentId: z.string(),
-	overlays: z.array(OverlaySchema),
-});
-
-export type Augment = z.infer<typeof AugmentSchema>;
-
-export const BordersSchema = z.object({
-	layer0: z.array(LayerSchema),
-	layer1: z.array(LayerSchema).nullish(),
-});
-
-export type Borders = z.infer<typeof BordersSchema>;
-
 export const SpellSchema = z.object({
 	spellKey: z.string(),
 	name: z.string(),
@@ -137,13 +113,6 @@ export const SpellSchema = z.object({
 
 export type Spell = z.infer<typeof SpellSchema>;
 
-export const SkinAugmentsSchema = z.object({
-	borders: BordersSchema,
-	augments: z.array(AugmentSchema).nullish(),
-});
-
-export type SkinAugments = z.infer<typeof SkinAugmentsSchema>;
-
 export const TierSchema = z.object({
 	id: z.number(),
 	name: z.string(),
@@ -157,7 +126,6 @@ export const TierSchema = z.object({
 	splashVideoPath: z.string().nullish(),
 	collectionSplashVideoPath: z.string().nullish(),
 	collectionCardHoverVideoPath: z.string().nullish(),
-	skinAugments: SkinAugmentsSchema.nullish(),
 	loadScreenVintagePath: z.string().nullish(),
 });
 
@@ -171,7 +139,6 @@ export const ChromaSchema = z.object({
 	descriptions: z.array(DescriptionSchema),
 	rarities: z.array(RaritySchema),
 	contentId: z.string(),
-	skinAugments: SkinAugmentsSchema.nullish(),
 });
 
 export type Chroma = z.infer<typeof ChromaSchema>;
@@ -214,7 +181,6 @@ export const SkinSchema = z.object({
 	description: z.string().nullish(),
 	chromas: z.array(ChromaSchema).nullish(),
 	contentId: z.string(),
-	skinAugments: SkinAugmentsSchema.nullish(),
 	questSkinInfo: QuestSkinInfoSchema.nullish(),
 	skinFeaturePreviewData: z.array(SkinFeaturePreviewDatumSchema).nullish(),
 });
@@ -225,7 +191,6 @@ export type Skin = z.infer<typeof SkinSchema>;
  * Full Version of the Champion from the Riot CDN
  */
 export const ChampionDBSchema = z.object({
-	_id: MongoDBIDSchema,
 	id: z.number(),
 	alias: z.string(),
 	banVoPath: z.string(),
@@ -260,17 +225,3 @@ export const ChampionRiotReducedSchema = z.object({
 });
 
 export type ChampionRiotSummary = z.infer<typeof ChampionRiotReducedSchema>;
-
-/**
- * Reduced Version of Champion for the Client
- */
-export const ChampionReducedSchema = z.object({
-	id: z.number(),
-	name: z.string(),
-	alias: z.string(),
-	title: z.string(),
-	shortBio: z.string(),
-	uncenteredSplashPath: z.string(),
-});
-
-export type ChampionReduced = z.infer<typeof ChampionReducedSchema>;

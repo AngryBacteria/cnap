@@ -1,88 +1,107 @@
 import { TRPCError } from "@trpc/server";
-import { z } from "zod";
-import dbh from "../../helpers/DBHelper.js";
+import { and, count, desc, eq, isNotNull, sql, sum } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
+import { z } from "zod/v4";
+import { db } from "../../db/index.js";
+import {
+	LEAGUE_CHAMPIONS_TABLE,
+	LEAGUE_GAME_MODES_TABLE,
+	LEAGUE_ITEMS_TABLE,
+	LEAGUE_MAPS_TABLE,
+	LEAGUE_MATCH_PARTICIPANTS_TABLE,
+	LEAGUE_QUEUES_TABLE,
+	LEAGUE_SUMMONER_SPELLS_TABLE,
+	LEAGUE_SUMMONERS_TABLE,
+} from "../../db/schemas/index.js";
+import { to } from "../../helpers/General.js";
 import logger from "../../helpers/Logger.js";
 import rh from "../../helpers/RiotHelper.js";
-import {
-	ChampionDBSchema,
-	ChampionReducedSchema,
-} from "../../model/Champion.js";
-import {
-	CollectionName,
-	type MongoFilter,
-	type MongoPipeline,
-} from "../../model/Database.js";
-import { ItemDBSchema } from "../../model/Item.js";
-import type { MatchV5Participant } from "../../model/MatchV5.js";
-import { QueueDBSchema } from "../../model/Queue.js";
-import {
-	SummonerDbSchema,
-	SummonerSummarySchema,
-} from "../../model/Summoner.js";
-import { SummonerSpellDBSchema } from "../../model/SummonerSpell.js";
 import { loggedProcedure } from "../middlewares/executionTime.js";
 import { router } from "../trcp.js";
+
+const item0Alias = alias(LEAGUE_ITEMS_TABLE, "item0Alias");
+const item1Alias = alias(LEAGUE_ITEMS_TABLE, "item1Alias");
+const item2Alias = alias(LEAGUE_ITEMS_TABLE, "item2Alias");
+const item3Alias = alias(LEAGUE_ITEMS_TABLE, "item3Alias");
+const item4Alias = alias(LEAGUE_ITEMS_TABLE, "item4Alias");
+const item5Alias = alias(LEAGUE_ITEMS_TABLE, "item5Alias");
+const item6Alias = alias(LEAGUE_ITEMS_TABLE, "item6Alias");
+
+const summonerSpell1Alias = alias(
+	LEAGUE_SUMMONER_SPELLS_TABLE,
+	"summonerSpell1Alias",
+);
+const summonerSpell2Alias = alias(
+	LEAGUE_SUMMONER_SPELLS_TABLE,
+	"summonerSpell2Alias",
+);
 
 // Test riot api connection
 await rh.testConnection();
 
 export const lolRouter = router({
 	getChampionsReduced: loggedProcedure.query(async () => {
-		const result = await dbh.genericGet(
-			CollectionName.CHAMPION,
-			{
-				limit: 1000,
-				projection: {
-					_id: 0,
-					id: 1,
-					name: 1,
-					alias: 1,
-					title: 1,
-					shortBio: 1,
-					uncenteredSplashPath: 1,
-				},
-			},
-			ChampionReducedSchema,
+		const [champions, error] = await to(
+			db.query.LEAGUE_CHAMPIONS_TABLE.findMany(),
 		);
-		if (!result.success) {
-			logger.error({ error: result.error }, "API:getChampionsReduced");
+
+		if (error) {
+			logger.error(
+				{ err: error },
+				"API:getChampionsReduced - failed to fetch champions from db",
+			);
 			throw new TRPCError({
 				message: `Champions couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
+				cause: error,
 			});
 		}
-		logger.info("API:getChampionsReduced");
-		return result.data;
+
+		logger.debug("API:getChampionsReduced - fetched champions from db");
+		return champions;
 	}),
 	getChampionById: loggedProcedure.input(z.number()).query(async (opts) => {
-		const dbResult = await dbh.genericGet(
-			CollectionName.CHAMPION,
-			{
-				filter: { id: opts.input },
-			},
-			ChampionDBSchema,
+		const [champion, error] = await to(
+			db.query.LEAGUE_CHAMPIONS_TABLE.findFirst({
+				where: (champion, { eq }) => eq(champion.id, opts.input),
+				with: {
+					playstyle: true,
+					tacticalInfo: true,
+					skins: true,
+					passives: true,
+					spells: true,
+				},
+			}),
 		);
 
-		if (!dbResult.success) {
-			logger.error({ error: dbResult.error }, "API:getChampionById");
+		if (error) {
+			logger.error(
+				{ err: error },
+				"API:getChampionById - failed to fetch champion by id",
+			);
 			throw new TRPCError({
 				message: `Champion couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
+				cause: error,
 			});
 		}
 
-		if (!dbResult.data[0]) {
-			logger.error({ operationInputs: opts.input }, "API:getChampionById");
+		if (!champion) {
+			logger.error(
+				{ operationInputs: opts.input },
+				"API:getChampionById - no champion found with this id",
+			);
 			throw new TRPCError({
 				message: `Champion not found: ${opts.input}`,
 				code: "NOT_FOUND",
 			});
 		}
-		logger.info(
-			{ operationInputs: opts.input, cached: false },
-			"API:getChampionById",
+
+		logger.debug(
+			{ operationInputs: opts.input },
+			"API:getChampionById - fetched champion by id",
 		);
-		return dbResult.data[0];
+		return champion;
 	}),
 	getMatchesParticipant: loggedProcedure
 		.input(
@@ -105,171 +124,243 @@ export const lolRouter = router({
 				onlySummonersInDb,
 			} = opts.input;
 
-			// Init the pipeline
-			const pipeline: MongoPipeline = [];
+			const PAGE_SIZE = 20;
+			const currentPage = Math.max(1, page);
+			const offset = (currentPage - 1) * PAGE_SIZE;
 
-			// Optionally filter by champion id
-			if (championId) {
-				pipeline.push({
-					$match: { "info.participants.championId": championId },
-				});
-			}
-
-			// Optionally Filter by summoner puuids
-			let summonerPuuids: string[] = [];
-			if (onlySummonersInDb || gameName || tagLine) {
-				const summonerFilter: MongoFilter = {};
-				if (gameName) {
-					summonerFilter.gameName = gameName;
-				}
-				if (tagLine) {
-					summonerFilter.tagLine = tagLine;
-				}
-				const existingPuuidsResponse = await dbh.genericGet(
-					CollectionName.SUMMONER,
-					{
-						limit: 100000,
-						projection: { puuid: 1 },
-						filter: summonerFilter,
-					},
-					z.object({
-						puuid: z.string(),
-					}),
-				);
-				if (!existingPuuidsResponse.success) {
-					logger.error(
-						{ error: existingPuuidsResponse.error },
-						"API:getMatchesParticipant",
-					);
-					throw new TRPCError({
-						message: `Summoners couldn't be fetched`,
-						code: "INTERNAL_SERVER_ERROR",
-					});
-				}
-				summonerPuuids = existingPuuidsResponse.data.map(
-					(responseObject) => responseObject.puuid,
-				);
-				pipeline.push({
-					$match: { "info.participants.puuid": { $in: summonerPuuids } },
-				});
-			}
-
-			// Filter by queue id
-			if (queueId) {
-				pipeline.push({ $match: { "info.queueId": queueId } });
-			}
-
-			// Unwind
-			pipeline.push({
-				$unwind: {
-					path: "$info.participants",
-					preserveNullAndEmptyArrays: true,
-				},
-			});
-
-			// Optionally filter unwinded document again by champion id
-			if (championId) {
-				pipeline.push({
-					$match: { "info.participants.championId": championId },
-				});
-			}
-
-			// Optionally filter unwinded documents again by summoner puuids
-			if (onlySummonersInDb || gameName || tagLine) {
-				pipeline.push({
-					$match: { "info.participants.puuid": { $in: summonerPuuids } },
-				});
-			}
-
-			// Sort
-			pipeline.push({ $sort: { "info.gameCreation": -1 } });
-
-			const dbResult = await dbh.genericPaginatedPipeline<MatchV5Participant>(
-				pipeline,
-				CollectionName.MATCH,
-				page,
+			const whereConditions = and(
+				gameName ? eq(LEAGUE_SUMMONERS_TABLE.gameName, gameName) : undefined,
+				tagLine ? eq(LEAGUE_SUMMONERS_TABLE.tagLine, tagLine) : undefined,
+				championId
+					? eq(LEAGUE_MATCH_PARTICIPANTS_TABLE.championId, championId)
+					: undefined,
+				queueId
+					? eq(LEAGUE_MATCH_PARTICIPANTS_TABLE.queueId, queueId)
+					: undefined,
+				onlySummonersInDb ? isNotNull(LEAGUE_SUMMONERS_TABLE.puuid) : undefined,
 			);
-			if (!dbResult.success) {
-				logger.error({ error: dbResult.error }, "API:getMatchesParticipant");
+
+			const [countResult, countError] = await to(
+				db
+					.select({
+						value: count(),
+					})
+					.from(LEAGUE_MATCH_PARTICIPANTS_TABLE)
+					.leftJoin(
+						LEAGUE_SUMMONERS_TABLE,
+						eq(
+							LEAGUE_MATCH_PARTICIPANTS_TABLE.puuid,
+							LEAGUE_SUMMONERS_TABLE.puuid,
+						),
+					)
+					.where(whereConditions),
+			);
+
+			if (countError) {
+				logger.error(
+					{ err: countError },
+					"API:getMatchesParticipant - counting participants failed",
+				);
+				throw new TRPCError({
+					message: `Participants couldn't be counted for pagination`,
+					code: "INTERNAL_SERVER_ERROR",
+					cause: countError,
+				});
+			}
+
+			const totalCount = countResult?.[0]?.value ?? 0;
+			const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+
+			const [matches, error] = await to(
+				db
+					.select({
+						participant: LEAGUE_MATCH_PARTICIPANTS_TABLE,
+						summoner: LEAGUE_SUMMONERS_TABLE,
+						item0: item0Alias,
+						item1: item1Alias,
+						item2: item2Alias,
+						item3: item3Alias,
+						item4: item4Alias,
+						item5: item5Alias,
+						item6: item6Alias,
+						queue: LEAGUE_QUEUES_TABLE,
+						gameMode: LEAGUE_GAME_MODES_TABLE,
+						map: LEAGUE_MAPS_TABLE,
+						champion: LEAGUE_CHAMPIONS_TABLE,
+						summonerSpell1: summonerSpell1Alias,
+						summonerSpell2: summonerSpell2Alias,
+					})
+					.from(LEAGUE_MATCH_PARTICIPANTS_TABLE)
+					.leftJoin(
+						LEAGUE_SUMMONERS_TABLE,
+						eq(
+							LEAGUE_MATCH_PARTICIPANTS_TABLE.puuid,
+							LEAGUE_SUMMONERS_TABLE.puuid,
+						),
+					)
+					.leftJoin(
+						item0Alias,
+						eq(LEAGUE_MATCH_PARTICIPANTS_TABLE.item0, item0Alias.id),
+					)
+					.leftJoin(
+						item1Alias,
+						eq(LEAGUE_MATCH_PARTICIPANTS_TABLE.item1, item1Alias.id),
+					)
+					.leftJoin(
+						item2Alias,
+						eq(LEAGUE_MATCH_PARTICIPANTS_TABLE.item2, item2Alias.id),
+					)
+					.leftJoin(
+						item3Alias,
+						eq(LEAGUE_MATCH_PARTICIPANTS_TABLE.item3, item3Alias.id),
+					)
+					.leftJoin(
+						item4Alias,
+						eq(LEAGUE_MATCH_PARTICIPANTS_TABLE.item4, item4Alias.id),
+					)
+					.leftJoin(
+						item5Alias,
+						eq(LEAGUE_MATCH_PARTICIPANTS_TABLE.item5, item5Alias.id),
+					)
+					.leftJoin(
+						item6Alias,
+						eq(LEAGUE_MATCH_PARTICIPANTS_TABLE.item6, item6Alias.id),
+					)
+					.leftJoin(
+						LEAGUE_QUEUES_TABLE,
+						eq(
+							LEAGUE_MATCH_PARTICIPANTS_TABLE.queueId,
+							LEAGUE_QUEUES_TABLE.queueId,
+						),
+					)
+					.leftJoin(
+						LEAGUE_GAME_MODES_TABLE,
+						eq(
+							LEAGUE_MATCH_PARTICIPANTS_TABLE.gameMode,
+							LEAGUE_GAME_MODES_TABLE.gameMode,
+						),
+					)
+					.leftJoin(
+						LEAGUE_MAPS_TABLE,
+						eq(LEAGUE_MATCH_PARTICIPANTS_TABLE.mapId, LEAGUE_MAPS_TABLE.mapId),
+					)
+					.leftJoin(
+						LEAGUE_CHAMPIONS_TABLE,
+						eq(
+							LEAGUE_MATCH_PARTICIPANTS_TABLE.championId,
+							LEAGUE_CHAMPIONS_TABLE.id,
+						),
+					)
+					.leftJoin(
+						summonerSpell1Alias,
+						eq(
+							LEAGUE_MATCH_PARTICIPANTS_TABLE.summoner1Id,
+							summonerSpell1Alias.id,
+						),
+					)
+					.leftJoin(
+						summonerSpell2Alias,
+						eq(
+							LEAGUE_MATCH_PARTICIPANTS_TABLE.summoner2Id,
+							summonerSpell2Alias.id,
+						),
+					)
+					.where(whereConditions)
+					.orderBy(desc(LEAGUE_MATCH_PARTICIPANTS_TABLE.gameCreation))
+					.limit(PAGE_SIZE)
+					.offset(offset),
+			);
+
+			if (error) {
+				logger.error({ err: error }, "API:getMatchesParticipant");
 				throw new TRPCError({
 					message: `Matches couldn't be fetched`,
 					code: "INTERNAL_SERVER_ERROR",
+					cause: error,
 				});
 			}
 
-			logger.info(
-				{ operationInputs: opts.input, cached: false },
-				"API:getMatchesParticipant",
-			);
-			return dbResult.data;
+			return {
+				data: matches,
+				pagination: {
+					currentPage,
+					totalPages,
+					totalCount,
+					pageSize: PAGE_SIZE,
+				},
+			};
 		}),
 	getQueues: loggedProcedure.query(async () => {
-		const result = await dbh.genericGet(
-			CollectionName.QUEUE,
-			{ limit: 1000 },
-			QueueDBSchema,
-		);
-		if (!result.success) {
-			logger.error({ error: result.error }, "API:getQueues");
+		const [queues, error] = await to(db.query.LEAGUE_QUEUES_TABLE.findMany());
+		if (error) {
+			logger.error(
+				{ err: error },
+				"API:getQueues - fetching queues from db failed",
+			);
 			throw new TRPCError({
 				message: `Queues couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
+				cause: error,
 			});
 		}
 
-		logger.info("API:getQueues");
-		return result.data;
+		logger.debug("API:getQueues - fetched queues from db");
+		return queues;
 	}),
 	getItems: loggedProcedure.query(async () => {
-		const results = await dbh.genericGet(
-			CollectionName.ITEM,
-			{ limit: 1000 },
-			ItemDBSchema,
-		);
-		if (!results.success) {
-			logger.error({ error: results.error }, "API:getItems");
+		const [items, error] = await to(db.query.LEAGUE_ITEMS_TABLE.findMany());
+		if (error) {
+			logger.error(
+				{ err: error },
+				"API:getItems - failed to fetch items from db",
+			);
 			throw new TRPCError({
 				message: `Items couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
+				cause: error,
 			});
 		}
 
-		logger.info("API:getItems");
-		return results.data;
+		logger.debug("API:getItems - fetched items from db");
+		return items;
 	}),
 	getSummonerSpells: loggedProcedure.query(async () => {
-		const result = await dbh.genericGet(
-			CollectionName.SUMMONER_SPELL,
-			{ limit: 1000 },
-			SummonerSpellDBSchema,
+		const [spells, error] = await to(
+			db.query.LEAGUE_SUMMONER_SPELLS_TABLE.findMany(),
 		);
-		if (!result.success) {
-			logger.error({ error: result.error }, "API:getSummonerSpells");
+		if (error) {
+			logger.error(
+				{ err: error },
+				"API:getSummonerSpells - failed to fetch summonerSpells from db",
+			);
 			throw new TRPCError({
 				message: `SummonerSpells couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
+				cause: error,
 			});
 		}
 
-		logger.info("API:getSummonerSpells");
-		return result.data;
+		logger.debug("API:getSummonerSpells - fetched summonerSpells from db");
+		return spells;
 	}),
 	getSummoners: loggedProcedure.query(async () => {
-		const summonerResponse = await dbh.genericGet(
-			CollectionName.SUMMONER,
-			{ limit: 1000 },
-			SummonerDbSchema,
+		const [summoners, error] = await to(
+			db.query.LEAGUE_SUMMONERS_TABLE.findMany(),
 		);
-		if (!summonerResponse.success) {
-			logger.error({ error: summonerResponse.error }, "API:getSummoners");
+		if (error) {
+			logger.error(
+				{ err: error },
+				"API:getSummoners - failed to fetch summoners from db",
+			);
 			throw new TRPCError({
 				message: `Summoners couldn't be fetched`,
 				code: "INTERNAL_SERVER_ERROR",
+				cause: error,
 			});
 		}
 
-		logger.info("API:getSummoners");
-		return summonerResponse.data;
+		logger.debug("API:getSummoners - fetched summoners from db");
+		return summoners;
 	}),
 	getSummonerByName: loggedProcedure
 		.input(
@@ -279,52 +370,51 @@ export const lolRouter = router({
 			}),
 		)
 		.query(async (opts) => {
-			const summonerResponse = await dbh.genericGet(
-				CollectionName.SUMMONER,
-				{
-					filter: {
-						gameName: opts.input.gameName,
-						tagLine: opts.input.tagLine,
-					},
-				},
-				SummonerDbSchema,
+			const [summoner, error] = await to(
+				db.query.LEAGUE_SUMMONERS_TABLE.findFirst({
+					where: (summoner, { eq }) =>
+						eq(summoner.gameName, opts.input.gameName) &&
+						eq(summoner.tagLine, opts.input.tagLine),
+				}),
 			);
 
-			if (!summonerResponse.success) {
+			if (error) {
 				logger.error(
 					{
-						error: summonerResponse.error,
-						puuid: opts.input,
+						err: error,
+						tagLine: opts.input.tagLine,
+						gameName: opts.input.gameName,
 						code: "INTERNAL_SERVER_ERROR",
 					},
-					"API:getSummonerByName",
+					"API:getSummonerByName - failed to fetch summoner by name and tagline from db",
 				);
 				throw new TRPCError({
 					message: `Summoner couldn't be fetched`,
 					code: "INTERNAL_SERVER_ERROR",
+					cause: error,
 				});
 			}
 
-			if (!summonerResponse.data[0]) {
+			if (!summoner) {
 				logger.warn(
 					{
-						puuid: opts.input,
+						tagLine: opts.input.tagLine,
+						gameName: opts.input.gameName,
 						code: "NOT_FOUND",
-						message: `Database returned no members for PUUID: ${opts.input}`,
 					},
-					"API:getSummonerByName",
+					"API:getSummonerByName - no summoner found with this name and tagline in db",
 				);
 				throw new TRPCError({
-					message: `Database returned no members for PUUID: ${opts.input}`,
+					message: `Database returned no members for name: ${opts.input.gameName} and tagLine: ${opts.input.tagLine}`,
 					code: "NOT_FOUND",
 				});
 			}
 
-			logger.info(
-				{ operationInputs: opts.input, cached: false },
-				"API:getSummonerByName",
+			logger.debug(
+				{ operationInputs: opts.input },
+				"API:getSummonerByName - fetched summoner by name and tagline from db",
 			);
-			return summonerResponse.data[0];
+			return summoner;
 		}),
 	getSummonerSummaryByName: loggedProcedure
 		.input(
@@ -334,135 +424,119 @@ export const lolRouter = router({
 			}),
 		)
 		.query(async (opts) => {
-			const summonerResponse = await dbh.genericGet(
-				CollectionName.SUMMONER,
-				{
-					filter: {
-						gameName: opts.input.gameName,
-						tagLine: opts.input.tagLine,
-					},
-				},
-				SummonerDbSchema,
+			const [summoner, _] = await to(
+				db.query.LEAGUE_SUMMONERS_TABLE.findFirst({
+					where: (summoner, { eq }) =>
+						eq(summoner.gameName, opts.input.gameName) &&
+						eq(summoner.tagLine, opts.input.tagLine),
+				}),
 			);
-			if (!summonerResponse.success) {
-				logger.error(
-					{
-						error: summonerResponse.error,
-						gameName: opts.input.gameName,
-						tagLine: opts.input.tagLine,
-						code: "INTERNAL_SERVER_ERROR",
-					},
-					"API:getSummonerSummaryByName",
-				);
+			if (!summoner) {
 				throw new TRPCError({
-					message: `Summoner couldn't be fetched`,
-					code: "INTERNAL_SERVER_ERROR",
-				});
-			}
-
-			if (!summonerResponse.data[0]) {
-				logger.warn(
-					{
-						gameName: opts.input.gameName,
-						tagLine: opts.input.tagLine,
-						code: "NOT_FOUND",
-						message: `Database returned no summoner: ${opts.input}`,
-					},
-					"API:getSummonerSummaryByName",
-				);
-				throw new TRPCError({
-					message: `Database returned no summoners: ${opts.input}`,
+					message: `Summoner not found: ${opts.input.gameName} and tagLine: ${opts.input.tagLine}`,
 					code: "NOT_FOUND",
 				});
 			}
 
-			const pipeline = [
-				{
-					$match: {
-						"info.participants.puuid": summonerResponse.data[0].puuid,
-					},
-				},
-				{
-					$unwind: {
-						path: "$info.participants",
-					},
-				},
-				{
-					$match: {
-						"info.participants.puuid": summonerResponse.data[0].puuid,
-					},
-				},
-				{
-					$group: {
-						_id: {
-							champion: "$info.participants.championName",
-							queueId: "$info.queueId",
-							teamPosition: "$info.participants.teamPosition",
-						},
-						totalMatches: {
-							$sum: 1,
-						},
-						wins: {
-							$sum: {
-								$cond: [
-									{
-										$eq: ["$info.participants.win", true],
-									},
-									1,
-									0,
-								],
-							},
-						},
-						secondsPlayed: {
-							$sum: "$info.gameDuration",
-						},
-						kills: {
-							$sum: "$info.participants.kills",
-						},
-						deaths: {
-							$sum: "$info.participants.deaths",
-						},
-						assists: {
-							$sum: "$info.participants.assists",
-						},
-						doubleKills: {
-							$sum: "$info.participants.doubleKills",
-						},
-						tripleKills: {
-							$sum: "$info.participants.tripleKills",
-						},
-						quadraKills: {
-							$sum: "$info.participants.quadraKills",
-						},
-						pentaKills: {
-							$sum: "$info.participants.pentaKills",
-						},
-						totalVisionScore: {
-							$sum: "$info.participants.visionScore",
-						},
-					},
-				},
-				{
-					$sort: {
-						totalMatches: -1,
-					},
-				},
-			];
-
-			const result = await dbh.genericPipeline(
-				pipeline,
-				CollectionName.MATCH,
-				SummonerSummarySchema,
+			const gamesCount = count().as("games");
+			const winCount = sql<number>`COUNT(CASE WHEN win = TRUE THEN 1 END)`.as(
+				"wins",
 			);
-			if (!result.success) {
-				logger.error({ error: result.error }, "API:getSummonerSummaryByName");
+
+			const [summonerSummary, error] = await to(
+				db
+					.select({
+						teamPosition: LEAGUE_MATCH_PARTICIPANTS_TABLE.teamPosition,
+						championName: LEAGUE_CHAMPIONS_TABLE.name,
+						queueName: LEAGUE_QUEUES_TABLE.description,
+
+						games: gamesCount,
+						wins: winCount,
+
+						secondsPlayed: sum(
+							LEAGUE_MATCH_PARTICIPANTS_TABLE.gameDuration,
+						).mapWith(Number),
+						kills: sum(LEAGUE_MATCH_PARTICIPANTS_TABLE.kills).mapWith(Number),
+						deaths: sum(LEAGUE_MATCH_PARTICIPANTS_TABLE.deaths).mapWith(Number),
+						assists: sum(LEAGUE_MATCH_PARTICIPANTS_TABLE.assists).mapWith(
+							Number,
+						),
+						doubleKills: sum(
+							LEAGUE_MATCH_PARTICIPANTS_TABLE.doubleKills,
+						).mapWith(Number),
+						tripleKills: sum(
+							LEAGUE_MATCH_PARTICIPANTS_TABLE.tripleKills,
+						).mapWith(Number),
+						quadraKills: sum(
+							LEAGUE_MATCH_PARTICIPANTS_TABLE.quadraKills,
+						).mapWith(Number),
+						pentaKills: sum(LEAGUE_MATCH_PARTICIPANTS_TABLE.pentaKills).mapWith(
+							Number,
+						),
+						totalVisionScore: sum(
+							LEAGUE_MATCH_PARTICIPANTS_TABLE.visionScore,
+						).mapWith(Number),
+					})
+					.from(LEAGUE_MATCH_PARTICIPANTS_TABLE)
+					.leftJoin(
+						LEAGUE_QUEUES_TABLE,
+						eq(
+							LEAGUE_MATCH_PARTICIPANTS_TABLE.queueId,
+							LEAGUE_QUEUES_TABLE.queueId,
+						),
+					)
+					.leftJoin(
+						LEAGUE_CHAMPIONS_TABLE,
+						eq(
+							LEAGUE_MATCH_PARTICIPANTS_TABLE.championId,
+							LEAGUE_CHAMPIONS_TABLE.id,
+						),
+					)
+					.where(eq(LEAGUE_MATCH_PARTICIPANTS_TABLE.puuid, summoner.puuid))
+					.groupBy(
+						LEAGUE_MATCH_PARTICIPANTS_TABLE.teamPosition,
+						LEAGUE_QUEUES_TABLE.description,
+						LEAGUE_CHAMPIONS_TABLE.name,
+					)
+					.orderBy(desc(gamesCount)),
+			);
+
+			if (error) {
+				logger.error(
+					{
+						err: error,
+						tagLine: opts.input.tagLine,
+						gameName: opts.input.gameName,
+						code: "INTERNAL_SERVER_ERROR",
+					},
+					"API:getSummonerByName - failed to fetch summoner summary",
+				);
 				throw new TRPCError({
-					message: `Summoner summary couldn't be fetched`,
+					message: `Summoner couldn't be fetched`,
 					code: "INTERNAL_SERVER_ERROR",
+					cause: error,
 				});
 			}
 
-			logger.info({ cached: false }, "API:getSummonerSummaryByName");
-			return result.data;
+			if (!summonerSummary) {
+				logger.warn(
+					{
+						tagLine: opts.input.tagLine,
+						gameName: opts.input.gameName,
+						code: "NOT_FOUND",
+					},
+					"API:getSummonerByName - no summoner summary found with this name/tagline in db",
+				);
+				throw new TRPCError({
+					message: `Database returned no summoner summary for name: ${opts.input.gameName} and tagLine: ${opts.input.tagLine}`,
+					code: "NOT_FOUND",
+				});
+			}
+
+			logger.debug(
+				{ operationInputs: opts.input },
+				"API:getSummonerByName - fetched summoner summary by name and tagline from db",
+			);
+			return summonerSummary;
 		}),
 });

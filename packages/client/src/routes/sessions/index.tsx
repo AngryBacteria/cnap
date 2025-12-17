@@ -1,87 +1,91 @@
-import { Alert, Badge, Card, Flex, Loader, Text, Title } from "@mantine/core";
-import { IconAlertSquareRounded } from "@tabler/icons-react";
-import { Link, createFileRoute } from "@tanstack/react-router";
-import { motion } from "motion/react";
-import { FormattedDateText } from "../../components/General/FormattedDateText.tsx";
+import { ActionIcon, Alert, Flex, Loader, Menu, Select } from "@mantine/core";
+import { IconAlertSquareRounded, IconEdit } from "@tabler/icons-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { CreateCharacterModal } from "../../components/Session/createCharacterModal.tsx";
+import { CreateEmptySessionModal } from "../../components/Session/createEmptySessionModal.tsx";
+import { SessionList } from "../../components/Session/SessionList.tsx";
+import { useCampaignOptions } from "../../hooks/api/useCampaignOptions.ts";
 import { usePenAndPaperSessions } from "../../hooks/api/usePenAndPaperSessions.ts";
-import { PRIMARY_COLOR } from "../../main.tsx";
-import { truncateText } from "../../utils/GeneralUtil.ts";
-import styles from "./index.module.css";
 
 export const Route = createFileRoute("/sessions/")({
 	component: RouteComponent,
 });
 
 function RouteComponent() {
-	const query = usePenAndPaperSessions();
+	const [campaign, setCampaign] = useState<string | undefined>(undefined);
+	const sessionQuery = usePenAndPaperSessions(campaign);
+	const campaignOptionsQuery = useCampaignOptions();
 
-	if (query.status === "pending") {
-		return (
-			<Flex
-				justify={"center"}
-				align={"center"}
-				h={"calc(100vh - var(--app-shell-header-height))"}
-				w={"100%"}
-			>
-				<Loader size="xl" type="dots" />
-			</Flex>
-		);
-	}
-
-	if (query.status === "error") {
-		return (
-			<Alert
-				title={"Fehler beim Laden der PenAndPaper Sessions"}
-				variant={"light"}
-				color={"red"}
-				icon={<IconAlertSquareRounded />}
-			>
-				Momentan können keine PenAndPaper Sessions geladen werden. Bitte
-				versuche es später nochmal.
-			</Alert>
-		);
-	}
+	const [emptySessionOpen, setEmptySessionOpen] = useState(false);
+	const [characterOpen, setCharacterOpen] = useState(false);
 
 	return (
 		<Flex direction={"column"} gap={"md"}>
-			{query.data?.map((session) => (
-				<motion.div
-					layout
-					initial={{ opacity: 0, scale: 0.9 }}
-					animate={{ opacity: 1, scale: 1 }}
-					exit={{ opacity: 0, scale: 0.9 }}
-					transition={{
-						duration: 0.25,
+			<Flex justify={"space-between"} align={"center"}>
+				<Select
+					label="Kampagne"
+					data={campaignOptionsQuery.data ?? []}
+					value={campaign}
+					onChange={(value) => {
+						if (value) {
+							setCampaign(value);
+						}
 					}}
-					className={"fillSpace"}
-					key={session._id}
+				/>
+
+				<Menu shadow="md">
+					<Menu.Target>
+						<ActionIcon size="lg" variant="light" aria-label="Settings">
+							<IconEdit style={{ width: "70%", height: "70%" }} stroke={1.5} />
+						</ActionIcon>
+					</Menu.Target>
+					<Menu.Dropdown>
+						<Menu.Dropdown>
+							<Menu.Item onClick={() => setEmptySessionOpen(true)}>
+								Session erstellen
+							</Menu.Item>
+							<Menu.Item onClick={() => setCharacterOpen(true)}>
+								Charakter erstellen
+							</Menu.Item>
+						</Menu.Dropdown>
+					</Menu.Dropdown>
+				</Menu>
+			</Flex>
+
+			<CreateEmptySessionModal
+				opened={emptySessionOpen}
+				onClose={() => setEmptySessionOpen(false)}
+			/>
+			<CreateCharacterModal
+				opened={characterOpen}
+				onClose={() => setCharacterOpen(false)}
+			/>
+
+			{sessionQuery.status === "pending" && (
+				<Flex
+					justify={"center"}
+					align={"center"}
+					h={"calc(100vh - var(--app-shell-header-height))"}
+					w={"100%"}
 				>
-					<Link
-						to={"/sessions/$sessionObjectId"}
-						params={{ sessionObjectId: session._id || "" }}
-						className={styles.navigationItem}
-					>
-						<Card shadow={"md"} withBorder className={"fillSpacePointer"}>
-							<Flex direction={"column"} gap={"md"}>
-								<Flex
-									wrap={"wrap"}
-									direction={"row"}
-									align={"center"}
-									gap={"md"}
-								>
-									<Title order={2}>{session.sessionName}</Title>
-									<FormattedDateText unixTimestamp={session.timestamp} />
-									<Badge color={PRIMARY_COLOR}>{session.framework}</Badge>
-								</Flex>
-								<Text hiddenFrom={"sm"}>
-									{truncateText(session.summaryShort, 500)}
-								</Text>
-								<Text visibleFrom={"sm"}>{session.summaryShort}</Text>
-							</Flex>
-						</Card>
-					</Link>
-				</motion.div>
-			))}
+					<Loader size="xl" type="dots" />
+				</Flex>
+			)}
+
+			{sessionQuery.status === "error" && (
+				<Alert
+					title={"Fehler beim Laden der PenAndPaper Sessions"}
+					variant={"light"}
+					color={"red"}
+					icon={<IconAlertSquareRounded />}
+				>
+					Momentan können keine PenAndPaper Sessions geladen werden. Bitte
+					versuche es später nochmal.
+				</Alert>
+			)}
+
+			<SessionList sessions={sessionQuery.data ?? []} />
 		</Flex>
 	);
 }

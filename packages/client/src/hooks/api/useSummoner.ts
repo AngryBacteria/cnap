@@ -5,12 +5,10 @@ export const useSummoner = (
 	queryParams: Inputs["lol"]["getSummonerByName"],
 	prefetchOnly?: boolean,
 ) => {
-	if (prefetchOnly) {
-		return useQuery(
-			trpc.lol.getSummonerByName.queryOptions(queryParams, {
+	const options = prefetchOnly
+		? trpc.lol.getSummonerByName.queryOptions(queryParams, {
 				notifyOnChangeProps: [],
-			}),
-		);
-	}
-	return useQuery(trpc.lol.getSummonerByName.queryOptions(queryParams));
+			})
+		: trpc.lol.getSummonerByName.queryOptions(queryParams);
+	return useQuery(options);
 };

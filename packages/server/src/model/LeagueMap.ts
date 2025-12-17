@@ -1,8 +1,6 @@
-import { z } from "zod";
-import { MongoDBIDSchema } from "./Database.js";
+import { z } from "zod/v4";
 
 export const LeagueMapDBSchema = z.object({
-	_id: MongoDBIDSchema,
 	mapId: z.number(),
 	mapName: z.string(),
 	notes: z.string(),

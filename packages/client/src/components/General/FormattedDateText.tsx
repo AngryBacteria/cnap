@@ -7,7 +7,7 @@ interface Props {
 }
 
 export function FormattedDateText({ unixTimestamp }: Props) {
-	const formattedDate = new Intl.DateTimeFormat("en-US", {
+	const formattedDate = new Intl.DateTimeFormat("de-CH", {
 		hour: "numeric",
 		minute: "numeric",
 		day: "numeric",
@@ -17,12 +17,12 @@ export function FormattedDateText({ unixTimestamp }: Props) {
 	}).format(new Date(unixTimestamp));
 
 	const formattedTimeAgo = useMemo(() => {
-		const rtf = new Intl.RelativeTimeFormat("en", {
+		const rtf = new Intl.RelativeTimeFormat("de-CH", {
 			numeric: "auto",
 			style: "long",
 		});
 
-		const diffTime = Math.abs(unixTimestamp - new Date().getTime());
+		const diffTime = Math.abs(unixTimestamp - Date.now());
 		const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
 		return rtf.format(-diffDays, "days");

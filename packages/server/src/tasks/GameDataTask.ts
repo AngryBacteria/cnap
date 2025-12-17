@@ -1,137 +1,323 @@
-import dbh from "../helpers/DBHelper.js";
+import { db, getAllOnConflictColumns } from "../db/index.js";
+import {
+	LEAGUE_CHAMPION_PASSIVES_TABLE,
+	LEAGUE_CHAMPION_PLAYSTYLES_TABLE,
+	LEAGUE_CHAMPION_SKINS_TABLE,
+	LEAGUE_CHAMPION_SPELLS_TABLE,
+	LEAGUE_CHAMPION_TACTICAL_INFO_TABLE,
+	LEAGUE_CHAMPIONS_TABLE,
+} from "../db/schemas/Champion.js";
+import { LEAGUE_GAME_MODES_TABLE } from "../db/schemas/GameMode.js";
+import { LEAGUE_GAME_TYPES_TABLE } from "../db/schemas/GameType.js";
+import { LEAGUE_ITEMS_TABLE } from "../db/schemas/Item.js";
+import {
+	LEAGUE_MAPS_TABLE,
+	LEAGUE_SUMMONER_ICONS_TABLE,
+	LEAGUE_SUMMONER_SPELLS_TABLE,
+} from "../db/schemas/index.js";
+import { LEAGUE_QUEUES_TABLE } from "../db/schemas/Queue.js";
 import logger from "../helpers/Logger.js";
 import rh from "../helpers/RiotHelper.js";
-import { ChampionDBSchema } from "../model/Champion.js";
-import { CollectionName } from "../model/Database.js";
-import { GameModeDBSchema } from "../model/GameMode.js";
-import { GameTypeDBSchema } from "../model/GameType.js";
-import { ItemDBSchema } from "../model/Item.js";
-import { LeagueMapDBSchema } from "../model/LeagueMap.js";
-import { QueueDBSchema } from "../model/Queue.js";
-import { SummonerIconDBSchema } from "../model/SummonerIcon.js";
-import { SummonerSpellDBSchema } from "../model/SummonerSpell.js";
 
 export class GameDataTask {
 	async updateChampions(): Promise<void> {
 		const champions = await rh.getChampions();
 		if (champions.length <= 0) {
-			logger.error("Task:updateChampions - No champions found in CDN response");
-		} else {
-			await dbh.genericUpsert(
-				champions,
-				"id",
-				CollectionName.CHAMPION,
-				ChampionDBSchema,
+			logger.warn("Task:updateChampions - No champions found in CDN response");
+			return;
+		}
+
+		try {
+			await db
+				.insert(LEAGUE_CHAMPIONS_TABLE)
+				.values(champions)
+				.onConflictDoUpdate({
+					target: LEAGUE_CHAMPIONS_TABLE.id,
+					set: getAllOnConflictColumns(LEAGUE_CHAMPIONS_TABLE, "id"),
+				});
+
+			await db
+				.insert(LEAGUE_CHAMPION_PLAYSTYLES_TABLE)
+				.values(
+					champions.map((champion) => {
+						return {
+							championId: champion.id,
+							...champion.playstyleInfo,
+						};
+					}),
+				)
+				.onConflictDoUpdate({
+					target: LEAGUE_CHAMPION_PLAYSTYLES_TABLE.championId,
+					set: getAllOnConflictColumns(
+						LEAGUE_CHAMPION_PLAYSTYLES_TABLE,
+						"championId",
+					),
+				});
+
+			await db
+				.insert(LEAGUE_CHAMPION_TACTICAL_INFO_TABLE)
+				.values(
+					champions.map((champion) => {
+						return {
+							championId: champion.id,
+							...champion.tacticalInfo,
+						};
+					}),
+				)
+				.onConflictDoUpdate({
+					target: LEAGUE_CHAMPION_TACTICAL_INFO_TABLE.championId,
+					set: getAllOnConflictColumns(
+						LEAGUE_CHAMPION_TACTICAL_INFO_TABLE,
+						"championId",
+					),
+				});
+
+			await db
+				.insert(LEAGUE_CHAMPION_SKINS_TABLE)
+				.values(
+					champions.flatMap((champion) => {
+						return champion.skins.map((skin) => {
+							return {
+								championId: champion.id,
+								...skin,
+							};
+						});
+					}),
+				)
+				.onConflictDoUpdate({
+					target: LEAGUE_CHAMPION_SKINS_TABLE.id,
+					set: getAllOnConflictColumns(LEAGUE_CHAMPION_SKINS_TABLE, "id"),
+				});
+
+			await db
+				.insert(LEAGUE_CHAMPION_PASSIVES_TABLE)
+				.values(
+					champions.map((champion) => {
+						return {
+							championId: champion.id,
+							...champion.passive,
+						};
+					}),
+				)
+				.onConflictDoUpdate({
+					target: LEAGUE_CHAMPION_PASSIVES_TABLE.championId,
+					set: getAllOnConflictColumns(
+						LEAGUE_CHAMPION_PASSIVES_TABLE,
+						"championId",
+					),
+				});
+
+			await db
+				.insert(LEAGUE_CHAMPION_SPELLS_TABLE)
+				.values(
+					champions.flatMap((champion) => {
+						return champion.spells.map((spell) => {
+							return {
+								championId: champion.id,
+								...spell,
+							};
+						});
+					}),
+				)
+				.onConflictDoUpdate({
+					target: [
+						LEAGUE_CHAMPION_SPELLS_TABLE.championId,
+						LEAGUE_CHAMPION_SPELLS_TABLE.spellKey,
+					],
+					set: getAllOnConflictColumns(LEAGUE_CHAMPION_SPELLS_TABLE, "id"),
+				});
+
+			logger.debug(
+				{ amount: champions.length },
+				"Task:updateChampions - Champions updated",
 			);
-			logger.debug("Task:updateChampions - Champions updated");
+		} catch (e) {
+			logger.error(
+				{ err: e },
+				"Task:updateChampions - Error while updating champions",
+			);
 		}
 	}
 
 	async updateGameModes(): Promise<void> {
 		const gameModes = await rh.getGameModes();
 		if (gameModes.length <= 0) {
+			logger.warn("Task:updateGameModes - No game modes found in CDN response");
+			return;
+		}
+		try {
+			await db
+				.insert(LEAGUE_GAME_MODES_TABLE)
+				.values(gameModes)
+				.onConflictDoUpdate({
+					target: LEAGUE_GAME_MODES_TABLE.gameMode,
+					set: getAllOnConflictColumns(LEAGUE_GAME_MODES_TABLE, "gameMode"),
+				});
+			logger.debug(
+				{ amount: gameModes.length },
+				"Task:updateGameModes - Game modes updated",
+			);
+		} catch (e) {
 			logger.error(
-				"Task:updateGameModes - No game modes found in CDN response",
+				{ err: e },
+				"Task:updateGameModes - Error while updating game modes",
 			);
-		} else {
-			await dbh.genericUpsert(
-				gameModes,
-				"gameMode",
-				CollectionName.GAME_MODE,
-				GameModeDBSchema,
-			);
-			logger.debug("Task:updateGameModes - Game modes updated");
 		}
 	}
 
 	async updateGameTypes(): Promise<void> {
 		const gameTypes = await rh.getGameTypes();
 		if (gameTypes.length <= 0) {
+			logger.warn("Task:updateGameTypes - No game types found in CDN response");
+			return;
+		}
+		try {
+			await db
+				.insert(LEAGUE_GAME_TYPES_TABLE)
+				.values(gameTypes)
+				.onConflictDoUpdate({
+					target: LEAGUE_GAME_TYPES_TABLE.gametype,
+					set: getAllOnConflictColumns(LEAGUE_GAME_TYPES_TABLE, "gametype"),
+				});
+			logger.debug(
+				{ amount: gameTypes.length },
+				"Task:updateGameTypes - Game types updated",
+			);
+		} catch (e) {
 			logger.error(
-				"Task:updateGameTypes - No game types found in CDN response",
+				{ err: e },
+				"Task:updateGameTypes - Error while updating game types",
 			);
-		} else {
-			await dbh.genericUpsert(
-				gameTypes,
-				"gametype",
-				CollectionName.GAME_TYPE,
-				GameTypeDBSchema,
-			);
-			logger.debug("Task:updateGameTypes - Game types updated");
 		}
 	}
 
 	async updateItems(): Promise<void> {
 		const items = await rh.getItems();
 		if (items.length <= 0) {
-			logger.error("Task:updateItems - No items found in CDN response");
-		} else {
-			await dbh.genericUpsert(items, "id", CollectionName.ITEM, ItemDBSchema);
-			logger.debug("Task:updateItems - Items updated");
+			logger.warn("Task:updateItems - No items found in CDN response");
+			return;
+		}
+		try {
+			await db
+				.insert(LEAGUE_ITEMS_TABLE)
+				.values(items)
+				.onConflictDoUpdate({
+					target: LEAGUE_ITEMS_TABLE.id,
+					set: getAllOnConflictColumns(LEAGUE_ITEMS_TABLE, "id"),
+				});
+			logger.debug(
+				{ amount: items.length },
+				"Task:updateItems - Items updated",
+			);
+		} catch (e) {
+			logger.error({ err: e }, "Task:updateItems - Error while updating items");
 		}
 	}
 
 	async updateMaps(): Promise<void> {
 		const maps = await rh.getMaps();
 		if (maps.length <= 0) {
-			logger.error("Task:updateMaps - No maps found in CDN response");
-		} else {
-			await dbh.genericUpsert(
-				maps,
-				"mapId",
-				CollectionName.MAP,
-				LeagueMapDBSchema,
-			);
-			logger.debug("Task:updateMaps - Maps updated");
+			logger.warn("Task:updateMaps - No maps found in CDN response");
+			return;
+		}
+		try {
+			await db
+				.insert(LEAGUE_MAPS_TABLE)
+				.values(maps)
+				.onConflictDoUpdate({
+					target: LEAGUE_MAPS_TABLE.mapId,
+					set: getAllOnConflictColumns(LEAGUE_MAPS_TABLE, "mapId"),
+				});
+			logger.debug({ amount: maps.length }, "Task:updateMaps - Maps updated");
+		} catch (e) {
+			logger.error({ err: e }, "Task:updateMaps - Error while updating maps");
 		}
 	}
 
 	async updateQueues(): Promise<void> {
 		const queues = await rh.getQueues();
 		if (queues.length <= 0) {
-			logger.error("Task:updateQueues - No queues found in CDN response");
-		} else {
-			await dbh.genericUpsert(
-				queues,
-				"queueId",
-				CollectionName.QUEUE,
-				QueueDBSchema,
+			logger.warn("Task:updateQueues - No queues found in CDN response");
+			return;
+		}
+		try {
+			await db
+				.insert(LEAGUE_QUEUES_TABLE)
+				.values(queues)
+				.onConflictDoUpdate({
+					target: LEAGUE_QUEUES_TABLE.queueId,
+					set: getAllOnConflictColumns(LEAGUE_QUEUES_TABLE, "queueId"),
+				});
+			logger.debug(
+				{ amount: queues.length },
+				"Task:updateQueues - Queues updated",
 			);
-			logger.debug("Task:updateQueues - Queues updated");
+		} catch (e) {
+			logger.error(
+				{ err: e },
+				"Task:updateQueues - Error while updating queues",
+			);
 		}
 	}
 
 	async updateSummonerIcons(): Promise<void> {
 		const summonerIcons = await rh.getSummonerIcons();
 		if (summonerIcons.length <= 0) {
-			logger.error(
+			logger.warn(
 				"Task:updateSummonerIcons - No summoner icons found in CDN response",
 			);
-		} else {
-			await dbh.genericUpsert(
-				summonerIcons,
-				"id",
-				CollectionName.SUMMONER_ICON,
-				SummonerIconDBSchema,
+			return;
+		}
+
+		try {
+			await db
+				.insert(LEAGUE_SUMMONER_ICONS_TABLE)
+				.values(summonerIcons)
+				.onConflictDoUpdate({
+					target: LEAGUE_SUMMONER_ICONS_TABLE.id,
+					set: getAllOnConflictColumns(LEAGUE_SUMMONER_ICONS_TABLE, "id"),
+				});
+			logger.debug(
+				{ amount: summonerIcons.length },
+				"Task:updateSummonerIcons - Summoner icons updated",
 			);
-			logger.debug("Task:updateSummonerIcons - Summoner icons updated");
+		} catch (e) {
+			logger.error(
+				{ err: e },
+				"Task:updateSummonerIcons - Error while updating summoner icons",
+			);
 		}
 	}
 
 	async updateSummonerSpells(): Promise<void> {
 		const summonerSpells = await rh.getSummonerSpells();
 		if (summonerSpells.length <= 0) {
-			logger.error(
+			logger.warn(
 				"Task:updateSummonerSpells - No summoner spells found in CDN response",
 			);
-		} else {
-			await dbh.genericUpsert(
-				summonerSpells,
-				"id",
-				CollectionName.SUMMONER_SPELL,
-				SummonerSpellDBSchema,
+			return;
+		}
+		try {
+			// remove all summoner spells from array if id 4294967295
+			const filtered = summonerSpells.filter((spell) => {
+				return spell.id !== 4294967295;
+			});
+			await db
+				.insert(LEAGUE_SUMMONER_SPELLS_TABLE)
+				.values(filtered)
+				.onConflictDoUpdate({
+					target: LEAGUE_SUMMONER_SPELLS_TABLE.id,
+					set: getAllOnConflictColumns(LEAGUE_SUMMONER_SPELLS_TABLE, "id"),
+				});
+			logger.debug(
+				{ amount: summonerSpells.length },
+				"Task:updateSummonerSpells - Summoner spells updated",
 			);
-			logger.debug("Task:updateSummonerSpells - Summoner spells updated");
+		} catch (e) {
+			logger.error(
+				{ err: e },
+				"Task:updateSummonerSpells - Error while updating summoner spells",
+			);
 		}
 	}
 

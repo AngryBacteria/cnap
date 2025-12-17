@@ -1,8 +1,6 @@
-import { z } from "zod";
-import { MongoDBIDSchema } from "./Database.js";
+import { z } from "zod/v4";
 
 export const QueueDBSchema = z.object({
-	_id: MongoDBIDSchema,
 	queueId: z.number(),
 	description: z.string().nullish(),
 	map: z.string(),

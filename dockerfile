@@ -1,13 +1,32 @@
-FROM node:slim
-WORKDIR /app
+# -------------------------------
+# Base image
+# -------------------------------
+FROM node:22-slim AS base
 
-# Copy all files
+# -------------------------------
+# Builder stage
+# -------------------------------
+FROM base AS builder
+
+WORKDIR /app
+RUN corepack enable
 COPY . .
 
-# Install dependencies
-RUN npm i && npm run build
+RUN pnpm install --frozen-lockfile
+RUN pnpm build
+RUN pnpm deploy --filter server --prod /app/server_deploy
 
-# Expose the ports for both backend and frontend
+# -------------------------------
+# Runtime stage
+# -------------------------------
+FROM base AS runner
+WORKDIR /app
+
+COPY --from=builder /app/packages/server/dist /app/dist
+COPY --from=builder /app/server_deploy/node_modules /app/node_modules
+COPY --from=builder /app/packages/client/dist /app/client_dist
+
+ENV CLIENT_DIST_PATH=/app/client_dist
 EXPOSE 3000
 
-CMD ["npm", "run", "start:server"]
+CMD ["node", "dist/trcp/routers/_app.js"]

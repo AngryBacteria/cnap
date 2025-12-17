@@ -1,30 +1,33 @@
 {
   "name": "cnap",
+  "description": "The monorepo for the cnap.ch website",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
-    "dev": "concurrently -c \"blue.bold,green.bold\" -n \"CLIENT,SERVER\" \"npm run dev:client\" \"npm run dev:server\"",
-    "dev:client": "npm run dev --workspace=client",
-    "dev:server": "npm run dev --workspace=server",
-    "test:server": "npm run test --workspace=server",
-    "build": "npm run build --workspaces",
-    "build:client": "npm run build --workspace=client",
-    "build:server": "npm run build --workspace=server",
-    "type-check": "npm run type-check --workspaces",
-    "biome": "npm run biome --workspaces",
-    "start": "concurrently \"npm run start:client\" \"npm run start:server\"",
-    "start:client": "npm run start --workspace=client",
-    "start:server": "npm run start --workspace=server",
-    "cleanup": "rimraf ./node_modules packages/client/node_modules  packages/client/dist packages/server/node_modules packages/server/dist",
+    "dev": "concurrently -c \"blue.bold,green.bold\" -n \"CLIENT,SERVER\" \"pnpm dev:client\" \"pnpm dev:server\"",
+    "dev:client": "pnpm --filter client dev",
+    "dev:server": "pnpm --filter server dev",
+    "test:server": "pnpm --filter server test",
+    "build": "pnpm -r build",
+    "build:client": "pnpm --filter client build",
+    "build:server": "pnpm --filter server build",
+    "type-check": "pnpm -r type-check",
+    "biome": "pnpm -r biome",
+    "start": "concurrently \"pnpm start:client\" \"pnpm start:server\"",
+    "start:client": "pnpm --filter client start",
+    "start:server": "pnpm --filter server start",
+    "cleanup": "pnpm -r cleanup && rimraf node_modules",
     "prepare": "husky"
   },
   "dependencies": {
-    "concurrently": "9.1.2",
-    "rimraf": "6.0.1"
+    "dotenv": "17.2.3"
   },
   "devDependencies": {
-    "husky": "^9.1.7"
-  }
+    "@biomejs/biome": "2.3.8",
+    "concurrently": "9.2.1",
+    "husky": "9.1.7",
+    "rimraf": "6.1.2",
+    "tsx": "4.21.0",
+    "typescript": "5.9.3"
+  },
+  "packageManager": "pnpm@10.18.0"
 }

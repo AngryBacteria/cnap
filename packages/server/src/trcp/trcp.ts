@@ -1,14 +1,18 @@
 import { initTRPC } from "@trpc/server";
-import { ZodError } from "zod";
+import superjson from "superjson";
+import { ZodError, z } from "zod/v4";
 
 const t = initTRPC.create({
+	transformer: superjson,
 	errorFormatter({ shape, error }) {
 		return {
 			...shape,
 			data: {
 				...shape.data,
-				zodError:
-					error.cause instanceof ZodError ? error.cause.flatten() : null,
+				zodErrorTree:
+					error.cause instanceof ZodError ? z.treeifyError(error.cause) : null,
+				prettyZodError:
+					error.cause instanceof ZodError ? z.prettifyError(error.cause) : null,
 			},
 		};
 	},

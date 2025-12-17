@@ -1,9 +1,6 @@
 import { Alert, Flex, Loader, Pagination } from "@mantine/core";
 import { IconAlertSquareRounded } from "@tabler/icons-react";
-import { useItems } from "../../hooks/api/useItems";
 import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts";
-import { useQueues } from "../../hooks/api/useQueues";
-import { useSummonerSpells } from "../../hooks/api/useSummonerSpells";
 import { PRIMARY_COLOR } from "../../main.tsx";
 import { MatchBannerSummary } from "./MatchBannerSummary/MatchBannerSummary";
 
@@ -24,8 +21,6 @@ export function MatchBannerSummaryLoader({
 	setPage,
 	queueId,
 }: Props) {
-	//TODO scroll to title
-
 	const matchesParticipantQuery = useMatchesParticipant({
 		page,
 		championId,
@@ -33,25 +28,12 @@ export function MatchBannerSummaryLoader({
 		tagLine,
 		queueId,
 	});
-	const itemQuery = useItems();
-	const queuesQuery = useQueues();
-	const summonerSpellsQuery = useSummonerSpells();
 
-	if (
-		matchesParticipantQuery.status === "pending" ||
-		itemQuery.status === "pending" ||
-		queuesQuery.status === "pending" ||
-		summonerSpellsQuery.status === "pending"
-	) {
+	if (matchesParticipantQuery.status === "pending") {
 		return <Loader color={PRIMARY_COLOR} />;
 	}
 
-	if (
-		matchesParticipantQuery.status === "error" ||
-		itemQuery.status === "error" ||
-		queuesQuery.status === "error" ||
-		summonerSpellsQuery.status === "error"
-	) {
+	if (matchesParticipantQuery.status === "error") {
 		return (
 			<Alert
 				title={"Fehler beim Laden der Matches"}
@@ -69,15 +51,12 @@ export function MatchBannerSummaryLoader({
 		<Flex direction={"column"} gap={"md"}>
 			{matchesParticipantQuery.data.data.map((match) => (
 				<MatchBannerSummary
-					key={`${match.info.gameId} - ${match.info.participants.puuid}`}
+					key={`${match.participant.matchId} - ${match.participant.matchId}`}
 					match={match}
-					queues={queuesQuery.data}
-					summonerSpells={summonerSpellsQuery.data}
-					items={itemQuery.data}
 				/>
 			))}
 			<Pagination
-				total={matchesParticipantQuery.data.maxPage}
+				total={matchesParticipantQuery.data.pagination.totalPages}
 				value={page}
 				onChange={setPage}
 			/>

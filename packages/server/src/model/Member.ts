@@ -1,10 +1,7 @@
-import { z } from "zod";
-import { MongoDBIDSchema } from "./Database.js";
+import { z } from "zod/v4";
 import { SummonerDbSchema } from "./Summoner.js";
 
-//TODO what to use for ID?
 export const MemberDBSchema = z.object({
-	_id: MongoDBIDSchema,
 	gameName: z.string(),
 	punchline: z.string().nullish(),
 	core: z.boolean(),

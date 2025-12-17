@@ -1,13 +1,13 @@
-import { z } from "zod";
-import dbh from "../../helpers/DBHelper.js";
+import { TRPCError } from "@trpc/server";
+import { z } from "zod/v4";
+import { db, testDBConnection } from "../../db/index.js";
+import { to } from "../../helpers/General.js";
 import logger from "../../helpers/Logger.js";
-import { CollectionName, type MongoPipeline } from "../../model/Database.js";
-import { MemberWithSummonerSchema } from "../../model/Member.js";
 import { loggedProcedure } from "../middlewares/executionTime.js";
 import { router } from "../trcp.js";
 
 // Test database connection
-await dbh.testConnection();
+await testDBConnection();
 
 export const generalRouter = router({
 	getServerTime: loggedProcedure.query(async () => {
@@ -20,27 +20,38 @@ export const generalRouter = router({
 			}),
 		)
 		.query(async (opts) => {
-			const pipeline: MongoPipeline = [];
-			if (opts.input.onlyCore) {
-				pipeline.push({ $match: { core: true } });
-			}
-			pipeline.push({
-				$lookup: {
-					from: "summoner",
-					localField: "_id",
-					foreignField: "memberId",
-					as: "leagueSummoners",
-				},
-			});
-			const memberResponse = await dbh.genericPipeline(
-				pipeline,
-				CollectionName.MEMBER,
-				MemberWithSummonerSchema,
+			const [data, error] = await to(
+				db.query.MEMBERS_TABLE.findMany({
+					where: opts.input.onlyCore
+						? (members, { eq }) => eq(members.core, true)
+						: undefined,
+					with: {
+						leagueSummoners: true,
+					},
+				}),
 			);
-			if (!memberResponse.success) {
-				throw new Error("Members couldn't be fetched");
+
+			if (error) {
+				logger.error(
+					{ err: error },
+					"API:getMembers - Failed to fetch members from Database",
+				);
+				throw new TRPCError({
+					message: "Failed to fetch members from Database",
+					code: "INTERNAL_SERVER_ERROR",
+					cause: error,
+				});
 			}
-			logger.info("API:getMembers");
-			return memberResponse.data;
+
+			if (data.length === 0) {
+				logger.warn("API:getMembers - No members found in Database");
+				throw new TRPCError({
+					message: "No members found in the database",
+					code: "NOT_FOUND",
+				});
+			}
+
+			logger.debug("API:getMembers - returned members");
+			return data;
 		}),
 });

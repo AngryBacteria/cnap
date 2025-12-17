@@ -14,7 +14,7 @@ export async function intervalUpdate(
 ): Promise<void> {
 	let iteration = initialIteration;
 
-	logger.info(
+	logger.debug(
 		{ iteration, initialIteration, intervalTime },
 		"Task:intervalUpdate - Starting interval update ",
 	);
@@ -23,7 +23,7 @@ export async function intervalUpdate(
 		await gameDataTask.updateEverything();
 	}
 
-	await matchTask.updateMatchData(69, 0);
+	await matchTask.updateSummonerMatchData(95, 0);
 
 	// Sleep for the specified interval
 	await new Promise((resolve) => setTimeout(resolve, intervalTime));

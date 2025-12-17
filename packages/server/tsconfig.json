@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-      // Base
       "target": "ES2024",
       "module": "NodeNext",
       "moduleResolution": "NodeNext",
@@ -14,13 +13,9 @@
       "isolatedModules": true,
       "verbatimModuleSyntax": true,
       "removeComments": true,
-
-      // Strictness
       "noUncheckedIndexedAccess": true,
       "strict": true,
-
-      // Fix for type character exceeding limit
-      "declaration": false,
+      "declaration": false
     },
     "include": ["src/**/*.ts"],
     "exclude": ["node_modules", "dist"]

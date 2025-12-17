@@ -1,9 +1,6 @@
-import { ObjectId } from "mongodb";
-import { z } from "zod";
-import { MongoDBIDSchema } from "./Database.js";
+import { z } from "zod/v4";
 
 export const ItemDBSchema = z.object({
-	_id: MongoDBIDSchema,
 	id: z.number(),
 	active: z.boolean(),
 	categories: z.array(z.string()),
