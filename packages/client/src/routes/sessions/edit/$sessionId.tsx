@@ -104,7 +104,7 @@ function SessionEditView({ session, members, characters }: Props) {
 			summaryLong: session.summaryLong,
 			summaryShort: session.summaryShort,
 			dmMemberGameName: session.dmMemberGameName,
-			characterIds: session.characters.map((char) => `${char.character.id}`),
+			characterIds: session.characters.map((char) => `${char.id}`),
 			goals: session.goals,
 			audioFile: null as File | null,
 			transcript: session.transcription ?? "",

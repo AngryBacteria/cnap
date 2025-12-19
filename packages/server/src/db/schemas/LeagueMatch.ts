@@ -1,4 +1,3 @@
-import { relations } from "drizzle-orm";
 import {
 	bigint,
 	boolean,
@@ -15,12 +14,6 @@ export const LEAGUE_MATCHES_TABLE = LEAGUE_SCHEMA.table("matches", {
 	dataVersion: varchar().notNull(),
 	raw: jsonb().notNull(),
 });
-export const leagueMatchRelations = relations(
-	LEAGUE_MATCHES_TABLE,
-	({ many }) => ({
-		matchParticipants: many(LEAGUE_MATCH_PARTICIPANTS_TABLE),
-	}),
-);
 
 export const LEAGUE_MATCH_PARTICIPANTS_TABLE = LEAGUE_SCHEMA.table(
 	"match_participants",
@@ -75,14 +68,4 @@ export const LEAGUE_MATCH_PARTICIPANTS_TABLE = LEAGUE_SCHEMA.table(
 		uniqueIndex().on(table.matchId, table.puuid),
 		index().on(table.gameCreation),
 	],
-);
-
-export const leagueMatchParticipantRelations = relations(
-	LEAGUE_MATCH_PARTICIPANTS_TABLE,
-	({ one }) => ({
-		match: one(LEAGUE_MATCHES_TABLE, {
-			fields: [LEAGUE_MATCH_PARTICIPANTS_TABLE.matchId],
-			references: [LEAGUE_MATCHES_TABLE.matchId],
-		}),
-	}),
 );

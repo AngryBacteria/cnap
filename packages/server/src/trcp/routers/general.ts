@@ -22,9 +22,9 @@ export const generalRouter = router({
 		.query(async (opts) => {
 			const [data, error] = await to(
 				db.query.MEMBERS_TABLE.findMany({
-					where: opts.input.onlyCore
-						? (members, { eq }) => eq(members.core, true)
-						: undefined,
+					where: {
+						core: opts.input.onlyCore ? true : undefined,
+					},
 					with: {
 						leagueSummoners: true,
 					},

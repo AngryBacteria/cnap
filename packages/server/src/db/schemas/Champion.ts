@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { defineRelations } from "drizzle-orm";
 import {
 	boolean,
 	integer,
@@ -19,22 +19,6 @@ export const LEAGUE_CHAMPIONS_TABLE = LEAGUE_SCHEMA.table("champions", {
 	title: varchar().notNull(),
 	uncenteredSplashPath: varchar(),
 });
-export const championRelations = relations(
-	LEAGUE_CHAMPIONS_TABLE,
-	({ one, many }) => ({
-		playstyle: one(LEAGUE_CHAMPION_PLAYSTYLES_TABLE, {
-			fields: [LEAGUE_CHAMPIONS_TABLE.id],
-			references: [LEAGUE_CHAMPION_PLAYSTYLES_TABLE.championId],
-		}),
-		tacticalInfo: one(LEAGUE_CHAMPION_TACTICAL_INFO_TABLE, {
-			fields: [LEAGUE_CHAMPIONS_TABLE.id],
-			references: [LEAGUE_CHAMPION_TACTICAL_INFO_TABLE.championId],
-		}),
-		skins: many(LEAGUE_CHAMPION_SKINS_TABLE),
-		passives: many(LEAGUE_CHAMPION_PASSIVES_TABLE),
-		spells: many(LEAGUE_CHAMPION_SPELLS_TABLE),
-	}),
-);
 
 export const LEAGUE_CHAMPION_PLAYSTYLES_TABLE = LEAGUE_SCHEMA.table(
 	"champion_playstyles",
@@ -50,15 +34,6 @@ export const LEAGUE_CHAMPION_PLAYSTYLES_TABLE = LEAGUE_SCHEMA.table(
 		utility: integer().notNull(),
 	},
 );
-export const championPlaystyleRelations = relations(
-	LEAGUE_CHAMPION_PLAYSTYLES_TABLE,
-	({ one }) => ({
-		champion: one(LEAGUE_CHAMPIONS_TABLE, {
-			fields: [LEAGUE_CHAMPION_PLAYSTYLES_TABLE.championId],
-			references: [LEAGUE_CHAMPIONS_TABLE.id],
-		}),
-	}),
-);
 
 export const LEAGUE_CHAMPION_TACTICAL_INFO_TABLE = LEAGUE_SCHEMA.table(
 	"champion_tactical_info",
@@ -71,15 +46,6 @@ export const LEAGUE_CHAMPION_TACTICAL_INFO_TABLE = LEAGUE_SCHEMA.table(
 		difficulty: integer().notNull(),
 		damageType: varchar().notNull(),
 	},
-);
-export const championTacticalInfoRelations = relations(
-	LEAGUE_CHAMPION_TACTICAL_INFO_TABLE,
-	({ one }) => ({
-		champion: one(LEAGUE_CHAMPIONS_TABLE, {
-			fields: [LEAGUE_CHAMPION_TACTICAL_INFO_TABLE.championId],
-			references: [LEAGUE_CHAMPIONS_TABLE.id],
-		}),
-	}),
 );
 
 export const LEAGUE_CHAMPION_SKINS_TABLE = LEAGUE_SCHEMA.table(
@@ -104,15 +70,6 @@ export const LEAGUE_CHAMPION_SKINS_TABLE = LEAGUE_SCHEMA.table(
 		description: varchar(),
 	},
 );
-export const championSkinsRelations = relations(
-	LEAGUE_CHAMPION_SKINS_TABLE,
-	({ one }) => ({
-		champion: one(LEAGUE_CHAMPIONS_TABLE, {
-			fields: [LEAGUE_CHAMPION_SKINS_TABLE.championId],
-			references: [LEAGUE_CHAMPIONS_TABLE.id],
-		}),
-	}),
-);
 
 export const LEAGUE_CHAMPION_PASSIVES_TABLE = LEAGUE_SCHEMA.table(
 	"champion_passives",
@@ -127,15 +84,6 @@ export const LEAGUE_CHAMPION_PASSIVES_TABLE = LEAGUE_SCHEMA.table(
 		abilityVideoImagePath: varchar().notNull(),
 		description: varchar().notNull(),
 	},
-);
-export const championPassivesRelations = relations(
-	LEAGUE_CHAMPION_PASSIVES_TABLE,
-	({ one }) => ({
-		champion: one(LEAGUE_CHAMPIONS_TABLE, {
-			fields: [LEAGUE_CHAMPION_PASSIVES_TABLE.championId],
-			references: [LEAGUE_CHAMPIONS_TABLE.id],
-		}),
-	}),
 );
 
 export const LEAGUE_CHAMPION_SPELLS_TABLE = LEAGUE_SCHEMA.table(
@@ -160,12 +108,38 @@ export const LEAGUE_CHAMPION_SPELLS_TABLE = LEAGUE_SCHEMA.table(
 	},
 	(t) => [unique().on(t.championId, t.spellKey)],
 );
-export const championSpellsRelations = relations(
-	LEAGUE_CHAMPION_SPELLS_TABLE,
-	({ one }) => ({
-		champion: one(LEAGUE_CHAMPIONS_TABLE, {
-			fields: [LEAGUE_CHAMPION_SPELLS_TABLE.championId],
-			references: [LEAGUE_CHAMPIONS_TABLE.id],
-		}),
+
+export const championRelations = defineRelations(
+	{
+		LEAGUE_CHAMPIONS_TABLE,
+		LEAGUE_CHAMPION_PASSIVES_TABLE,
+		LEAGUE_CHAMPION_PLAYSTYLES_TABLE,
+		LEAGUE_CHAMPION_SKINS_TABLE,
+		LEAGUE_CHAMPION_SPELLS_TABLE,
+		LEAGUE_CHAMPION_TACTICAL_INFO_TABLE,
+	},
+	(r) => ({
+		LEAGUE_CHAMPIONS_TABLE: {
+			passives: r.many.LEAGUE_CHAMPION_PASSIVES_TABLE({
+				from: r.LEAGUE_CHAMPIONS_TABLE.id,
+				to: r.LEAGUE_CHAMPION_PASSIVES_TABLE.championId,
+			}),
+			playstyle: r.one.LEAGUE_CHAMPION_PLAYSTYLES_TABLE({
+				from: r.LEAGUE_CHAMPIONS_TABLE.id,
+				to: r.LEAGUE_CHAMPION_PLAYSTYLES_TABLE.championId,
+			}),
+			skins: r.many.LEAGUE_CHAMPION_SKINS_TABLE({
+				from: r.LEAGUE_CHAMPIONS_TABLE.id,
+				to: r.LEAGUE_CHAMPION_SKINS_TABLE.championId,
+			}),
+			spells: r.many.LEAGUE_CHAMPION_SPELLS_TABLE({
+				from: r.LEAGUE_CHAMPIONS_TABLE.id,
+				to: r.LEAGUE_CHAMPION_SPELLS_TABLE.championId,
+			}),
+			tacticalInfo: r.one.LEAGUE_CHAMPION_TACTICAL_INFO_TABLE({
+				from: r.LEAGUE_CHAMPIONS_TABLE.id,
+				to: r.LEAGUE_CHAMPION_TACTICAL_INFO_TABLE.championId,
+			}),
+		},
 	}),
 );

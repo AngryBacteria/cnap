@@ -63,7 +63,9 @@ export const lolRouter = router({
 	getChampionById: loggedProcedure.input(z.number()).query(async (opts) => {
 		const [champion, error] = await to(
 			db.query.LEAGUE_CHAMPIONS_TABLE.findFirst({
-				where: (champion, { eq }) => eq(champion.id, opts.input),
+				where: {
+					id: opts.input,
+				},
 				with: {
 					playstyle: true,
 					tacticalInfo: true,
@@ -372,11 +374,10 @@ export const lolRouter = router({
 		.query(async (opts) => {
 			const [summoner, error] = await to(
 				db.query.LEAGUE_SUMMONERS_TABLE.findFirst({
-					where: (summoner, { eq, and }) =>
-						and(
-							eq(summoner.gameName, opts.input.gameName),
-							eq(summoner.tagLine, opts.input.tagLine),
-						),
+					where: {
+						gameName: opts.input.gameName,
+						tagLine: opts.input.tagLine,
+					},
 				}),
 			);
 
@@ -428,11 +429,10 @@ export const lolRouter = router({
 		.query(async (opts) => {
 			const [summoner, _] = await to(
 				db.query.LEAGUE_SUMMONERS_TABLE.findFirst({
-					where: (summoner, { eq, and }) =>
-						and(
-							eq(summoner.memberGameName, opts.input.gameName),
-							eq(summoner.tagLine, opts.input.tagLine),
-						),
+					where: {
+						memberGameName: opts.input.gameName,
+						tagLine: opts.input.tagLine,
+					},
 				}),
 			);
 			if (!summoner) {

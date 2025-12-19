@@ -1,17 +1,16 @@
-import { getTableColumns, type SQL, sql } from "drizzle-orm";
+import { getColumns, type SQL, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import type { PgTable } from "drizzle-orm/pg-core";
 import { DB_URL } from "../helpers/EnvironmentConfig.js";
 import { to } from "../helpers/General.js";
 import logger from "../helpers/Logger.js";
+import { dbRelations } from "./relations.js";
 import * as schema from "./schemas/index.js";
+import { LEAGUE_CHAMPIONS_TABLE } from "./schemas/index.js";
 
-export const db = drizzle({
-	connection: {
-		connectionString: DB_URL,
-		ssl: false,
-	},
+export const db = drizzle(DB_URL, {
 	schema,
+	relations: dbRelations,
 });
 
 export async function testDBConnection() {
@@ -41,7 +40,7 @@ export const getAllOnConflictColumns = <
 	table: T,
 	excludeColumn: Q,
 ) => {
-	const cls = getTableColumns(table);
+	const cls = getColumns(table);
 
 	return Object.entries(cls).reduce(
 		(acc, [columnKey, column]) => {

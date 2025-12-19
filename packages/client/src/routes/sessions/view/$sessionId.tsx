@@ -66,23 +66,23 @@ function RouteComponent() {
 		characterName?: string;
 		role: string;
 		memberName: string;
-		profilePictureBase64: string | null;
-		profilePictureMimeType: string | null;
+		profilePictureBase64: string | null | undefined;
+		profilePictureMimeType: string | null | undefined;
 	}
 	const playerObjects: PenAndPaperParticipant[] = session.characters.map(
 		(character) => ({
-			characterName: character.character.name,
+			characterName: character.name,
 			role: "Player",
-			memberName: character.character.member.gameName,
-			profilePictureBase64: character.character.member.profilePictureBase64,
-			profilePictureMimeType: character.character.member.profilePictureMimeType,
+			memberName: character?.member?.gameName ?? "Unknown Player",
+			profilePictureBase64: character?.member?.profilePictureBase64,
+			profilePictureMimeType: character?.member?.profilePictureMimeType,
 		}),
 	);
 	const dmObject: PenAndPaperParticipant = {
-		memberName: session.dm.gameName,
+		memberName: session?.dm?.gameName ?? "Unknown DM",
 		role: "Dungeon Master",
-		profilePictureBase64: session.dm.profilePictureBase64,
-		profilePictureMimeType: session.dm.profilePictureMimeType,
+		profilePictureBase64: session?.dm?.profilePictureBase64,
+		profilePictureMimeType: session?.dm?.profilePictureMimeType,
 	};
 	const participants: PenAndPaperParticipant[] = [
 		...playerObjects,

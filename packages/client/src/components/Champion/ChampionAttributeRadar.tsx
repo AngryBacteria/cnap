@@ -9,7 +9,7 @@ interface Props {
 
 export function ChampionAttributeRadar({ champion }: Props) {
 	const chartData = useMemo(() => {
-		const output = Object.entries(champion.playstyle)
+		const output = Object.entries(champion?.playstyle ?? {})
 			.filter(([key]) => key !== "id" && key !== "championId")
 			.map(([key, value]) => {
 				return {
@@ -20,7 +20,7 @@ export function ChampionAttributeRadar({ champion }: Props) {
 
 		output.push({
 			attribute: "difficulty",
-			value: champion.tacticalInfo.difficulty,
+			value: champion?.tacticalInfo?.difficulty ?? 0,
 		});
 
 		return output;

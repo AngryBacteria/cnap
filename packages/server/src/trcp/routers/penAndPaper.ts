@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { z } from "zod/v4";
 import { db } from "../../db/index.js";
 import {
@@ -22,16 +22,14 @@ export const penAndPaperRouter = router({
 					audioFileMimeType: false,
 					audioFileBase64: false,
 				},
-				where: (sessions, { eq }) => eq(sessions.id, opts.input),
+				where: {
+					id: opts.input,
+				},
 				with: {
 					dm: true,
 					characters: {
 						with: {
-							character: {
-								with: {
-									member: true,
-								},
-							},
+							member: true,
 						},
 					},
 				},
@@ -99,16 +97,13 @@ export const penAndPaperRouter = router({
 		.query(async (opts) => {
 			const [sessions, error] = await to(
 				db.query.PEN_AND_PAPER_SESSION_TABLE.findMany({
-					where: (sessions, { eq }) => {
-						const conditions = [eq(sessions.status, "valid")];
-						if (opts.input.campaign) {
-							conditions.push(
-								eq(PEN_AND_PAPER_SESSION_TABLE.campaign, opts.input.campaign),
-							);
-						}
-						return and(...conditions);
+					where: {
+						status: "valid",
+						campaign: opts.input.campaign || undefined,
 					},
-					orderBy: (sessions, { desc }) => [desc(sessions.timestamp)],
+					orderBy: {
+						timestamp: "desc",
+					},
 					columns: {
 						audioFileMimeType: false,
 						audioFileBase64: false,

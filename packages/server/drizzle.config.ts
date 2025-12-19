@@ -4,7 +4,7 @@ import {DB_URL} from "./src/helpers/EnvironmentConfig";
 
 export default defineConfig({
     out: './drizzle',
-    schema: './src/db/schemas/*',
+    schema: './src/db/schemas',
     dialect: 'postgresql',
     schemaFilter: ["public", "league", "pnp", "core"],
     dbCredentials: {
