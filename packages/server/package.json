@@ -11,7 +11,7 @@
     "test": "vitest run --coverage",
     "build": "tsc",
     "start": "node dist/trcp/routers/_app.js",
-    "db:push": "set NODE_OPTIONS=--import tsx && drizzle-kit push",
+    "db:push": "tsx node_modules/drizzle-kit/bin.cjs push --verbose --strict",
     "cleanup": "rimraf dist && rimraf node_modules"
   },
   "dependencies": {
