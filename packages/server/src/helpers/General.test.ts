@@ -1,5 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { difference, to, URLToBase64 } from "./General.js";
+import {
+	createAdminPassword,
+	difference,
+	to,
+	URLToBase64,
+	verifyAdminPassword,
+} from "./General.js";
 
 describe("difference", () => {
 	it("returns items in list1 not in list2", () => {
@@ -93,5 +99,30 @@ describe("URLToBase64", () => {
 		await expect(URLToBase64("https://example.com/no-mime")).rejects.toThrow(
 			"Could not determine MIME type",
 		);
+	});
+});
+
+describe("Password Utilities", () => {
+	describe("createAdminPassword", () => {
+		it("should return a salt and hash as base64 strings", () => {
+			const password = "mySecurePassword";
+			const result = createAdminPassword(password);
+
+			expect(result).toHaveProperty("salt");
+			expect(result).toHaveProperty("hash");
+			expect(typeof result.salt).toBe("string");
+			expect(typeof result.hash).toBe("string");
+
+			expect(() => Buffer.from(result.salt, "base64")).not.toThrow();
+			expect(() => Buffer.from(result.hash, "base64")).not.toThrow();
+		});
+
+		it("should generate a unique salt for every call", () => {
+			const res1 = createAdminPassword("password");
+			const res2 = createAdminPassword("password");
+
+			expect(res1.salt).not.toBe(res2.salt);
+			expect(res1.hash).not.toBe(res2.hash);
+		});
 	});
 });

@@ -51,39 +51,3 @@ export const getAllOnConflictColumns = <
 		{} as Record<string, SQL>,
 	);
 };
-
-export type MissingParticipant = {
-	matchId: string;
-	puuid: string;
-};
-
-export async function getMissingMatchParticipants() {
-	const query = sql`
-		SELECT DISTINCT
-			m."matchId",
-			(p ->> 'puuid') AS puuid
-		FROM
-			league.matches AS m,
-			jsonb_array_elements(m.raw -> 'info' -> 'participants') AS p
-		WHERE (p ->> 'puuid') <> 'BOT' AND NOT EXISTS (
-			SELECT 1
-			FROM league.match_participants AS mp
-			WHERE mp."matchId" = m."matchId" AND mp.puuid = (p ->> 'puuid')
-		);
-	`;
-
-	const [result, error] = await to(db.execute(query));
-	if (error) {
-		logger.error(
-			{ err: error },
-			"getMissingParticipants: Error executing query to find missing Match Participants",
-		);
-		return [];
-	}
-
-	logger.debug(
-		{ missingAmount: result.rows.length },
-		"getMissingParticipants: Query executed successfully",
-	);
-	return result.rows as MissingParticipant[];
-}
