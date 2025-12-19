@@ -6,7 +6,6 @@ import { to } from "../helpers/General.js";
 import logger from "../helpers/Logger.js";
 import { dbRelations } from "./relations.js";
 import * as schema from "./schemas/index.js";
-import { LEAGUE_CHAMPIONS_TABLE } from "./schemas/index.js";
 
 export const db = drizzle(DB_URL, {
 	schema,
