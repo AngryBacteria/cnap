@@ -1,11 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import {
-	createAdminPassword,
-	difference,
-	to,
-	URLToBase64,
-	verifyAdminPassword,
-} from "./General.js";
+import { createAdminPassword, difference, to, URLToBase64 } from "./General.js";
 
 describe("difference", () => {
 	it("returns items in list1 not in list2", () => {

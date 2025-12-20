@@ -6,7 +6,6 @@
   "main": "dist/trcp/routers/_app.js",
   "scripts": {
     "dev": "tsx watch src/trcp/routers/_app.ts | pino-pretty",
-    "biome": "biome check --write ./src/",
     "type-check": "tsc --noEmit",
     "test": "vitest run --coverage",
     "build": "tsc",
