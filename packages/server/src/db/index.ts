@@ -14,7 +14,7 @@ export const db = drizzle(DB_URL, {
 export async function testDBConnection() {
 	try {
 		const dbResult = await db.query.MEMBERS_TABLE.findFirst();
-		if (dbResult) {
+		if (dbResult && dbResult.gameName.length > 0) {
 			logger.debug("testDBConnection: Connection successful");
 			return true;
 		}

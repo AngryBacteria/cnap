@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import riotHelper from "./RiotHelper.js";
+import riotHelper, { mapAssetPath } from "./RiotHelper.js";
 
 const MATCH_ID = "EUW1_7084514418";
 const PUUID =
@@ -124,5 +124,44 @@ describe("RiotHelper API", () => {
 			const spells = await riotHelper.getSummonerSpells();
 			expect(spells[0]).toBeDefined();
 		});
+	});
+});
+
+describe("mapAssetPath", () => {
+	test("should return an empty string if inputPath is undefined or empty", () => {
+		expect(mapAssetPath()).toBe("");
+		expect(mapAssetPath("")).toBe("");
+	});
+
+	test("should return the original path if it does not start with the prefix", () => {
+		const externalPath = "https://example.com/image.png";
+		const unrelatedPath = "/other-data/assets/test.png";
+
+		expect(mapAssetPath(externalPath)).toBe(externalPath);
+		expect(mapAssetPath(unrelatedPath)).toBe(unrelatedPath);
+	});
+
+	test("should map the asset path to the community dragon URL when the prefix matches", () => {
+		const input = "/lol-game-data/assets/v1/profile-icons/1.jpg";
+		const expected =
+			"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/1.jpg";
+
+		expect(mapAssetPath(input)).toBe(expected);
+	});
+
+	test("should return the entire mapped URL in lowercase", () => {
+		const input = "/lol-game-data/assets/CHAMPION_SKIN.PNG";
+		const expected =
+			"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/champion_skin.png";
+
+		expect(mapAssetPath(input)).toBe(expected);
+	});
+
+	test("should handle paths that only consist of the prefix", () => {
+		const input = "/lol-game-data/assets/";
+		const expected =
+			"https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/";
+
+		expect(mapAssetPath(input)).toBe(expected);
 	});
 });

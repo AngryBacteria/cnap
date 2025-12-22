@@ -16,14 +16,14 @@ export const generalRouter = router({
 	getMembers: loggedProcedure
 		.input(
 			z.object({
-				onlyCore: z.boolean().optional().default(true),
+				onlyCore: z.boolean().nullish(),
 			}),
 		)
 		.query(async (opts) => {
 			const [data, error] = await to(
 				db.query.MEMBERS_TABLE.findMany({
 					where: {
-						core: opts.input.onlyCore ? true : undefined,
+						core: opts.input.onlyCore ?? undefined,
 					},
 					with: {
 						leagueSummoners: true,

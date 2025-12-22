@@ -1,6 +1,6 @@
 import { PgDialect } from "drizzle-orm/pg-core";
-import { describe, expect, it } from "vitest";
-import { getAllOnConflictColumns } from "./index.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { db, getAllOnConflictColumns, testDBConnection } from "./index.js";
 import { LEAGUE_SUMMONERS_TABLE } from "./schemas/Summoner.js";
 
 describe("Index DB", () => {
@@ -54,6 +54,41 @@ describe("Index DB", () => {
 
 			const puuidGenerated = dialect.sqlToQuery(result.puuid);
 			expect(puuidGenerated.sql).toBe('excluded."puuid"');
+		});
+	});
+
+	describe("testDBConnection", () => {
+		beforeEach(() => {
+			vi.restoreAllMocks();
+		});
+
+		it("should return true and log success when data is found", async () => {
+			vi.spyOn(db.query.MEMBERS_TABLE, "findFirst").mockResolvedValueOnce({
+				gameName: "PlayerOne",
+				core: true,
+				punchline: null,
+				profilePictureBase64: null,
+				profilePictureMimeType: null,
+			});
+			const result = await testDBConnection();
+			expect(result).toBe(true);
+		});
+
+		it("should return true and log success when data is found", async () => {
+			vi.spyOn(db.query.MEMBERS_TABLE, "findFirst").mockResolvedValueOnce(
+				undefined,
+			);
+			const result = await testDBConnection();
+			expect(result).toBe(false);
+		});
+
+		it("should return true and log success when data is found", async () => {
+			const error = new Error("Database connection error");
+			vi.spyOn(db.query.MEMBERS_TABLE, "findFirst").mockRejectedValueOnce(
+				error,
+			);
+			const result = await testDBConnection();
+			expect(result).toBe(false);
 		});
 	});
 });

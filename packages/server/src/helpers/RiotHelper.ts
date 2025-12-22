@@ -31,10 +31,7 @@ import logger from "./Logger.js";
 /**
  * Maps an asset path to the correct URL for the Community Dragon CDN.
  */
-export function mapAssetPath(
-	inputPath?: string,
-	plugin = "rcp-be-lol-game-data",
-): string {
+export function mapAssetPath(inputPath?: string): string {
 	const prefix = "/lol-game-data/assets/";
 
 	if (!inputPath) {
@@ -46,7 +43,7 @@ export function mapAssetPath(
 	}
 
 	const assetPath = inputPath.substring(prefix.length);
-	return `https://raw.communitydragon.org/latest/plugins/${plugin}/global/default/${assetPath}`.toLowerCase();
+	return `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/${assetPath}`.toLowerCase();
 }
 
 export class RiotHelper {
