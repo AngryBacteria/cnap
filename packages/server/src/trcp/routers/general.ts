@@ -20,10 +20,12 @@ export const generalRouter = router({
 			}),
 		)
 		.query(async (opts) => {
+			const onlyCoreFilter = opts.input.onlyCore ? { core: true } : {};
+
 			const [data, error] = await to(
 				db.query.MEMBERS_TABLE.findMany({
 					where: {
-						core: opts.input.onlyCore ?? undefined,
+						...onlyCoreFilter,
 					},
 					with: {
 						leagueSummoners: true,

@@ -51,7 +51,7 @@ describe("getMembers", () => {
 		expect(result).toEqual([mockMemberCore, mockMemberNonCore]);
 	});
 
-	test("should return members when onlyCore=false", async () => {
+	test("should return all members when onlyCore=false", async () => {
 		vi.spyOn(db.query.MEMBERS_TABLE, "findMany").mockResolvedValueOnce([
 			mockMemberNonCore,
 		]);
@@ -60,13 +60,13 @@ describe("getMembers", () => {
 
 		expect(db.query.MEMBERS_TABLE.findMany).toHaveBeenCalledWith(
 			expect.objectContaining({
-				where: { core: false },
+				where: {},
 			}),
 		);
 		expect(result).toEqual([mockMemberNonCore]);
 	});
 
-	test("should return members when onlyCore=true", async () => {
+	test("should return only core members when onlyCore=true", async () => {
 		vi.spyOn(db.query.MEMBERS_TABLE, "findMany").mockResolvedValueOnce([
 			mockMemberCore,
 		]);
