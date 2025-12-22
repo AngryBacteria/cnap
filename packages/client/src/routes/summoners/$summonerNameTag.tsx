@@ -3,6 +3,7 @@ import { IconAlertSquareRounded } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { ChampionIdSelector } from "../../components/Match/ChampionIdSelector.tsx";
+import { LaneSelector } from "../../components/Match/LaneSelector.tsx";
 import { MatchBannerSummaryLoader } from "../../components/Match/MatchBannerSummaryLoader.tsx";
 import { QueueIdSelector } from "../../components/Match/QueueIdSelector.tsx";
 import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts";
@@ -20,6 +21,7 @@ function SummonerPage() {
 	const [selectedChampionId, setSelectedChampionId] = useState<string | null>(
 		null,
 	);
+	const [selectedLane, setSelectedLane] = useState<string | null>(null);
 
 	const gameName = summonerNameTag.split("-")[0];
 	const tagLine = summonerNameTag.split("-")[1];
@@ -34,6 +36,7 @@ function SummonerPage() {
 			queueId: Number(selectedQueueId),
 			gameName,
 			tagLine,
+			lane: selectedLane || undefined,
 		},
 		true,
 	);
@@ -79,6 +82,10 @@ function SummonerPage() {
 					selectedChampionId={selectedChampionId}
 					setSelectedChampionId={setSelectedChampionId}
 				/>
+				<LaneSelector
+					selectedLane={selectedLane}
+					setSelectedLane={setSelectedLane}
+				/>
 			</Flex>
 
 			<MatchBannerSummaryLoader
@@ -88,6 +95,7 @@ function SummonerPage() {
 				setPage={setPage}
 				queueId={Number(selectedQueueId)}
 				championId={Number(selectedChampionId)}
+				lane={selectedLane || undefined}
 			/>
 		</Flex>
 	);

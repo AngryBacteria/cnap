@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { and, count, desc, eq, isNotNull, sql, sum } from "drizzle-orm";
+import { and, count, desc, eq, sql, sum } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { z } from "zod/v4";
 import { db } from "../../db/index.js";
@@ -113,18 +113,11 @@ export const lolRouter = router({
 				queueId: z.number().optional(),
 				gameName: z.string().optional(),
 				tagLine: z.string().optional(),
-				onlySummonersInDb: z.boolean().default(true),
+				lane: z.string().optional(),
 			}),
 		)
 		.query(async (opts) => {
-			const {
-				page,
-				championId,
-				queueId,
-				gameName,
-				tagLine,
-				onlySummonersInDb,
-			} = opts.input;
+			const { page, championId, queueId, gameName, tagLine, lane } = opts.input;
 
 			const PAGE_SIZE = 20;
 			const currentPage = Math.max(1, page);
@@ -139,7 +132,9 @@ export const lolRouter = router({
 				queueId
 					? eq(LEAGUE_MATCH_PARTICIPANTS_TABLE.queueId, queueId)
 					: undefined,
-				onlySummonersInDb ? isNotNull(LEAGUE_SUMMONERS_TABLE.puuid) : undefined,
+				lane
+					? eq(LEAGUE_MATCH_PARTICIPANTS_TABLE.teamPosition, lane)
+					: undefined,
 			);
 
 			const [countResult, countError] = await to(

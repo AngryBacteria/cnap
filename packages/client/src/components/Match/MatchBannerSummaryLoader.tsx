@@ -11,6 +11,7 @@ export interface Props {
 	gameName?: string;
 	tagLine?: string;
 	queueId?: number;
+	lane?: string;
 }
 
 export function MatchBannerSummaryLoader({
@@ -20,6 +21,7 @@ export function MatchBannerSummaryLoader({
 	page,
 	setPage,
 	queueId,
+	lane,
 }: Props) {
 	const matchesParticipantQuery = useMatchesParticipant({
 		page,
@@ -27,9 +29,13 @@ export function MatchBannerSummaryLoader({
 		gameName,
 		tagLine,
 		queueId,
+		lane,
 	});
 
-	if (matchesParticipantQuery.status === "pending") {
+	if (
+		matchesParticipantQuery.status === "pending" &&
+		!matchesParticipantQuery.data
+	) {
 		return <Loader color={PRIMARY_COLOR} />;
 	}
 
