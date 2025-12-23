@@ -5,11 +5,13 @@ import { useChampions } from "../../hooks/api/useChampions.ts";
 interface Props {
 	selectedChampionId: string | null;
 	setSelectedChampionId: (queue: string | null) => void;
+	disabled?: boolean;
 }
 
 export function ChampionIdSelector({
 	selectedChampionId,
 	setSelectedChampionId,
+	disabled,
 }: Props) {
 	const championsQuery = useChampions();
 	const formattedChampions = useMemo(() => {
@@ -30,11 +32,9 @@ export function ChampionIdSelector({
 
 	return (
 		<Select
-			maw={400}
 			clearable
 			searchable
-			placeholder={championsQuery.isLoading ? "Loading..." : undefined}
-			disabled={championsQuery.isLoading}
+			disabled={championsQuery.isLoading || disabled}
 			data={formattedChampions}
 			value={selectedChampionId}
 			onChange={setSelectedChampionId}

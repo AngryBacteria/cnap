@@ -1,12 +1,10 @@
 import { Alert, Flex, Loader, Title } from "@mantine/core";
 import { IconAlertSquareRounded } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
 import { ChampionAbilitiesTabs } from "../../components/Champion/ChampionAbilities/ChampionAbilitiesTabs.tsx";
 import { ChampionHeader } from "../../components/Champion/ChampionHeader.tsx";
 import { ChampionSkins } from "../../components/Champion/ChampionSkins/ChampionSkins.tsx";
 import { MatchBannerSummaryLoader } from "../../components/Match/MatchBannerSummaryLoader.tsx";
-import { QueueIdSelector } from "../../components/Match/QueueIdSelector.tsx";
 import { useChampion } from "../../hooks/api/useChampion.ts";
 
 export const Route = createFileRoute("/champions/$championId")({
@@ -15,8 +13,6 @@ export const Route = createFileRoute("/champions/$championId")({
 
 function ChampionPage() {
 	const { championId } = Route.useParams();
-	const [page, setPage] = useState<number>(1);
-	const [selectedQueueId, setSelectedQueueId] = useState<string | null>(null);
 
 	// Fetch champion
 	const query = useChampion(Number(championId));
@@ -56,17 +52,7 @@ function ChampionPage() {
 
 			<Title order={2}>Matches from CnAP Players on this champion</Title>
 
-			<QueueIdSelector
-				selectedQueueId={selectedQueueId}
-				setSelectedQueueId={setSelectedQueueId}
-			/>
-
-			<MatchBannerSummaryLoader
-				championId={query.data.id}
-				page={page}
-				setPage={setPage}
-				queueId={Number(selectedQueueId)}
-			/>
+			<MatchBannerSummaryLoader championIdOverride={query.data.id} />
 		</Flex>
 	);
 }

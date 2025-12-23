@@ -1,46 +1,49 @@
-import { Alert, Flex, Loader, Pagination } from "@mantine/core";
+import { Alert, Box, Flex, Loader, Pagination } from "@mantine/core";
 import { IconAlertSquareRounded } from "@tabler/icons-react";
+import { type JSX, useState } from "react";
 import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts";
 import { PRIMARY_COLOR } from "../../main.tsx";
+import { ChampionIdSelector } from "./ChampionIdSelector.tsx";
+import { LaneSelector } from "./LaneSelector.tsx";
 import { MatchBannerSummary } from "./MatchBannerSummary/MatchBannerSummary";
+import { QueueIdSelector } from "./QueueIdSelector.tsx";
 
 export interface Props {
-	page: number;
-	setPage: (page: number) => void;
-	championId?: number;
 	gameName?: string;
 	tagLine?: string;
-	queueId?: number;
-	lane?: string;
+	championIdOverride?: number;
 }
 
 export function MatchBannerSummaryLoader({
-	championId,
 	gameName,
 	tagLine,
-	page,
-	setPage,
-	queueId,
-	lane,
+	championIdOverride,
 }: Props) {
+	const [selectedQueueId, setSelectedQueueId] = useState<string | null>(null);
+	const [selectedChampionId, setSelectedChampionId] = useState<string | null>(
+		null,
+	);
+	const [selectedLane, setSelectedLane] = useState<string | null>(null);
+
+	const [page, setPage] = useState<number>(1);
+
 	const matchesParticipantQuery = useMatchesParticipant({
 		page,
-		championId,
 		gameName,
 		tagLine,
-		queueId,
-		lane,
+		queueId: selectedQueueId ? Number(selectedQueueId) : undefined,
+		championId: selectedChampionId
+			? Number(selectedChampionId)
+			: championIdOverride,
+		lane: selectedLane || undefined,
 	});
+	const isLoading = matchesParticipantQuery.isLoading;
 
-	if (
-		matchesParticipantQuery.status === "pending" &&
-		!matchesParticipantQuery.data
-	) {
-		return <Loader color={PRIMARY_COLOR} />;
-	}
-
-	if (matchesParticipantQuery.status === "error") {
-		return (
+	let mainContent: JSX.Element = <></>;
+	if (matchesParticipantQuery.status === "pending") {
+		mainContent = <Loader color={PRIMARY_COLOR} />;
+	} else if (matchesParticipantQuery.status === "error") {
+		mainContent = (
 			<Alert
 				title={"Fehler beim Laden der Matches"}
 				variant={"light"}
@@ -51,21 +54,50 @@ export function MatchBannerSummaryLoader({
 				nochmal.
 			</Alert>
 		);
+	} else {
+		mainContent = (
+			<Flex direction={"column"} gap={"md"}>
+				{matchesParticipantQuery.data.data.map((match) => (
+					<MatchBannerSummary key={match.participant.matchId} match={match} />
+				))}
+				<Pagination
+					total={matchesParticipantQuery.data.pagination.totalPages}
+					value={page}
+					onChange={setPage}
+					disabled={isLoading}
+				/>
+			</Flex>
+		);
 	}
 
 	return (
 		<Flex direction={"column"} gap={"md"}>
-			{matchesParticipantQuery.data.data.map((match) => (
-				<MatchBannerSummary
-					key={`${match.participant.matchId} - ${match.participant.matchId}`}
-					match={match}
-				/>
-			))}
-			<Pagination
-				total={matchesParticipantQuery.data.pagination.totalPages}
-				value={page}
-				onChange={setPage}
-			/>
+			<Flex direction={{ base: "column", sm: "row" }} gap="md">
+				<Box style={{ flex: 1 }}>
+					<QueueIdSelector
+						selectedQueueId={selectedQueueId}
+						setSelectedQueueId={setSelectedQueueId}
+						disabled={isLoading}
+					/>
+				</Box>
+				{championIdOverride === undefined && (
+					<Box style={{ flex: 1 }}>
+						<ChampionIdSelector
+							selectedChampionId={selectedChampionId}
+							setSelectedChampionId={setSelectedChampionId}
+							disabled={isLoading}
+						/>
+					</Box>
+				)}
+				<Box style={{ flex: 1 }}>
+					<LaneSelector
+						selectedLane={selectedLane}
+						setSelectedLane={setSelectedLane}
+						disabled={isLoading}
+					/>
+				</Box>
+			</Flex>
+			{mainContent}
 		</Flex>
 	);
 }

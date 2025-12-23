@@ -1,12 +1,18 @@
-import { Alert, Flex, Loader, Title } from "@mantine/core";
+import {
+	Alert,
+	Avatar,
+	Badge,
+	Flex,
+	Group,
+	Loader,
+	Paper,
+	Stack,
+	Text,
+	Title,
+} from "@mantine/core";
 import { IconAlertSquareRounded } from "@tabler/icons-react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { ChampionIdSelector } from "../../components/Match/ChampionIdSelector.tsx";
-import { LaneSelector } from "../../components/Match/LaneSelector.tsx";
 import { MatchBannerSummaryLoader } from "../../components/Match/MatchBannerSummaryLoader.tsx";
-import { QueueIdSelector } from "../../components/Match/QueueIdSelector.tsx";
-import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts";
 import { useSummoner } from "../../hooks/api/useSummoner.ts";
 
 export const Route = createFileRoute("/summoners/$summonerNameTag")({
@@ -15,31 +21,13 @@ export const Route = createFileRoute("/summoners/$summonerNameTag")({
 
 function SummonerPage() {
 	const { summonerNameTag } = Route.useParams();
-	const [page, setPage] = useState<number>(1);
-
-	const [selectedQueueId, setSelectedQueueId] = useState<string | null>(null);
-	const [selectedChampionId, setSelectedChampionId] = useState<string | null>(
-		null,
-	);
-	const [selectedLane, setSelectedLane] = useState<string | null>(null);
 
 	const gameName = summonerNameTag.split("-")[0];
 	const tagLine = summonerNameTag.split("-")[1];
 
 	const summonerQuery = useSummoner({ gameName, tagLine });
 
-	// Preloading
-	useMatchesParticipant(
-		{
-			page,
-			championId: Number(selectedChampionId),
-			queueId: Number(selectedQueueId),
-			gameName,
-			tagLine,
-			lane: selectedLane || undefined,
-		},
-		true,
-	);
+	const iconUrl = `https://ddragon.leagueoflegends.com/cdn/14.24.1/img/profileicon/${summonerQuery.data?.profileIconId}.png`;
 
 	if (summonerQuery.status === "pending") {
 		return (
@@ -68,35 +56,32 @@ function SummonerPage() {
 		);
 	}
 
-	//TODO name not correct
 	return (
 		<Flex direction={"column"} gap={"md"}>
-			<Title order={2}>Matches from {summonerQuery.data.gameName}</Title>
+			<Paper withBorder p="sm" radius="md" shadow="sm">
+				<Flex align={"center"} gap={"md"} wrap={"wrap"}>
+					<Avatar src={iconUrl} size={100} radius="md" />
 
-			<Flex direction={"row"} gap={"md"} wrap={"wrap"}>
-				<QueueIdSelector
-					selectedQueueId={selectedQueueId}
-					setSelectedQueueId={setSelectedQueueId}
-				/>
-				<ChampionIdSelector
-					selectedChampionId={selectedChampionId}
-					setSelectedChampionId={setSelectedChampionId}
-				/>
-				<LaneSelector
-					selectedLane={selectedLane}
-					setSelectedLane={setSelectedLane}
-				/>
-			</Flex>
+					<Stack gap={0}>
+						<Flex gap="xs" align="baseline" wrap={"wrap"}>
+							<Title order={1} style={{ textOverflow: "ellipsis" }}>
+								{summonerQuery.data.gameName}
+							</Title>
+							<Text c="dimmed" size="xl" fw={700}>
+								#{summonerQuery.data.tagLine}
+							</Text>
+						</Flex>
 
-			<MatchBannerSummaryLoader
-				gameName={gameName}
-				tagLine={tagLine}
-				page={page}
-				setPage={setPage}
-				queueId={Number(selectedQueueId)}
-				championId={Number(selectedChampionId)}
-				lane={selectedLane || undefined}
-			/>
+						<Group gap="xs" mt="sm">
+							<Badge variant="light" color="blue">
+								Summoner Level {summonerQuery.data.summonerLevel}
+							</Badge>
+						</Group>
+					</Stack>
+				</Flex>
+			</Paper>
+
+			<MatchBannerSummaryLoader gameName={gameName} tagLine={tagLine} />
 		</Flex>
 	);
 }

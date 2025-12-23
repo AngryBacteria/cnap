@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { type Inputs, trpc } from "../../utils/trcp.ts";
 
 export const useMatchesParticipant = (
@@ -8,7 +8,10 @@ export const useMatchesParticipant = (
 	const options = prefetchOnly
 		? trpc.lol.getMatchesParticipant.queryOptions(queryParams, {
 				notifyOnChangeProps: [],
+				placeholderData: keepPreviousData,
 			})
-		: trpc.lol.getMatchesParticipant.queryOptions(queryParams);
+		: trpc.lol.getMatchesParticipant.queryOptions(queryParams, {
+				placeholderData: keepPreviousData,
+			});
 	return useQuery(options);
 };

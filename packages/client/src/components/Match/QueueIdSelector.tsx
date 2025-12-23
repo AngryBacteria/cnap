@@ -5,11 +5,13 @@ import { useQueues } from "../../hooks/api/useQueues.ts";
 interface Props {
 	selectedQueueId: string | null;
 	setSelectedQueueId: (queue: string | null) => void;
+	disabled?: boolean;
 }
 
 export function QueueIdSelector({
 	selectedQueueId,
 	setSelectedQueueId,
+	disabled,
 }: Props) {
 	const queuesQuery = useQueues();
 	const formattedQueues = useMemo(() => {
@@ -33,11 +35,9 @@ export function QueueIdSelector({
 
 	return (
 		<Select
-			maw={400}
 			clearable
 			searchable
-			placeholder={queuesQuery.isLoading ? "Loading..." : undefined}
-			disabled={queuesQuery.isLoading}
+			disabled={queuesQuery.isLoading || disabled}
 			data={formattedQueues}
 			value={selectedQueueId}
 			onChange={setSelectedQueueId}

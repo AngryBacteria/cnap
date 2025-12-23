@@ -447,44 +447,22 @@ export const lolRouter = router({
 					.select({
 						teamPosition: LEAGUE_MATCH_PARTICIPANTS_TABLE.teamPosition,
 						championName: LEAGUE_CHAMPIONS_TABLE.name,
-						queueName: LEAGUE_QUEUES_TABLE.description,
 
 						games: gamesCount,
 						wins: winCount,
 
-						secondsPlayed: sum(
-							LEAGUE_MATCH_PARTICIPANTS_TABLE.gameDuration,
-						).mapWith(Number),
-						kills: sum(LEAGUE_MATCH_PARTICIPANTS_TABLE.kills).mapWith(Number),
-						deaths: sum(LEAGUE_MATCH_PARTICIPANTS_TABLE.deaths).mapWith(Number),
-						assists: sum(LEAGUE_MATCH_PARTICIPANTS_TABLE.assists).mapWith(
-							Number,
-						),
-						doubleKills: sum(
-							LEAGUE_MATCH_PARTICIPANTS_TABLE.doubleKills,
-						).mapWith(Number),
-						tripleKills: sum(
-							LEAGUE_MATCH_PARTICIPANTS_TABLE.tripleKills,
-						).mapWith(Number),
-						quadraKills: sum(
-							LEAGUE_MATCH_PARTICIPANTS_TABLE.quadraKills,
-						).mapWith(Number),
-						pentaKills: sum(LEAGUE_MATCH_PARTICIPANTS_TABLE.pentaKills).mapWith(
-							Number,
-						),
-						totalVisionScore: sum(
-							LEAGUE_MATCH_PARTICIPANTS_TABLE.visionScore,
-						).mapWith(Number),
+						secondsPlayed: sum(LEAGUE_MATCH_PARTICIPANTS_TABLE.gameDuration),
+						kills: sum(LEAGUE_MATCH_PARTICIPANTS_TABLE.kills),
+						deaths: sum(LEAGUE_MATCH_PARTICIPANTS_TABLE.deaths),
+						assists: sum(LEAGUE_MATCH_PARTICIPANTS_TABLE.assists),
+						doubleKills: sum(LEAGUE_MATCH_PARTICIPANTS_TABLE.doubleKills),
+						tripleKills: sum(LEAGUE_MATCH_PARTICIPANTS_TABLE.tripleKills),
+						quadraKills: sum(LEAGUE_MATCH_PARTICIPANTS_TABLE.quadraKills),
+						pentaKills: sum(LEAGUE_MATCH_PARTICIPANTS_TABLE.pentaKills),
+						totalVisionScore: sum(LEAGUE_MATCH_PARTICIPANTS_TABLE.visionScore),
 					})
 					.from(LEAGUE_MATCH_PARTICIPANTS_TABLE)
-					.leftJoin(
-						LEAGUE_QUEUES_TABLE,
-						eq(
-							LEAGUE_MATCH_PARTICIPANTS_TABLE.queueId,
-							LEAGUE_QUEUES_TABLE.queueId,
-						),
-					)
-					.leftJoin(
+					.innerJoin(
 						LEAGUE_CHAMPIONS_TABLE,
 						eq(
 							LEAGUE_MATCH_PARTICIPANTS_TABLE.championId,
@@ -494,7 +472,6 @@ export const lolRouter = router({
 					.where(eq(LEAGUE_MATCH_PARTICIPANTS_TABLE.puuid, summoner.puuid))
 					.groupBy(
 						LEAGUE_MATCH_PARTICIPANTS_TABLE.teamPosition,
-						LEAGUE_QUEUES_TABLE.description,
 						LEAGUE_CHAMPIONS_TABLE.name,
 					)
 					.orderBy(desc(gamesCount)),

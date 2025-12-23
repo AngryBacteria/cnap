@@ -1,9 +1,11 @@
+import { sql } from "drizzle-orm";
 import {
 	bigint,
 	boolean,
 	index,
 	integer,
 	jsonb,
+	timestamp,
 	uniqueIndex,
 	varchar,
 } from "drizzle-orm/pg-core";
@@ -41,6 +43,10 @@ export const LEAGUE_MATCH_PARTICIPANTS_TABLE = LEAGUE_SCHEMA.table(
 		gameDuration: integer().notNull(),
 		endOfGameResult: varchar(),
 		gameCreation: bigint({ mode: "number" }).notNull(),
+		gameCreationTimestamp: timestamp({
+			withTimezone: true,
+			mode: "date",
+		}).generatedAlwaysAs(sql`to_timestamp(game_creation / 1000.0)`),
 		gameType: varchar().notNull(),
 		gameVersion: varchar().notNull(),
 		platformId: varchar().notNull(),
