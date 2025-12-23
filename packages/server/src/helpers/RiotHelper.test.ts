@@ -14,12 +14,9 @@ describe("RiotHelper API", () => {
 		expect(isConnected).toBeTruthy();
 	});
 
-	test("Match and Timeline Schemas are correct", async () => {
-		const match = await riotHelper.getMatch(MATCH_ID);
+	test("Match Schemas are correct", async () => {
+		const match = await riotHelper.getMatch(MATCH_ID, false);
 		expect(match).toBeDefined();
-
-		const timeline = await riotHelper.getTimeline(MATCH_ID);
-		expect(timeline).toBeDefined();
 	});
 
 	describe("getMatchList", () => {

@@ -1,5 +1,6 @@
 import { RateLimiter } from "limiter";
 import { z } from "zod/v4";
+import { db } from "../db/index.js";
 import { type AccountDB, AccountDBSchema } from "../model/Account.js";
 import {
 	type ChampionDB,
@@ -10,7 +11,7 @@ import { type GameModeDB, GameModeDBSchema } from "../model/GameMode.js";
 import { type GameTypeDB, GameTypeDBSchema } from "../model/GameType.js";
 import { type ItemDB, ItemDBSchema } from "../model/Item.js";
 import { type LeagueMapDB, LeagueMapDBSchema } from "../model/LeagueMap.js";
-import type { MatchV5DB } from "../model/MatchV5.js";
+import { MatchSchema, type MatchV5DB } from "../model/MatchV5.js";
 import { type QueueDB, QueueDBSchema } from "../model/Queue.js";
 import {
 	type SummonerDb,
@@ -26,6 +27,7 @@ import {
 	SummonerSpellDBSchema,
 } from "../model/SummonerSpell.js";
 import { RIOT_API_KEY } from "./EnvironmentConfig.js";
+import { to } from "./General.js";
 import logger from "./Logger.js";
 
 /**
@@ -141,36 +143,47 @@ export class RiotHelper {
 	 * @param matchId The match id of the match to fetch
 	 * @returns Dict representation of the match
 	 */
-	async getMatch(matchId: string): Promise<MatchV5DB | undefined> {
+	async getMatch(
+		matchId: string,
+		useCache = true,
+	): Promise<MatchV5DB | undefined> {
 		try {
+			if (useCache) {
+				const [dbResult, _] = await to(
+					db.query.LEAGUE_MATCHES_TABLE.findFirst({
+						where: {
+							matchId: matchId,
+						},
+					}),
+				);
+				if (dbResult) {
+					const parsed = MatchSchema.safeParse(dbResult.raw);
+					if (parsed.success) {
+						logger.debug(
+							{ matchId },
+							"RiotHelper:getMatch - match fetched from db",
+						);
+						return parsed.data;
+					} else {
+						logger.warn(
+							{ matchId, zodError: parsed.error.issues },
+							"RiotHelper:getMatch - match in db failed schema validation",
+						);
+					}
+				}
+			}
+
 			const url = `https://europe.api.riotgames.com/lol/match/v5/matches/${matchId}`;
-			const match = await this.makeRequest(url);
-			logger.debug({ matchId }, "RiotHelper:getMatch - match fetched");
-			return match as MatchV5DB;
+			const match = await this.makeRequest(url, MatchSchema);
+			logger.debug(
+				{ matchId },
+				"RiotHelper:getMatch - match fetched from riot",
+			);
+			return match;
 		} catch (e) {
 			logger.error(
 				{ matchId, err: e },
 				"RiotHelper:getMatch - match fetching failed",
-			);
-			return undefined;
-		}
-	}
-
-	/**
-	 * Fetch a timeline from the Riot-API. No schema validation as data changes quite often.
-	 * @param timelineId The id of the timeline to fetch
-	 * @returns Dict representation of the timeline
-	 */
-	async getTimeline(timelineId: string): Promise<MatchV5DB | undefined> {
-		try {
-			const url = `https://europe.api.riotgames.com/lol/match/v5/matches/${timelineId}/timeline`;
-			const timeline = await this.makeRequest(url);
-			logger.debug({ timelineId }, "RiotHelper:getTimeline - timeline fetched");
-			return timeline as MatchV5DB; //TODO make right;
-		} catch (e) {
-			logger.error(
-				{ timelineId, err: e },
-				"RiotHelper:getTimeline - timeline fetch failed",
 			);
 			return undefined;
 		}

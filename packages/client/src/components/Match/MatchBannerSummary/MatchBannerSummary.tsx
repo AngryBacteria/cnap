@@ -32,6 +32,7 @@ export function MatchBannerSummary({ match }: Props) {
 			padding={"xs"}
 			className={participant.win ? styles.wonCard : styles.lostCard}
 		>
+			r
 			<Card.Section withBorder inheritPadding py="4px">
 				<Flex direction={"row"} gap={"md"}>
 					<Text>
@@ -44,7 +45,6 @@ export function MatchBannerSummary({ match }: Props) {
 					<Text c="dimmed">{formattedGameDuration}</Text>
 				</Flex>
 			</Card.Section>
-
 			<Card.Section withBorder inheritPadding py="4px">
 				<Flex
 					direction={"row"}
