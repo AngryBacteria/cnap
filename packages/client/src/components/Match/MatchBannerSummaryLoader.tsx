@@ -1,4 +1,4 @@
-import { Alert, Box, Flex, Loader, Pagination } from "@mantine/core";
+import { Alert, Box, Flex, Loader, Pagination, Paper } from "@mantine/core";
 import { IconAlertSquareRounded } from "@tabler/icons-react";
 import { type JSX, useState } from "react";
 import { useMatchesParticipant } from "../../hooks/api/useMatchesParticipant.ts";
@@ -72,31 +72,33 @@ export function MatchBannerSummaryLoader({
 
 	return (
 		<Flex direction={"column"} gap={"md"}>
-			<Flex direction={{ base: "column", sm: "row" }} gap="md">
-				<Box style={{ flex: 1 }}>
-					<QueueIdSelector
-						selectedQueueId={selectedQueueId}
-						setSelectedQueueId={setSelectedQueueId}
-						disabled={isLoading}
-					/>
-				</Box>
-				{championIdOverride === undefined && (
+			<Paper withBorder p="sm" radius="md" shadow="sm">
+				<Flex direction={{ base: "column", sm: "row" }} gap="md">
 					<Box style={{ flex: 1 }}>
-						<ChampionIdSelector
-							selectedChampionId={selectedChampionId}
-							setSelectedChampionId={setSelectedChampionId}
+						<QueueIdSelector
+							selectedQueueId={selectedQueueId}
+							setSelectedQueueId={setSelectedQueueId}
 							disabled={isLoading}
 						/>
 					</Box>
-				)}
-				<Box style={{ flex: 1 }}>
-					<LaneSelector
-						selectedLane={selectedLane}
-						setSelectedLane={setSelectedLane}
-						disabled={isLoading}
-					/>
-				</Box>
-			</Flex>
+					{championIdOverride === undefined && (
+						<Box style={{ flex: 1 }}>
+							<ChampionIdSelector
+								selectedChampionId={selectedChampionId}
+								setSelectedChampionId={setSelectedChampionId}
+								disabled={isLoading}
+							/>
+						</Box>
+					)}
+					<Box style={{ flex: 1 }}>
+						<LaneSelector
+							selectedLane={selectedLane}
+							setSelectedLane={setSelectedLane}
+							disabled={isLoading}
+						/>
+					</Box>
+				</Flex>
+			</Paper>
 			{mainContent}
 		</Flex>
 	);

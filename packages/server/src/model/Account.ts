@@ -1,9 +1,9 @@
 import { z } from "zod/v4";
 
-export const AccountDBSchema = z.object({
+export const AccountRiotSchema = z.object({
 	puuid: z.string(),
 	gameName: z.string(),
 	tagLine: z.string(),
 });
 
-export type AccountDB = z.infer<typeof AccountDBSchema>;
+export type AccountRiot = z.infer<typeof AccountRiotSchema>;

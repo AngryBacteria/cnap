@@ -27,7 +27,7 @@ function SummonerPage() {
 
 	const summonerQuery = useSummoner({ gameName, tagLine });
 
-	const iconUrl = `https://ddragon.leagueoflegends.com/cdn/14.24.1/img/profileicon/${summonerQuery.data?.profileIconId}.png`;
+	const iconUrl = `https://raw.communitydragon.org/latest/plugins/rcp-be-lol-game-data/global/default/v1/profile-icons/${summonerQuery.data?.profileIconId}.jpg`;
 
 	if (summonerQuery.status === "pending") {
 		return (

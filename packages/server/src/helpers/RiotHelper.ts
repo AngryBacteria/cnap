@@ -1,7 +1,7 @@
 import { RateLimiter } from "limiter";
 import { z } from "zod/v4";
 import { db } from "../db/index.js";
-import { type AccountDB, AccountDBSchema } from "../model/Account.js";
+import { type AccountRiot, AccountRiotSchema } from "../model/Account.js";
 import {
 	type ChampionDB,
 	ChampionDBSchema,
@@ -220,11 +220,11 @@ export class RiotHelper {
 	async getRiotAccountByTag(
 		name: string,
 		tag: string,
-	): Promise<AccountDB | undefined> {
+	): Promise<AccountRiot | undefined> {
 		try {
 			const properTag = tag.replace("#", "");
 			const url = `https://europe.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${name}/${properTag}`;
-			const account = await this.makeRequest(url, AccountDBSchema);
+			const account = await this.makeRequest(url, AccountRiotSchema);
 			logger.debug(
 				{ name, tag },
 				"RiotHelper:getRiotAccountByTag - fetched riot account",
@@ -244,10 +244,10 @@ export class RiotHelper {
 	 * @param puuid The puuid of the account
 	 * @returns AccountDTO object
 	 */
-	async getRiotAccountByPuuid(puuid: string): Promise<AccountDB | undefined> {
+	async getRiotAccountByPuuid(puuid: string): Promise<AccountRiot | undefined> {
 		try {
 			const url = `https://europe.api.riotgames.com/riot/account/v1/accounts/by-puuid/${puuid}`;
-			const account = await this.makeRequest(url, AccountDBSchema);
+			const account = await this.makeRequest(url, AccountRiotSchema);
 			logger.debug({ puuid }, "RiotHelper:getRiotAccountByPuuid");
 			return account;
 		} catch (e) {
@@ -265,7 +265,7 @@ export class RiotHelper {
 	 */
 	async getSummonerByPuuidRiot(
 		puuid: string,
-		account?: AccountDB | undefined,
+		account?: AccountRiot | undefined,
 	): Promise<SummonerDb | undefined> {
 		try {
 			const url = `https://euw1.api.riotgames.com/lol/summoner/v4/summoners/by-puuid/${puuid}`;
@@ -273,7 +273,7 @@ export class RiotHelper {
 			logger.debug({ puuid }, "RiotHelper:getSummonerByPuuidRiot");
 
 			// check if account provided
-			let properAccount: AccountDB | undefined = account;
+			let properAccount: AccountRiot | undefined = account;
 			if (!account) {
 				properAccount = await this.getRiotAccountByPuuid(summonerRiot.puuid);
 			}

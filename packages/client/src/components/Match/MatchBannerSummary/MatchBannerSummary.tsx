@@ -32,7 +32,6 @@ export function MatchBannerSummary({ match }: Props) {
 			padding={"xs"}
 			className={participant.win ? styles.wonCard : styles.lostCard}
 		>
-			r
 			<Card.Section withBorder inheritPadding py="4px">
 				<Flex direction={"row"} gap={"md"}>
 					<Text>
