@@ -64,9 +64,9 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/champions/$championId': typeof ChampionsChampionIdRoute
   '/summoners/$summonerNameTag': typeof SummonersSummonerNameTagRoute
-  '/champions': typeof ChampionsIndexRoute
-  '/sessions': typeof SessionsIndexRoute
-  '/summoners': typeof SummonersIndexRoute
+  '/champions/': typeof ChampionsIndexRoute
+  '/sessions/': typeof SessionsIndexRoute
+  '/summoners/': typeof SummonersIndexRoute
   '/sessions/edit/$sessionId': typeof SessionsEditSessionIdRoute
   '/sessions/view/$sessionId': typeof SessionsViewSessionIdRoute
 }
@@ -97,9 +97,9 @@ export interface FileRouteTypes {
     | '/'
     | '/champions/$championId'
     | '/summoners/$summonerNameTag'
-    | '/champions'
-    | '/sessions'
-    | '/summoners'
+    | '/champions/'
+    | '/sessions/'
+    | '/summoners/'
     | '/sessions/edit/$sessionId'
     | '/sessions/view/$sessionId'
   fileRoutesByTo: FileRoutesByTo
@@ -147,21 +147,21 @@ declare module '@tanstack/react-router' {
     '/summoners/': {
       id: '/summoners/'
       path: '/summoners'
-      fullPath: '/summoners'
+      fullPath: '/summoners/'
       preLoaderRoute: typeof SummonersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sessions/': {
       id: '/sessions/'
       path: '/sessions'
-      fullPath: '/sessions'
+      fullPath: '/sessions/'
       preLoaderRoute: typeof SessionsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/champions/': {
       id: '/champions/'
       path: '/champions'
-      fullPath: '/champions'
+      fullPath: '/champions/'
       preLoaderRoute: typeof ChampionsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }

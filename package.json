@@ -20,10 +20,10 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "dotenv": "17.2.3"
+    "dotenv": "17.3.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.3.9",
+    "@biomejs/biome": "2.3.15",
     "concurrently": "9.2.1",
     "husky": "9.1.7",
     "lint-staged": "16.2.7",
