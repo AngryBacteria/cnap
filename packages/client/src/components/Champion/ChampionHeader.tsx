@@ -10,7 +10,7 @@ interface Props {
 export function ChampionHeader({ champion }: Props) {
 	return (
 		<Card shadow={"md"} withBorder>
-			<Grid justify="space-between" gutter={"xs"}>
+			<Grid justify="space-between" gap={"xs"}>
 				<Grid.Col span={{ base: 12, md: 7 }}>
 					<Flex gap={"md"}>
 						<Image

@@ -245,7 +245,7 @@ function SessionEditView({ session, members, characters }: Props) {
 					{getErrorMessage()}
 				</Alert>
 			)}
-			<Grid gutter="md">
+			<Grid gap="md">
 				<Grid.Col span={{ base: 12, md: 6 }}>
 					<Paper
 						shadow="md"

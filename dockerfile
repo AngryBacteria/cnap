@@ -1,7 +1,7 @@
 # -------------------------------
 # Base image
 # -------------------------------
-FROM node:24.13.1-slim AS base
+FROM node:24.15.0-slim AS base
 
 # -------------------------------
 # Builder stage
