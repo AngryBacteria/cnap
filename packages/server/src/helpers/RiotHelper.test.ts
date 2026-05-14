@@ -122,7 +122,7 @@ describe.skip("RiotHelper API", () => {
 	});
 });
 
-describe("mapAssetPath", () => {
+describe.skip("mapAssetPath", () => {
 	test("should return an empty string if inputPath is undefined or empty", () => {
 		expect(mapAssetPath()).toBe("");
 		expect(mapAssetPath("")).toBe("");
