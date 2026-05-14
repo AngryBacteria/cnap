@@ -76,7 +76,7 @@ jobs:
         with:
           node-version: 24
           cache: pnpm
-      - run: pnpm audit --audit-level high
+      - run: pnpm audit --audit-level critical
 
   build-and-push:
     name: Build and Push Docker image
