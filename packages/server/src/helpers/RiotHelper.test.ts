@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test } from "vitest";
 import riotHelper, { mapAssetPath } from "./RiotHelper.js";
 
 const MATCH_ID = "EUW1_7084514418";
@@ -6,6 +6,11 @@ const PUUID =
 	"zk1tF-l0TT1SrT9SbUmofKLT4R2gLKxzhGSyNuuxTCbmjr6dOqTCw1GcYrHoRp5DV2f5M17GMLPEFw";
 const NAME = "AngryBacteria";
 const TAG = "CnAP";
+
+// Riots api has wait limits which we cant respect in tests as they run in parallel
+afterEach(async () => {
+	await new Promise((r) => setTimeout(r, 1200));
+});
 
 describe("RiotHelper API", () => {
 	test("connects to Riot API", async () => {
